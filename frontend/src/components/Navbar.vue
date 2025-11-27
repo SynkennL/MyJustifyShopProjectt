@@ -21,18 +21,18 @@ const toggleDropdown = () => {
       <!-- Logo -->
       <div>
       <RouterLink to="/">
-        <img src="../assets/justifylogo.png" class="object-contain h-40 w-auto mt-3 ml-20 sm:ml-60" />
+        <img src="../assets/justifylogo.png" class="object-contain h-40 w-auto mt-3 ml-20 sm:ml-60 hover:scale-110 transition-transform duration-200" />
       </RouterLink>
       </div>
 
       <!-- Desktop Menu -->
       <ul class="hidden md:flex space-x-8 text-lg items-center">
 
-        <li><RouterLink to="/" class="hover:text-gray-200">Anasayfa</RouterLink></li>
+        <li><RouterLink to="/" class="hover:text-gray-200 font-bold">Anasayfa</RouterLink></li>
 
         <!-- DROPDOWN -->
         <li class="relative">
-          <button @click="toggleDropdown" class="hover:text-gray-200 flex items-center gap-1">
+          <button @click="toggleDropdown" class="hover:text-gray-200 flex items-center font-bold gap-1">
             Kategoriler
             <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2"
                  viewBox="0 0 24 24">
@@ -55,12 +55,12 @@ const toggleDropdown = () => {
           </div>
         </li>
 
-        <li><a href="#" class="hover:text-gray-200">Hakkımızda</a></li>
-        <li><a href="#" class="hover:text-gray-200">İletişim</a></li>
+        <li><RouterLink to="/hakkimizda" class="hover:text-gray-200 font-bold">Hakkımızda</RouterLink></li>
+        <li><RouterLink to="/iletisim" class="hover:text-gray-200 font-bold">İletişim</RouterLink></li>
       </ul>
 
       <!-- Mobile Menu Button -->
-      <button @click="toggleMobileMenu" class="md:hidden">
+      <button @click="toggleMobileMenu" class="md:hidden hover:text-gray-200 focus:outline-none cursor-pointer hover:scale-110 transition-transform duration-200">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none"
              viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -96,8 +96,8 @@ const toggleDropdown = () => {
           </div>
         </li>
 
-        <li><a href="#" class="block py-2 hover:text-gray-200">Hakkımızda</a></li>
-        <li><a href="#" class="block py-2 hover:text-gray-200">İletişim</a></li>
+        <li><RouterLink to="/iletisim" class="block py-2 hover:text-gray-200">Hakkimizda</RouterLink></li>
+        <li><RouterLink to="/iletisim" class="block py-2 hover:text-gray-200">İletişim</RouterLink></li>
 
       </ul>
 

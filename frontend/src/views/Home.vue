@@ -9,7 +9,7 @@
     </div>
     <div class="sm:w-1/2 p-5">
         <div class="text">
-            <span class="text-gray-500 border-b-4 border-indigo-600 uppercase">Hakkımızda</span>
+            <span class="text-gray-500 border-b-4 p-2 font-bold border-indigo-600 uppercase">Bilgilendirme</span>
             <h2 class="my-4 font-bold text-3xl  sm:text-4xl ">Biz Kimiz? <span class="text-indigo-600"></span>
             </h2>
             <p class="text-gray-700">
@@ -20,4 +20,5 @@
 </div>
 </template>
 
-<script lang="ts"></script>
+<script lang="ts">
+</script>

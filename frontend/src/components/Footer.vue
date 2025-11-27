@@ -1,6 +1,6 @@
 <template>
-  <footer class="bg-gray-900 text-gray-200 pt-12">
-    <div class="container mx-auto px-4">
+  <footer class="bg-gray-900 text-gray-200 pt-12 pb-6 mt-10">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
         <!-- Logo & Hakkımızda -->
         <div>
@@ -38,8 +38,8 @@
         <div>
           <h3 class="font-semibold mb-4">Bültene Abone Ol</h3>
           <form class="flex flex-col space-y-2">
-            <input type="email" placeholder="E-posta adresiniz" class="px-3 py-2 rounded text-gray-800" />
-            <button class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded">Abone Ol</button>
+            <input type="email" placeholder="E-posta adresiniz" required class="font-semibold px-1 py-2 rounded text-white" />
+            <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded">Abone Ol</button>
           </form>
 
           <div class="mt-6 flex space-x-4">
@@ -56,7 +56,7 @@
         </div>
       </div>
 
-      <div class="border-t border-gray-700 mt-5 pt-4 text-center text-gray-500 text-sm">
+      <div class="border-t border-gray-700 mt-5 pt-2 text-center text-gray-500 text-sm">
         © 2025 JustifyShop. Tüm hakları saklıdır.
       </div>
     </div>
