@@ -21,18 +21,18 @@ const toggleDropdown = () => {
       <!-- Logo -->
       <div>
       <RouterLink to="/">
-        <img src="../assets/justifylogo.png" class="object-contain h-40 w-auto mt-3 ml-20 sm:ml-60 hover:scale-110 transition-transform duration-200" />
+        <img src="../assets/justifylogo.png" class="object-contain h-40 w-auto mt-3 ml-25 sm:-ml-0 hover:scale-110 transition-transform duration-200" />
       </RouterLink>
       </div>
 
       <!-- Desktop Menu -->
       <ul class="hidden md:flex space-x-8 text-lg items-center">
 
-        <li><RouterLink to="/" class="hover:text-gray-200 font-bold">Anasayfa</RouterLink></li>
+        <li><RouterLink to="/" class="hover:text-gray-200 font-bold hover:underline">Anasayfa</RouterLink></li>
 
         <!-- DROPDOWN -->
         <li class="relative">
-          <button @click="toggleDropdown" class="hover:text-gray-200 flex items-center font-bold gap-1">
+          <button @click="toggleDropdown" class="hover:text-gray-200 flex items-center font-bold hover:underline gap-1">
             Kategoriler
             <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2"
                  viewBox="0 0 24 24">
@@ -55,8 +55,8 @@ const toggleDropdown = () => {
           </div>
         </li>
 
-        <li><RouterLink to="/hakkimizda" class="hover:text-gray-200 font-bold">Hakkımızda</RouterLink></li>
-        <li><RouterLink to="/iletisim" class="hover:text-gray-200 font-bold">İletişim</RouterLink></li>
+        <li><RouterLink to="/hakkimizda" class="hover:text-gray-200 font-bold hover:underline">Hakkımızda</RouterLink></li>
+        <li><RouterLink to="/iletisim" class="hover:text-gray-200 font-bold hover:underline">İletişim</RouterLink></li>
       </ul>
 
       <!-- Mobile Menu Button -->
@@ -74,11 +74,11 @@ const toggleDropdown = () => {
 
       <ul class="space-y-3 text-lg">
 
-        <li><RouterLink to="/" class="block py-2 hover:text-gray-200">Anasayfa</RouterLink></li>
+        <li><RouterLink to="/" class="block py-2 hover:text-gray-200 hover:underline">Anasayfa</RouterLink></li>
 
         <!-- Mobile Dropdown -->
         <li>
-          <button @click="toggleDropdown" class="w-full text-left py-2 flex justify-between">
+          <button @click="toggleDropdown" class="w-full text-left py-2 flex justify-between hover:underline items-center">
             Kategoriler
             <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2"
                  viewBox="0 0 24 24">
@@ -96,8 +96,8 @@ const toggleDropdown = () => {
           </div>
         </li>
 
-        <li><RouterLink to="/iletisim" class="block py-2 hover:text-gray-200">Hakkimizda</RouterLink></li>
-        <li><RouterLink to="/iletisim" class="block py-2 hover:text-gray-200">İletişim</RouterLink></li>
+        <li><RouterLink to="/iletisim" class="block py-2 hover:text-gray-200 hover:underline">Hakkimizda</RouterLink></li>
+        <li><RouterLink to="/iletisim" class="block py-2 hover:text-gray-200 hover:underline">İletişim</RouterLink></li>
 
       </ul>
 
