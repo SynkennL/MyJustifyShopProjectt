@@ -1,7 +1,7 @@
 <style scoped></style>
 
 <template>
-    <section class="py-24 relative">
+    <section class="py-60 relative">
         <div class="w-full max-w-7xl px-4 md:px-5 lg:px-5 mx-auto">
             <div class="w-full justify-start items-center gap-8 grid lg:grid-cols-2 grid-cols-1">
                 <div class="w-full flex-col justify-start lg:items-start items-center gap-10 inline-flex">
@@ -13,7 +13,7 @@
                             JustifyShop olarak, moda tutkunlarına en trend ürünleri sunma misyonuyla yola çıktık.
                             Müşteri
                             memnuniyetini ön planda tutarak, güvenli alışveriş deneyimi ve hızlı teslimat ile sektörde
-                            fark yaratıyoruz. Geniş ürün yelpazemizle her zevke hitap eden JustifyShop'ta, stilinizi
+                            fark yaratıyoruz. Geniş ürün yelpazemizle her zevke hitap eden JustifyShop'ta, stilinizi bulabilirsiniz.
 
                         </p>
                     </div>
@@ -32,7 +32,7 @@
     </section>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import { RouterLink } from 'vue-router';
 
 </script>

@@ -14,11 +14,10 @@
         <div>
           <h3 class="font-semibold mb-4">Kategoriler</h3>
           <ul class="space-y-2 text-gray-400">
-            <li><a href="#" class="hover:text-white">Erkek Giyim</a></li>
-            <li><a href="#" class="hover:text-white">Kadın Giyim</a></li>
-            <li><a href="#" class="hover:text-white">Ayakkabı</a></li>
-            <li><a href="#" class="hover:text-white">Aksesuar</a></li>
-            <li><a href="#" class="hover:text-white">Çocuk Giyim</a></li>
+            <li><RouterLink to="/kategori/erkek-giyim"><a href="#" class="hover:text-white">Erkek Giyim</a></RouterLink></li>
+            <li><RouterLink to="/kategori/kadin-giyim"><a href="#" class="hover:text-white">Kadın Giyim</a></RouterLink></li>
+            <li><RouterLink to="/kategori/ayakkabi"><a href="#" class="hover:text-white">Ayakkabı</a></RouterLink></li>
+            <li><RouterLink to="/kategori/cocuk-giyim"><a href="#" class="hover:text-white">Çocuk Giyim</a></RouterLink></li>
           </ul>
         </div>
 

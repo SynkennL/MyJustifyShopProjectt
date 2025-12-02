@@ -1,6 +1,4 @@
 @import "tailwindcss";
-@import "daisyui";
-
 
 @layer base {
   button:not(:disabled),

@@ -15,7 +15,7 @@ const toggleDropdown = () => {
 </script>
 
 <template>
-  <nav class="bg-gray-600 text-white">
+  <nav class="bg-gray-900 text-white">
     <div class="mx-auto px-10 flex justify-between items-center" style="height: 90px;">
       
       <!-- Logo -->
@@ -46,11 +46,10 @@ const toggleDropdown = () => {
             v-if="isDropdownOpen"
             class="absolute left-0 mt-2 w-48 bg-white text-black rounded-lg shadow-lg overflow-hidden z-50"
           >
-            <a href="#" class="block px-4 py-2 hover:bg-gray-100">Erkek Giyim</a>
-            <a href="#" class="block px-4 py-2 hover:bg-gray-100">Kadın Giyim</a>
-            <a href="#" class="block px-4 py-2 hover:bg-gray-100">Ayakkabı</a>
-            <a href="#" class="block px-4 py-2 hover:bg-gray-100">Aksesuar</a>
-            <a href="#" class="block px-4 py-2 hover:bg-gray-100">Çocuk Giyim</a>
+            <RouterLink to="/kategori/erkek-giyim" class="block px-4 py-2 hover:bg-gray-100">Erkek Giyim</RouterLink>
+            <RouterLink to="/kategori/kadin-giyim" class="block px-4 py-2 hover:bg-gray-100">Kadın Giyim</RouterLink>
+            <RouterLink to="/kategori/ayakkabi" class="block px-4 py-2 hover:bg-gray-100">Ayakkabı</RouterLink>
+            <RouterLink to="/kategori/cocuk-giyim" class="block px-4 py-2 hover:bg-gray-100">Çocuk Giyim</RouterLink>
 
           </div>
         </li>
@@ -70,7 +69,7 @@ const toggleDropdown = () => {
     </div>
 
     <!-- Mobile Menu -->
-    <div v-if="isMobileMenuOpen" class="md:hidden bg-gray-700 px-4 pb-4">
+    <div v-if="isMobileMenuOpen" class="md:hidden bg-gray-900 px-4 pb-4">
 
       <ul class="space-y-3 text-lg">
 
@@ -90,7 +89,6 @@ const toggleDropdown = () => {
           <div v-if="isDropdownOpen" class="bg-gray-800 rounded px-2 py-2">
             <a href="#" class="block py-2 pl-4 hover:text-gray-200">Erkek Giyim</a>
             <a href="#" class="block py-2 pl-4 hover:text-gray-200">Kadın Giyim</a>
-            <a href="#" class="block py-2 pl-4 hover:text-gray-200">Aksesuar</a>
             <a href="#" class="block py-2 pl-4 hover:text-gray-200">Ayakkabı</a>
             <a href="#" class="block py-2 pl-4 hover:text-gray-200">Çocuk Giyim</a>
           </div>
