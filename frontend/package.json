@@ -11,6 +11,7 @@
   "dependencies": {
     "@radix-ui/react-slot": "^1.2.4",
     "@tailwindcss/vite": "^4.1.17",
+    "axios": "^1.13.2",
     "class-variance-authority": "^0.7.1",
     "preline": "^3.2.3",
     "react": "^19.2.0",
@@ -20,6 +21,7 @@
     "vue3-carousel": "^0.17.0"
   },
   "devDependencies": {
+    "@types/axios": "^0.9.36",
     "@types/node": "^24.10.1",
     "@vitejs/plugin-vue": "^6.0.1",
     "@vue/tsconfig": "^0.8.1",

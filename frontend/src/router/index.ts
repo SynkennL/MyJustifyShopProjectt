@@ -4,15 +4,23 @@ import HomeView from '../views/Home.vue'
 import AboutView from '../views/About.vue'
 import ContactView from '../views/Contact.vue'
 import CategoryView from '../views/CategoryView.vue'
-
+import LoginView from '../views/Login.vue'
+import RegisterView from '../views/Register.vue'
+import AdminView from '../views/AdminView.vue'
+import CartView from '../views/CartView.vue'
 const routes = [
   { path: '/', component: HomeView },
   { path: '/hakkimizda', component: AboutView },
   { path: '/iletisim', component: ContactView },
-  { path: "/kategori/:name", name: "category", component: CategoryView,
-}
+  { path: '/login', component: LoginView },
+  { path: '/register', component: RegisterView },
+  { path: '/admin', component: AdminView },
+  { path: "/cart", name: "Cart", component: CartView },
+  {
+    path: "/kategori/:name", name: "category", component: CategoryView,
+  }
 
-  
+
 ]
 
 export const router = createRouter({
