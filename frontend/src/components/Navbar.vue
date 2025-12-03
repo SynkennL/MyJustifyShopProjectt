@@ -64,14 +64,23 @@ function logout() {
         <li><RouterLink to="/hakkimizda" class="hover:text-gray-200 font-bold hover:underline">Hakkımızda</RouterLink></li>
         <li><RouterLink to="/iletisim" class="hover:text-gray-200 font-bold hover:underline">İletişim</RouterLink></li>
 
-        <!-- Sepetim -->
+        <!-- Sepetim - Modern Tasarım -->
         <li>
-          <RouterLink to="/cart" class="hover:text-gray-200 font-bold hover:underline relative">
-            Sepetim
-            <span v-if="cart.length"
-              class="ml-1 bg-red-600 text-white rounded-full w-4 h-4 text-xs flex items-center justify-center">
-              {{ cart.reduce((acc, i) => acc + i.quantity, 0) }}
-            </span>
+          <RouterLink to="/cart" class="relative group">
+            <div class="flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-700 hover:bg-green-500 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105">
+              <!-- Sepet İkonu -->
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+              </svg>
+              
+              <span class="font-bold text-sm">Sepetim</span>
+              
+              <!-- Badge - Ürün Sayısı -->
+              <span v-if="cart.length" 
+                class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 text-xs font-bold flex items-center justify-center animate-pulse shadow-lg border-2 border-white">
+                {{ cart.reduce((acc, i) => acc + i.quantity, 0) }}
+              </span>
+            </div>
           </RouterLink>
         </li>
 
@@ -83,7 +92,6 @@ function logout() {
         <li v-else class="flex items-center gap-4">
           <span class="text-sm">Merhaba, {{ user.email }}</span>
           <button @click="logout" class="btn">Çıkış</button>
-          <!-- Herkes customer-panel'e gidiyor -->
           <RouterLink to="/customer-panel" class="btn">
             {{ user.role === 'admin' ? '🛠️ Panelim' : 'Panelim' }}
           </RouterLink>
@@ -122,14 +130,25 @@ function logout() {
         <li><RouterLink to="/hakkimizda" class="block py-2 hover:text-gray-200 hover:underline">Hakkımızda</RouterLink></li>
         <li><RouterLink to="/iletisim" class="block py-2 hover:text-gray-200 hover:underline">İletişim</RouterLink></li>
 
-        <!-- Sepetim -->
+        <!-- Sepetim - Mobile Modern Tasarım -->
         <li>
-          <RouterLink to="/cart" class="block py-2 hover:text-gray-200 hover:underline relative">
-            Sepetim
-            <span v-if="cart.length"
-              class="ml-1 bg-red-600 text-white rounded-full w-4 h-4 text-xs flex items-center justify-center">
-              {{ cart.reduce((acc, i) => acc + i.quantity, 0) }}
-            </span>
+          <RouterLink to="/cart" class="relative block">
+            <div class="flex items-center justify-between gap-3 px-4 py-3 rounded-lg bg-blue-700 hover:bg-green-500 transition-all duration-300 shadow-lg">
+              <div class="flex items-center gap-3">
+                <!-- Sepet İkonu -->
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                </svg>
+                <span class="font-bold">Sepetim</span>
+              </div>
+              
+              <!-- Badge - Ürün Sayısı -->
+              <span v-if="cart.length" 
+                class="bg-red-500 text-white rounded-full px-3 py-1 text-sm font-bold animate-pulse shadow-lg">
+                {{ cart.reduce((acc, i) => acc + i.quantity, 0) }} Ürün
+              </span>
+              <span v-else class="text-gray-300 text-sm">Boş</span>
+            </div>
           </RouterLink>
         </li>
 
@@ -150,4 +169,5 @@ function logout() {
   </nav>
 </template>
 
-<style scoped></style>
+<style scoped>
+</style>
