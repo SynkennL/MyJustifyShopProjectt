@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
 import { apiGet, apiPost } from "../services/api";
+import { useRouter } from "vue-router";
 
 interface Product {
   id: number;
@@ -11,7 +12,7 @@ interface Product {
   image_url?: string;
 }
 
-interface Order {
+interface SoldOrder {
   id: number;
   product_title: string;
   quantity: number;
@@ -22,9 +23,24 @@ interface Order {
   created_at: string;
 }
 
+interface PurchasedOrder {
+  id: number;
+  product_title: string;
+  quantity: number;
+  total_price: number;
+  status: string;
+  seller_email: string;
+  image_url?: string;
+  created_at: string;
+}
+
+const router = useRouter();
 const myProducts = ref<Product[]>([]);
-const myOrders = ref<Order[]>([]);
+const soldOrders = ref<SoldOrder[]>([]);
+const purchasedOrders = ref<PurchasedOrder[]>([]);
 const categories = ref<any[]>([]);
+const userId = ref<number | null>(null);
+const userRole = ref<string>("");
 
 // Yeni ürün formu
 const newProduct = ref({
@@ -36,18 +52,36 @@ const newProduct = ref({
 });
 
 async function loadData() {
-  // Tüm ürünleri al ve sadece kendi ürünlerimi filtrele
-  const allProducts = await apiGet("/products");
-  const user = JSON.parse(localStorage.getItem("user") || "{}");
-  myProducts.value = allProducts.filter((p: any) => p.seller_id === user.id);
-  
-  // Bana gelen siparişleri al (benim ürünlerimi satın alanlar)
-  const orders = await apiGet("/orders/my-orders");
-  myOrders.value = orders;
+  try {
+    const user = JSON.parse(localStorage.getItem("user") || "{}");
+    userId.value = user.id;
+    userRole.value = user.role;
 
-  // Kategorileri yükle
-  const cats = await apiGet("/categories");
-  categories.value = cats;
+    // Tüm ürünleri al ve sadece kendi ürünlerimi filtrele
+    const allProducts = await apiGet("/products");
+    myProducts.value = allProducts.filter((p: any) => p.seller_id === user.id);
+    
+    // Tüm siparişleri al (hem satın aldığım hem de sattığım)
+    const allOrders = await apiGet("/orders/my-orders");
+    
+    // Siparişleri ayır:
+    // 1. Benim ürünlerimi satın alanlar (seller_id bana ait) - Bunları yönetebilirim
+    // 2. Benim satın aldığım siparişler (buyer_id bana ait) - Sadece görüntüleyebilirim
+    
+    soldOrders.value = allOrders.filter((order: any) => 
+      order.seller_id === user.id
+    );
+    
+    purchasedOrders.value = allOrders.filter((order: any) => 
+      order.buyer_id === user.id
+    );
+
+    // Kategorileri yükle
+    const cats = await apiGet("/categories");
+    categories.value = cats;
+  } catch (error) {
+    console.error("Veri yükleme hatası:", error);
+  }
 }
 
 async function addProduct() {
@@ -56,52 +90,71 @@ async function addProduct() {
     return;
   }
 
-  const res = await apiPost("/products", newProduct.value);
-  if (res.error) {
-    alert(res.error);
-    return;
-  }
+  try {
+    const res = await apiPost("/products", newProduct.value);
+    if (res.error) {
+      alert(res.error);
+      return;
+    }
 
-  alert("Ürün başarıyla eklendi!");
-  newProduct.value = { title: "", description: "", price: 0, category_id: null, image_url: "" };
-  await loadData();
+    alert("Ürün başarıyla eklendi!");
+    newProduct.value = { title: "", description: "", price: 0, category_id: null, image_url: "" };
+    await loadData();
+  } catch (error) {
+    console.error("Ürün ekleme hatası:", error);
+    alert("Ürün eklenirken bir hata oluştu!");
+  }
 }
 
 async function deleteProduct(productId: number) {
   if (!confirm("Bu ürünü silmek istediğinize emin misiniz?")) return;
 
   const token = localStorage.getItem("token");
-  const res = await fetch(`${import.meta.env.VITE_API_BASE || "http://localhost:4000/api"}/products/${productId}`, {
-    method: "DELETE",
-    headers: {
-      "Authorization": `Bearer ${token}`
-    }
-  });
+  try {
+    const res = await fetch(`${import.meta.env.VITE_API_BASE || "http://localhost:4000/api"}/products/${productId}`, {
+      method: "DELETE",
+      headers: {
+        "Authorization": `Bearer ${token}`,
+        "Content-Type": "application/json"
+      }
+    });
 
-  if (res.ok) {
-    alert("Ürün silindi!");
-    await loadData();
-  } else {
-    alert("Ürün silinemedi!");
+    const data = await res.json();
+
+    if (res.ok) {
+      alert("Ürün başarıyla silindi!");
+      await loadData();
+    } else {
+      alert(data.error || "Ürün silinemedi!");
+    }
+  } catch (error) {
+    console.error("Silme hatası:", error);
+    alert("Ürün silinirken bir hata oluştu!");
   }
 }
 
 async function updateOrderStatus(orderId: number, newStatus: string) {
   const token = localStorage.getItem("token");
-  const res = await fetch(`${import.meta.env.VITE_API_BASE || "http://localhost:4000/api"}/orders/${orderId}/status`, {
-    method: "PATCH",
-    headers: {
-      "Content-Type": "application/json",
-      "Authorization": `Bearer ${token}`
-    },
-    body: JSON.stringify({ status: newStatus })
-  });
-  
-  if (res.ok) {
-    alert("Sipariş durumu güncellendi!");
-    await loadData();
-  } else {
-    alert("Durum güncellenemedi!");
+  try {
+    const res = await fetch(`${import.meta.env.VITE_API_BASE || "http://localhost:4000/api"}/orders/${orderId}/status`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`
+      },
+      body: JSON.stringify({ status: newStatus })
+    });
+    
+    if (res.ok) {
+      alert("Sipariş durumu güncellendi!");
+      await loadData();
+    } else {
+      const data = await res.json();
+      alert(data.error || "Durum güncellenemedi!");
+    }
+  } catch (error) {
+    console.error("Durum güncelleme hatası:", error);
+    alert("Durum güncellenirken bir hata oluştu!");
   }
 }
 
@@ -136,11 +189,34 @@ function getStatusText(status: string) {
 
 <template>
   <div class="p-6 max-w-7xl mx-auto bg-white rounded-xl shadow-md">
-    <h2 class="text-2xl font-bold mb-6">Müşteri Paneli</h2>
+    <div class="flex justify-between items-center mb-6">
+      <h2 class="text-2xl font-bold">
+        {{ userRole === 'admin' ? '👑 Yönetici Paneli' : '👤 Kullanıcı Paneli' }}
+      </h2>
+      <button 
+        v-if="userRole === 'admin'" 
+        @click="router.push('/admin')"
+        class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition"
+      >
+        🛠️ Admin Yönetim Paneli
+      </button>
+    </div>
 
-    <!-- Yeni Ürün Ekle -->
-    <section class="mb-8 p-4 border rounded-lg">
-      <h3 class="font-semibold mb-3 text-lg">Yeni Ürün Ekle</h3>
+    <!-- Admin Bilgi Mesajı -->
+    <div v-if="userRole === 'admin'" class="mb-6 p-4 bg-indigo-50 border border-indigo-200 rounded-lg">
+      <div class="flex items-start gap-3">
+        <svg class="w-5 h-5 text-indigo-600 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        <div class="text-sm text-indigo-800">
+          <strong>Yönetici Olarak:</strong> Kendi ürünlerinizi satabilir, alabilir ve yönetebilirsiniz. Ayrıca tüm kullanıcıların ürünlerini ve kategorileri yönetmek için yukarıdaki "Admin Yönetim Paneli" butonuna tıklayın.
+        </div>
+      </div>
+    </div>
+
+    <!-- Yeni Ürün Ekle (Herkes ekleyebilir) -->
+    <section class="mb-8 p-4 border rounded-lg bg-green-50">
+      <h3 class="font-semibold mb-3 text-lg">📦 Yeni İlan Ekle</h3>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <input v-model="newProduct.title" placeholder="Ürün başlığı" class="input" />
         <input v-model.number="newProduct.price" type="number" placeholder="Fiyat" class="input" />
@@ -154,12 +230,12 @@ function getStatusText(status: string) {
       </div>
     </section>
 
-    <!-- Benim Ürünlerim -->
+    <!-- Benim İlanlarım -->
     <section class="mb-8 p-4 border rounded-lg">
-      <h3 class="font-semibold mb-4 text-lg">Benim Ürünlerim ({{ myProducts.length }})</h3>
+      <h3 class="font-semibold mb-4 text-lg">🏷️ Benim İlanlarım ({{ myProducts.length }})</h3>
       
       <div v-if="myProducts.length === 0" class="text-center py-10 text-gray-500">
-        Henüz ürün eklemediniz.
+        Henüz ilan eklemediniz. Yukarıdan yeni ilan ekleyebilirsiniz.
       </div>
 
       <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -173,23 +249,24 @@ function getStatusText(status: string) {
           <p class="text-gray-600 text-sm mb-2 line-clamp-2">{{ product.description }}</p>
           <p class="text-gray-500 text-xs mb-2">Kategori: {{ product.category_name }}</p>
           <p class="font-bold text-lg mb-3">{{ product.price }} TL</p>
-          <button @click="deleteProduct(product.id)" class="w-full bg-red-600 text-white py-2 rounded hover:bg-red-700">
+          <button @click="deleteProduct(product.id)" class="w-full bg-red-600 text-white py-2 rounded hover:bg-red-700 transition">
             Sil
           </button>
         </div>
       </div>
     </section>
 
-    <!-- Gelen Siparişler -->
-    <section class="p-4 border rounded-lg">
-      <h3 class="font-semibold mb-4 text-lg">Gelen Siparişler ({{ myOrders.length }})</h3>
+    <!-- Sattığım Ürünlerin Siparişleri (Yönetebilirim) -->
+    <section class="mb-8 p-4 border rounded-lg bg-blue-50">
+      <h3 class="font-semibold mb-4 text-lg">💼 Sattığım Ürünlerin Siparişleri ({{ soldOrders.length }})</h3>
+      <p class="text-sm text-gray-600 mb-4">Sizin ilanlarınızdan satın alınan ürünler. Sipariş durumlarını buradan yönetebilirsiniz.</p>
       
-      <div v-if="myOrders.length === 0" class="text-center py-10 text-gray-500">
-        Henüz sipariş bulunmuyor.
+      <div v-if="soldOrders.length === 0" class="text-center py-10 text-gray-500">
+        Henüz ürünlerinizden sipariş verilmedi.
       </div>
 
       <div v-else class="space-y-4">
-        <div v-for="order in myOrders" :key="order.id" class="border rounded-lg p-4 hover:shadow-lg transition">
+        <div v-for="order in soldOrders" :key="order.id" class="bg-white border rounded-lg p-4 hover:shadow-lg transition">
           <div class="flex items-start gap-4">
             <img 
               :src="order.image_url || 'https://via.placeholder.com/100'" 
@@ -198,12 +275,12 @@ function getStatusText(status: string) {
             />
             <div class="flex-1">
               <h3 class="font-semibold text-lg">{{ order.product_title }}</h3>
-              <p class="text-gray-600 text-sm">Müşteri: {{ order.buyer_email }}</p>
-              <p class="text-gray-600 text-sm">Adet: {{ order.quantity }}</p>
-              <p class="font-bold text-lg mt-1">{{ order.total_price }} TL</p>
-              <p class="text-gray-500 text-xs mt-1">Tarih: {{ formatDate(order.created_at) }}</p>
+              <p class="text-gray-600 text-sm">✉️ Alıcı: {{ order.buyer_email }}</p>
+              <p class="text-gray-600 text-sm">📦 Adet: {{ order.quantity }}</p>
+              <p class="font-bold text-lg mt-1">💰 {{ order.total_price }} TL</p>
+              <p class="text-gray-500 text-xs mt-1">📅 {{ formatDate(order.created_at) }}</p>
             </div>
-            <div class="flex flex-col gap-2">
+            <div class="flex flex-col gap-2 min-w-[140px]">
               <span 
                 :class="['px-3 py-1 rounded-full text-sm font-medium text-center', getStatusBadge(order.status)]"
               >
@@ -211,14 +288,53 @@ function getStatusText(status: string) {
               </span>
               <select 
                 @change="(e) => updateOrderStatus(order.id, (e.target as HTMLSelectElement).value)"
-                class="text-sm border rounded px-2 py-1"
+                class="text-sm border rounded px-2 py-1.5 bg-white cursor-pointer"
               >
                 <option value="">Durum Değiştir</option>
-                <option value="confirmed">Onayla</option>
-                <option value="shipped">Kargola</option>
-                <option value="delivered">Teslim Et</option>
-                <option value="cancelled">İptal Et</option>
+                <option value="confirmed">✅ Onayla</option>
+                <option value="shipped">🚚 Kargola</option>
+                <option value="delivered">✔️ Teslim Et</option>
+                <option value="cancelled">❌ İptal Et</option>
               </select>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Satın Aldığım Siparişler (Sadece görüntüleyebilirim) -->
+    <section class="p-4 border rounded-lg bg-purple-50">
+      <h3 class="font-semibold mb-4 text-lg">🛒 Satın Aldığım Siparişler ({{ purchasedOrders.length }})</h3>
+      <p class="text-sm text-gray-600 mb-4">Başka satıcılardan satın aldığınız ürünler. Sipariş durumunu takip edebilirsiniz.</p>
+      
+      <div v-if="purchasedOrders.length === 0" class="text-center py-10 text-gray-500">
+        Henüz ürün satın almadınız.
+      </div>
+
+      <div v-else class="space-y-4">
+        <div v-for="order in purchasedOrders" :key="order.id" class="bg-white border rounded-lg p-4 hover:shadow-lg transition">
+          <div class="flex items-start gap-4">
+            <img 
+              :src="order.image_url || 'https://via.placeholder.com/100'" 
+              alt="Ürün" 
+              class="w-24 h-24 object-cover rounded-lg"
+            />
+            <div class="flex-1">
+              <h3 class="font-semibold text-lg">{{ order.product_title }}</h3>
+              <p class="text-gray-600 text-sm">🏪 Satıcı: {{ order.seller_email }}</p>
+              <p class="text-gray-600 text-sm">📦 Adet: {{ order.quantity }}</p>
+              <p class="font-bold text-lg mt-1">💰 {{ order.total_price }} TL</p>
+              <p class="text-gray-500 text-xs mt-1">📅 {{ formatDate(order.created_at) }}</p>
+            </div>
+            <div class="flex flex-col gap-2">
+              <span 
+                :class="['px-3 py-1 rounded-full text-sm font-medium text-center', getStatusBadge(order.status)]"
+              >
+                {{ getStatusText(order.status) }}
+              </span>
+              <div class="text-xs text-gray-500 text-center mt-1 px-2">
+                Satıcı tarafından yönetiliyor
+              </div>
             </div>
           </div>
         </div>

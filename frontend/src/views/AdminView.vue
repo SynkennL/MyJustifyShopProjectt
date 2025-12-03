@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
 import { apiGet, apiPost } from "../services/api";
+import { useRouter } from "vue-router";
+
+const router = useRouter();
 
 interface Category {
   id: number;
@@ -58,16 +61,44 @@ async function deleteProduct(productId: number) {
   }
 }
 
-onMounted(load);
+// Sadece adminlerin erişebilmesi için kontrol
+onMounted(() => {
+  const user = JSON.parse(localStorage.getItem("user") || "{}");
+  if (user.role !== 'admin') {
+    alert("Bu sayfaya erişim yetkiniz yok!");
+    router.push("/");
+    return;
+  }
+  load();
+});
 </script>
 
 <template>
   <div class="p-6 max-w-7xl mx-auto bg-white rounded-xl shadow-md">
-    <h2 class="text-2xl font-bold mb-6">Yönetim Paneli</h2>
+    <div class="flex justify-between items-center mb-6">
+      <h2 class="text-2xl font-bold">🛠️ Admin Yönetim Paneli</h2>
+      <button 
+        @click="router.push('/customer-panel')"
+        class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition"
+      >
+        ← Kişisel Panelime Dön
+      </button>
+    </div>
+
+    <div class="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+      <div class="flex items-start gap-3">
+        <svg class="w-5 h-5 text-yellow-600 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+        </svg>
+        <div class="text-sm text-yellow-800">
+          <strong>Not:</strong> Bu sayfa sadece site yönetimi içindir. Kendi ürünlerinizi ve siparişlerinizi yönetmek için "Kişisel Panelime Dön" butonuna tıklayın.
+        </div>
+      </div>
+    </div>
 
     <!-- Kategori Ekle -->
     <section class="mb-8 p-4 border rounded-lg">
-      <h3 class="font-semibold mb-3 text-lg">Kategori Ekle</h3>
+      <h3 class="font-semibold mb-3 text-lg">➕ Kategori Ekle</h3>
       <div class="flex gap-2">
         <input v-model="catName" placeholder="Kategori adı" class="input flex-1" />
         <input v-model="catSlug" placeholder="Slug (örn: erkek-giyim)" class="input flex-1" />
@@ -77,7 +108,7 @@ onMounted(load);
 
     <!-- Mevcut Kategoriler -->
     <section class="mb-8 p-4 border rounded-lg">
-      <h3 class="font-semibold mb-3 text-lg">Mevcut Kategoriler</h3>
+      <h3 class="font-semibold mb-3 text-lg">📂 Mevcut Kategoriler</h3>
       <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
         <div v-for="cat in categories" :key="cat.id" class="bg-gray-100 p-2 rounded text-center">
           <p class="font-medium">{{ cat.name }}</p>
@@ -88,7 +119,7 @@ onMounted(load);
 
     <!-- Tüm Ürünler -->
     <section class="p-4 border rounded-lg">
-      <h3 class="font-semibold mb-4 text-lg">Tüm Müşteri Ürünleri ({{ allProducts.length }})</h3>
+      <h3 class="font-semibold mb-4 text-lg">🏪 Tüm Kullanıcı Ürünleri ({{ allProducts.length }})</h3>
       
       <div v-if="allProducts.length === 0" class="text-center py-10 text-gray-500">
         Henüz ürün bulunmuyor.

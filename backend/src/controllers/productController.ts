@@ -59,17 +59,22 @@ export async function deleteProduct(req: Request, res: Response) {
       // Admin tüm ürünleri silebilir
       query = await pool.query("DELETE FROM products WHERE id = $1 RETURNING *", [id]);
     } else {
-      // Normal kullanıcı sadece kendi ürünlerini silebilir
+      // Normal kullanıcı (customer rolü) sadece kendi ürünlerini silebilir
+      // Not: customer rolündeki kullanıcılar da ürün satabilir
       query = await pool.query("DELETE FROM products WHERE id = $1 AND seller_id = $2 RETURNING *", [id, user_id]);
     }
 
     if (query.rows.length === 0) {
-      return res.status(404).json({ error: "Product not found or unauthorized" });
+      return res.status(404).json({ error: "Ürün bulunamadı veya silme yetkiniz yok" });
     }
 
-    res.json({ message: "Product deleted successfully" });
-  } catch (err) {
+    res.json({ message: "Ürün başarıyla silindi" });
+  } catch (err: any) {
     console.error(err);
-    res.status(500).json({ error: "Server error" });
+    // Foreign key constraint hatası kontrolü
+    if (err.code === '23503') {
+      return res.status(400).json({ error: "Bu ürünle ilişkili siparişler var, silinemez" });
+    }
+    res.status(500).json({ error: "Sunucu hatası" });
   }
 }

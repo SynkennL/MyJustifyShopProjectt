@@ -83,8 +83,10 @@ function logout() {
         <li v-else class="flex items-center gap-4">
           <span class="text-sm">Merhaba, {{ user.email }}</span>
           <button @click="logout" class="btn">Çıkış</button>
-          <RouterLink v-if="user.role === 'admin'" to="/admin" class="btn">Yönetim</RouterLink>
-          <RouterLink v-if="user.role === 'customer'" to="/customer-panel" class="btn">Panelim</RouterLink>
+          <!-- Herkes customer-panel'e gidiyor -->
+          <RouterLink to="/customer-panel" class="btn">
+            {{ user.role === 'admin' ? '🛠️ Panelim' : 'Panelim' }}
+          </RouterLink>
         </li>
       </ul>
 
@@ -139,8 +141,9 @@ function logout() {
         <li v-else class="flex flex-col gap-2">
           <span class="text-sm text-center">Merhaba, {{ user.email }}</span>
           <button @click="logout" class="btn w-full">Çıkış</button>
-          <RouterLink v-if="user.role === 'admin'" to="/admin" class="btn w-full text-center">Yönetim</RouterLink>
-          <RouterLink v-if="user.role === 'customer'" to="/customer-panel" class="btn w-full text-center">Panelim</RouterLink>
+          <RouterLink to="/customer-panel" class="btn w-full text-center">
+            {{ user.role === 'admin' ? '🛠️ Panelim' : 'Panelim' }}
+          </RouterLink>
         </li>
       </ul>
     </div>

@@ -20,6 +20,12 @@ export async function createOrder(req: Request, res: Response) {
     }
 
     const product = productQuery.rows[0];
+    
+    // Kendi ürününü satın alamaz kontrolü
+    if (product.seller_id === buyer_id) {
+      return res.status(400).json({ error: "Kendi ürününüzü satın alamazsınız!" });
+    }
+
     const total_price = product.price * quantity;
 
     const orderQuery = await client.query(
@@ -40,34 +46,26 @@ export async function createOrder(req: Request, res: Response) {
 
 export async function getMyOrders(req: Request, res: Response) {
   const user_id = (req as any).user?.id;
-  const user_role = (req as any).user?.role;
 
   if (!user_id) return res.status(401).json({ error: "Unauthorized" });
 
   try {
-    let query;
-    if (user_role === 'customer') {
-      // Müşteri olarak satın aldığım siparişler
-      query = await pool.query(
-        `SELECT o.*, p.title as product_title, p.image_url, u.email as seller_email
-         FROM orders o
-         LEFT JOIN products p ON o.product_id = p.id
-         LEFT JOIN users u ON o.seller_id = u.id
-         WHERE o.buyer_id = $1
-         ORDER BY o.created_at DESC`,
-        [user_id]
-      );
-    } else {
-      query = await pool.query(
-        `SELECT o.*, p.title as product_title, p.image_url, u.email as buyer_email
-         FROM orders o
-         LEFT JOIN products p ON o.product_id = p.id
-         LEFT JOIN users u ON o.buyer_id = u.id
-         WHERE o.seller_id = $1
-         ORDER BY o.created_at DESC`,
-        [user_id]
-      );
-    }
+    // Hem satın aldığım hem de sattığım siparişleri getir
+    const query = await pool.query(
+      `SELECT 
+        o.*,
+        p.title as product_title, 
+        p.image_url,
+        seller.email as seller_email,
+        buyer.email as buyer_email
+       FROM orders o
+       LEFT JOIN products p ON o.product_id = p.id
+       LEFT JOIN users seller ON o.seller_id = seller.id
+       LEFT JOIN users buyer ON o.buyer_id = buyer.id
+       WHERE o.buyer_id = $1 OR o.seller_id = $1
+       ORDER BY o.created_at DESC`,
+      [user_id]
+    );
 
     res.json(query.rows);
   } catch (err) {

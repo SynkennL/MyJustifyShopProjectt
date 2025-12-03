@@ -24,6 +24,17 @@ const categoryTitles: Record<string, string> = {
 };
 
 const products = ref<any[]>([]);
+const currentUserId = ref<number | null>(null);
+
+// Kullanıcı bilgisini al
+onMounted(() => {
+  const userStr = localStorage.getItem("user");
+  if (userStr) {
+    const user = JSON.parse(userStr);
+    currentUserId.value = user.id;
+  }
+  loadProducts();
+});
 
 async function loadProducts() {
   if (!categorySlug.value) return;
@@ -31,9 +42,17 @@ async function loadProducts() {
   products.value = res;
 }
 
-onMounted(loadProducts);
+// Ürünün kullanıcının kendisine ait olup olmadığını kontrol et
+function isOwnProduct(product: any) {
+  return currentUserId.value && product.seller_id === currentUserId.value;
+}
 
 const handleAddToCart = (product: any) => {
+  if (isOwnProduct(product)) {
+    alert("Kendi ürününüzü sepete ekleyemezsiniz!");
+    return;
+  }
+  
   addToCart({
     id: product.id,
     title: product.title,
@@ -48,6 +67,11 @@ const handleBuyNow = async (product: any) => {
   if (!token) {
     alert("Satın almak için giriş yapmalısınız!");
     router.push("/login");
+    return;
+  }
+
+  if (isOwnProduct(product)) {
+    alert("Kendi ürününüzü satın alamazsınız!");
     return;
   }
 
@@ -71,14 +95,21 @@ const handleBuyNow = async (product: any) => {
     <h1 class="text-3xl font-bold mb-8">{{ categoryTitles[categorySlug] || "Kategori" }}</h1>
 
     <div v-if="products.length" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-      <div v-for="item in products" :key="item.id" class="bg-white rounded-xl shadow hover:shadow-xl transition p-4 flex flex-col">
+      <div v-for="item in products" :key="item.id" class="bg-white rounded-xl shadow hover:shadow-xl transition p-4 flex flex-col relative">
+        <!-- Kendi ürünü badge'i -->
+        <div v-if="isOwnProduct(item)" class="absolute top-2 right-2 z-10">
+          <span class="bg-blue-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg">
+            Sizin Ürününüz
+          </span>
+        </div>
+        
         <img :src="item.image_url || 'https://via.placeholder.com/300x300?text=No+Image'" alt="Ürün Resmi" class="w-full h-48 object-cover rounded-lg mb-4"/>
         <h2 class="text-lg font-semibold mb-1">{{ item.title }}</h2>
         <p class="text-gray-500 text-sm mb-2 line-clamp-3">{{ item.description }}</p>
         <p class="text-gray-600 text-xs mb-1" v-if="item.seller_email">Satıcı: {{ item.seller_email }}</p>
         <p class="text-gray-900 font-bold text-lg mt-auto">{{ item.price }} TL</p>
         
-        <div class="flex gap-2 mt-3">
+        <div v-if="!isOwnProduct(item)" class="flex gap-2 mt-3">
           <button 
             @click="handleAddToCart(item)" 
             class="flex-1 bg-gray-900 text-white font-medium py-2 rounded hover:bg-gray-800 transition"
@@ -88,6 +119,24 @@ const handleBuyNow = async (product: any) => {
           <button 
             @click="handleBuyNow(item)" 
             class="flex-1 bg-green-600 text-white font-medium py-2 rounded hover:bg-green-700 transition"
+          >
+            Satın Al
+          </button>
+        </div>
+        
+        <!-- Kendi ürünü için devre dışı butonlar -->
+        <div v-else class="flex gap-2 mt-3">
+          <button 
+            disabled
+            class="flex-1 bg-gray-300 text-gray-500 font-medium py-2 rounded cursor-not-allowed"
+            title="Kendi ürününüzü satın alamazsınız"
+          >
+            Sepete Ekle
+          </button>
+          <button 
+            disabled
+            class="flex-1 bg-gray-300 text-gray-500 font-medium py-2 rounded cursor-not-allowed"
+            title="Kendi ürününüzü satın alamazsınız"
           >
             Satın Al
           </button>
