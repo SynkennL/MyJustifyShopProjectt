@@ -95,7 +95,7 @@ async function submit() {
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
               </svg>
               <span class="font-bold text-lg block mb-1" :class="role === 'customer' ? 'text-blue-600' : 'text-gray-700'">Müşteri</span>
-              <span class="text-xs text-gray-500">Alışveriş yap</span>
+              <span class="text-xs text-gray-500">Ürün satın al & Ürün satışı yap</span>
             </div>
             <div v-if="role === 'customer'" class="absolute top-3 right-3">
               <svg class="w-6 h-6 text-blue-500" fill="currentColor" viewBox="0 0 20 20">
@@ -124,7 +124,7 @@ async function submit() {
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
               </svg>
               <span class="font-bold text-lg block mb-1" :class="role === 'admin' ? 'text-purple-600' : 'text-gray-700'">Yönetici</span>
-              <span class="text-xs text-gray-500">Ürün sat</span>
+              <span class="text-xs text-gray-500">Ürün sat & Ürünleri yönet</span>
             </div>
             <div v-if="role === 'admin'" class="absolute top-3 right-3">
               <svg class="w-6 h-6 text-purple-500" fill="currentColor" viewBox="0 0 20 20">
@@ -144,8 +144,8 @@ async function submit() {
           <div class="text-sm text-gray-600">
             <strong class="text-gray-700">{{ role === 'admin' ? 'Yönetici:' : 'Müşteri:' }}</strong>
             {{ role === 'admin' 
-              ? 'Ürün ekleyebilir, satabilir ve siparişlerinizi yönetebilirsiniz.' 
-              : 'Ürünleri satın alabilir ve siparişlerinizi takip edebilirsiniz.' 
+              ? 'Müşterilerin mevcut ilanlarını yönetebilir,ürün satabilir,ürün satın alabilirsiniz.' 
+              : 'Ürün satın alabilir,ürün satabilir,mevcut ürünleri görüntüleyebilirsiniz.' 
             }}
           </div>
         </div>
