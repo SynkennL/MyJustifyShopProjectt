@@ -255,7 +255,6 @@
       </div>
     </div>
   </div>
-<!-- Kategori Kartları - Geliştirilmiş Tasarım -->
 <div class="px-4 sm:px-6 lg:px-8 py-12 bg-gray-50">
   <div class="max-w-7xl mx-auto">
     <div class="text-center mb-10">
