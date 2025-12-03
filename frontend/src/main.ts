@@ -5,4 +5,14 @@ import 'preline'
 
 import { router } from './router'
 
-createApp(App).use(router).mount('#app')
+const app = createApp(App)
+
+router.afterEach(() => {
+  setTimeout(() => {
+    if (typeof window !== 'undefined' && (window as any).HSStaticMethods) {
+      (window as any).HSStaticMethods.autoInit();
+    }
+  }, 100);
+});
+
+app.use(router).mount('#app')
