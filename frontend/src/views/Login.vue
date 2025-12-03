@@ -17,20 +17,26 @@ async function submit() {
     localStorage.setItem("user", JSON.stringify(res.user));
     router.push("/");
     location.reload();
-  } catch (e:any) {
+  } catch (e: any) {
     error.value = "Sunucu hatası";
   }
 }
 </script>
 
 <template>
-  <div class="p-6 mx-auto max-w-md bg-white rounded-xl shadow-md mt-10">
-    <h1 class="text-3xl font-bold text-slate-900 mb-6">Giriş Yap</h1>
+  <div class="p-8 mx-auto max-w-lg bg-white rounded-2xl shadow-2xl mt-10 border border-gray-100">
+    <div class="text-center mb-8">
+      <h1 class="text-3xl font-bold text-slate-900 mb-6">Giriş Yap</h1>
+    </div>
 
-    <input v-model="email" placeholder="Email" class="w-full py-2.5 px-4 mb-4 bg-gray-100 border border-gray-200 focus:border-slate-900 focus:bg-transparent text-sm outline-0 rounded-md transition-all" />
-    <input v-model="password" type="password" placeholder="Şifre" class="w-full py-2.5 px-4 mb-4 bg-gray-100 border border-gray-200 focus:border-slate-900 focus:bg-transparent text-sm outline-0 rounded-md transition-all" />
+    <input v-model="email" placeholder="Email"
+      class="w-full py-3 px-4 bg-gray-50 border-2 border-gray-200 focus:border-slate-900 focus:bg-white text-sm outline-0 rounded-lg transition-all">
+    <input v-model="password" type="password" placeholder="Şifre"
+      class="w-full py-3 px-4 bg-gray-50 border-2 border-gray-200 focus:border-slate-900 focus:bg-white  mt-4  mb-5 text-sm outline-0 rounded-lg transition-all">
 
-    <button @click="submit" class="w-full bg-slate-900 text-white py-2.5 rounded-md hover:bg-slate-800 transition-transform duration-300 hover:scale-105">Giriş Yap</button>
+    <button @click="submit"
+      class="w-full bg-slate-900 text-white py-2.5 rounded-md hover:bg-slate-800 transition-transform duration-300 hover:scale-105">Giriş
+      Yap</button>
 
     <p v-if="error" class="text-red-500 mt-3">{{ error }}</p>
   </div>

@@ -84,6 +84,7 @@ function logout() {
           <span class="text-sm">Merhaba, {{ user.email }}</span>
           <button @click="logout" class="btn">Çıkış</button>
           <RouterLink v-if="user.role === 'admin'" to="/admin" class="btn">Yönetim</RouterLink>
+          <RouterLink v-if="user.role === 'customer'" to="/customer-panel" class="btn">Panelim</RouterLink>
         </li>
       </ul>
 
@@ -139,6 +140,7 @@ function logout() {
           <span class="text-sm text-center">Merhaba, {{ user.email }}</span>
           <button @click="logout" class="btn w-full">Çıkış</button>
           <RouterLink v-if="user.role === 'admin'" to="/admin" class="btn w-full text-center">Yönetim</RouterLink>
+          <RouterLink v-if="user.role === 'customer'" to="/customer-panel" class="btn w-full text-center">Panelim</RouterLink>
         </li>
       </ul>
     </div>

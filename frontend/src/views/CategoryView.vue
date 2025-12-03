@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import { ref, onMounted, watch } from "vue";
-import { useRoute } from "vue-router";
-import { apiGet } from "../services/api";
+import { useRoute, useRouter } from "vue-router";
+import { apiGet, apiPost } from "../services/api";
 import { addToCart } from "../services/cart";
 
 const route = useRoute();
+const router = useRouter();
 const categorySlug = ref(String(route.params.name));
 
 watch(
@@ -37,9 +38,31 @@ const handleAddToCart = (product: any) => {
     id: product.id,
     title: product.title,
     price: product.price,
-    image: product.image || "https://via.placeholder.com/300x300?text=No+Image",
+    image: product.image_url || "https://via.placeholder.com/300x300?text=No+Image",
   });
   alert(`${product.title} sepete eklendi!`);
+};
+
+const handleBuyNow = async (product: any) => {
+  const token = localStorage.getItem("token");
+  if (!token) {
+    alert("Satın almak için giriş yapmalısınız!");
+    router.push("/login");
+    return;
+  }
+
+  const quantity = 1;
+  const res = await apiPost("/orders", {
+    product_id: product.id,
+    quantity: quantity
+  });
+
+  if (res.error) {
+    alert(res.error);
+    return;
+  }
+
+  alert(`${product.title} başarıyla satın alındı! Siparişlerinizi panelden takip edebilirsiniz.`);
 };
 </script>
 
@@ -49,13 +72,26 @@ const handleAddToCart = (product: any) => {
 
     <div v-if="products.length" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
       <div v-for="item in products" :key="item.id" class="bg-white rounded-xl shadow hover:shadow-xl transition p-4 flex flex-col">
-        <img :src="item.image || 'https://via.placeholder.com/300x300?text=No+Image'" alt="Ürün Resmi" class="w-full h-48 object-cover rounded-lg mb-4"/>
+        <img :src="item.image_url || 'https://via.placeholder.com/300x300?text=No+Image'" alt="Ürün Resmi" class="w-full h-48 object-cover rounded-lg mb-4"/>
         <h2 class="text-lg font-semibold mb-1">{{ item.title }}</h2>
         <p class="text-gray-500 text-sm mb-2 line-clamp-3">{{ item.description }}</p>
+        <p class="text-gray-600 text-xs mb-1" v-if="item.seller_email">Satıcı: {{ item.seller_email }}</p>
         <p class="text-gray-900 font-bold text-lg mt-auto">{{ item.price }} TL</p>
-        <button @click="handleAddToCart(item)" class="mt-3 bg-gray-900 text-white font-medium py-2 rounded hover:bg-gray-800 transition">
-          Sepete Ekle
-        </button>
+        
+        <div class="flex gap-2 mt-3">
+          <button 
+            @click="handleAddToCart(item)" 
+            class="flex-1 bg-gray-900 text-white font-medium py-2 rounded hover:bg-gray-800 transition"
+          >
+            Sepete Ekle
+          </button>
+          <button 
+            @click="handleBuyNow(item)" 
+            class="flex-1 bg-green-600 text-white font-medium py-2 rounded hover:bg-green-700 transition"
+          >
+            Satın Al
+          </button>
+        </div>
       </div>
     </div>
 

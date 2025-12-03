@@ -10,15 +10,18 @@ const JWT_SECRET = process.env.JWT_SECRET ?? "secret";
 const TOKEN_EXPIRES_IN = process.env.TOKEN_EXPIRES_IN ?? "7d";
 
 export async function register(req: Request, res: Response) {
-  const { email, password, name } = req.body;
+  const { email, password, name, role } = req.body;
   if (!email || !password) return res.status(400).json({ error: "Email and password required" });
+  if (!role || !['admin', 'customer'].includes(role)) {
+    return res.status(400).json({ error: "Valid role required (admin or customer)" });
+  }
 
   const client = await pool.connect();
   try {
     const hashed = await bcrypt.hash(password, 10);
     const q = await client.query(
-      "INSERT INTO users (email, password_hash, name) VALUES ($1,$2,$3) RETURNING id, email, name, role",
-      [email, hashed, name || null]
+      "INSERT INTO users (email, password_hash, name, role) VALUES ($1,$2,$3,$4) RETURNING id, email, name, role",
+      [email, hashed, name || null, role]
     );
     const user = q.rows[0];
 
