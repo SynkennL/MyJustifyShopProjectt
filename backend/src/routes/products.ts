@@ -5,7 +5,7 @@ import { authenticateToken, requireAdmin } from "../middlewares/auth";
 const router = Router();
 
 router.get("/", listProducts);
-router.get("/popular", getPopularProducts); // YENİ: Popüler ürünler endpoint'i
+router.get("/popular", getPopularProducts);
 router.post("/", authenticateToken, createProduct);
 router.delete("/:id", authenticateToken, deleteProduct);
 

@@ -312,7 +312,6 @@ const router = useRouter();
 const popularProducts = ref<any[]>([]);
 const currentUserId = ref<number | null>(null);
 
-// Kullanıcı bilgisini al
 onMounted(async () => {
   const userStr = localStorage.getItem("user");
   if (userStr) {
@@ -320,7 +319,6 @@ onMounted(async () => {
     currentUserId.value = user.id;
   }
   
-  // Popüler ürünleri yükle
   try {
     const products = await apiGet("/products/popular");
     popularProducts.value = products;
@@ -329,7 +327,6 @@ onMounted(async () => {
   }
 });
 
-// Ürünün kullanıcının kendisine ait olup olmadığını kontrol et
 function isOwnProduct(product: any) {
   return currentUserId.value && product.seller_id === currentUserId.value;
 }
@@ -375,7 +372,7 @@ const handleBuyNow = async (product: any) => {
 
   alert(`${product.title} başarıyla satın alındı! Siparişlerinizi panelden takip edebilirsiniz.`);
   
-  // Popüler ürünleri yeniden yükle (satış sayısı değişti)
+  // Popüler ürünleri yeniden yüklemek için
   const products = await apiGet("/products/popular");
   popularProducts.value = products;
 };
