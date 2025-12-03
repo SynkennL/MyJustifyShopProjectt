@@ -214,7 +214,6 @@ function getStatusText(status: string) {
       </div>
     </div>
 
-    <!-- Yeni Ürün Ekle (Herkes ekleyebilir) -->
     <section class="mb-8 p-4 border rounded-lg bg-green-50">
       <h3 class="font-semibold mb-3 text-lg">📦 Yeni İlan Ekle</h3>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -230,7 +229,6 @@ function getStatusText(status: string) {
       </div>
     </section>
 
-    <!-- Benim İlanlarım -->
     <section class="mb-8 p-4 border rounded-lg">
       <h3 class="font-semibold mb-4 text-lg">🏷️ Benim İlanlarım ({{ myProducts.length }})</h3>
       
@@ -256,7 +254,6 @@ function getStatusText(status: string) {
       </div>
     </section>
 
-    <!-- Sattığım Ürünlerin Siparişleri (Yönetebilirim) -->
     <section class="mb-8 p-4 border rounded-lg bg-blue-50">
       <h3 class="font-semibold mb-4 text-lg">💼 Sattığım Ürünlerin Siparişleri ({{ soldOrders.length }})</h3>
       <p class="text-sm text-gray-600 mb-4">Sizin ilanlarınızdan satın alınan ürünler. Sipariş durumlarını buradan yönetebilirsiniz.</p>
@@ -302,7 +299,6 @@ function getStatusText(status: string) {
       </div>
     </section>
 
-    <!-- Satın Aldığım Siparişler (Sadece görüntüleyebilirim) -->
     <section class="p-4 border rounded-lg bg-purple-50">
       <h3 class="font-semibold mb-4 text-lg">🛒 Satın Aldığım Siparişler ({{ purchasedOrders.length }})</h3>
       <p class="text-sm text-gray-600 mb-4">Başka satıcılardan satın aldığınız ürünler. Sipariş durumunu takip edebilirsiniz.</p>
