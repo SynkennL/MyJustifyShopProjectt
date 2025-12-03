@@ -185,13 +185,23 @@ function getStatusText(status: string) {
   };
   return texts[status] || status;
 }
+
+// Sadece admin veya müşterilerin erişebilmesi için kontrol
+onMounted(() => {
+  const user = JSON.parse(localStorage.getItem("user") || "{}");
+  if (user.role !== 'customer' && user.role !== 'admin') {
+    alert("Bu sayfaya erişim yetkiniz yok!");
+    router.push("/");
+    return;
+  }
+});
 </script>
 
 <template>
-  <div class="p-6 max-w-7xl mx-auto bg-white rounded-xl shadow-md">
+  <div v-if="userRole === 'admin' || userRole==='customer'" class="p-6 max-w-7xl mx-auto bg-white rounded-xl shadow-md">
     <div class="flex justify-between items-center mb-6">
       <h2 class="text-2xl font-bold">
-        {{ userRole === 'admin' ? '👑 Yönetici Paneli' : '👤 Kullanıcı Paneli' }}
+        {{ userRole === 'admin' ? 'Yönetici Paneli' : '👤 Kullanıcı Paneli' }}
       </h2>
       <button 
         v-if="userRole === 'admin'" 
