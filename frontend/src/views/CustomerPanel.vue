@@ -64,10 +64,6 @@ async function loadData() {
     // Tüm siparişleri al (hem satın aldığım hem de sattığım)
     const allOrders = await apiGet("/orders/my-orders");
     
-    // Siparişleri ayır:
-    // 1. Benim ürünlerimi satın alanlar (seller_id bana ait) - Bunları yönetebilirim
-    // 2. Benim satın aldığım siparişler (buyer_id bana ait) - Sadece görüntüleyebilirim
-    
     soldOrders.value = allOrders.filter((order: any) => 
       order.seller_id === user.id
     );
