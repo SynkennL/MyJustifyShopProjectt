@@ -255,85 +255,117 @@
       </div>
     </div>
   </div>
-  <!-- End Keşfedilebilir Ürünler -->
-  <div class="p-10 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-4 gap-5">
-
-    <!-- Card Template -->
-    <div class="rounded overflow-hidden shadow-lg h-full flex flex-col">
-      <img class="w-full h-60 object-cover" src="../assets/erkek-giyim.jpeg" alt="Erkek Giyim">
-      <div class="px-6 py-4 flex-grow">
-        <div class="font-bold text-xl mb-2">Erkek-Giyim Kategorisi</div>
-        <p class="text-gray-700 text-base">
-          Erkek Giyim ürünlerimizde indirimler mevcuttur.
-        </p>
-      </div>
-      <div class="px-6 pt-4 pb-2">
-        <span
-          class="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#erkek-giyim</span>
-        <span
-          class="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#erkek</span>
-        <span
-          class="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#erkek-kıyafetleri</span>
-      </div>
+<!-- Kategori Kartları - Geliştirilmiş Tasarım -->
+<div class="px-4 sm:px-6 lg:px-8 py-12 bg-gray-50">
+  <div class="max-w-7xl mx-auto">
+    <div class="text-center mb-10">
+      <h2 class="text-3xl font-bold text-slate-900 mb-2">Popüler Kategoriler</h2>
+      <p class="text-gray-600">En çok tercih edilen kategorilerimizi keşfedin</p>
     </div>
 
-    <!-- Card 2 -->
-    <div class="rounded overflow-hidden shadow-lg h-full flex flex-col">
-      <img class="w-full h-60 object-cover" src="../assets/kadın-giyim.jpg" alt="Kadın Giyim">
-      <div class="px-6 py-4 flex-grow">
-        <div class="font-bold text-xl mb-2">Kadın-Giyim Kategorisi</div>
-        <p class="text-gray-700 text-base">
-          Kadın Giyim ürünlerimizde indirimler mevcuttur.
-        </p>
-      </div>
-      <div class="px-6 pt-4 pb-2">
-        <span
-          class="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#kadın-giyim</span>
-        <span
-          class="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#kadın</span>
-        <span
-          class="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#kadın-kıyafetleri</span>
-      </div>
-    </div>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      <!-- Erkek Giyim -->
+      <RouterLink to="/kategori/erkek-giyim" class="group">
+        <div class="bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden transform hover:-translate-y-2">
+          <div class="relative overflow-hidden h-56">
+            <img class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" 
+              src="../assets/erkek-giyim.jpeg" alt="Erkek Giyim">
+            <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+            <div class="absolute bottom-4 left-4 right-4">
+              <h3 class="text-white font-bold text-xl mb-1">Erkek Giyim</h3>
+              <p class="text-gray-200 text-sm">Trend erkek kıyafetleri</p>
+            </div>
+          </div>
+          <div class="p-4">
+            <div class="flex flex-wrap gap-2">
+              <span class="inline-block bg-gray-100 rounded-full px-3 py-1 text-xs font-medium text-gray-700">
+                #erkek-giyim
+              </span>
+              <span class="inline-block bg-gray-100 rounded-full px-3 py-1 text-xs font-medium text-gray-700">
+                #erkek-kıyafetleri
+              </span>
+            </div>
+          </div>
+        </div>
+      </RouterLink>
 
-    <!-- Card 3 -->
-    <div class="rounded overflow-hidden shadow-lg h-full flex flex-col">
-      <img class="w-full h-60 object-cover" src="../assets/ayakkabi3.jpg" alt="Ayakkabi">
-      <div class="px-6 py-4 flex-grow">
-        <div class="font-bold text-xl mb-2">Ayakkabı Kategorisi</div>
-        <p class="text-gray-700 text-base">
-          Ayakkabı ürünlerimizde indirimler mevcuttur.
-        </p>
-      </div>
-      <div class="px-6 pt-4 pb-2">
-        <span
-          class="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#ayakkabı-ürünleri</span>
-        <span
-          class="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#ayakkabı</span>
-        <span
-          class="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#ayakkabılar</span>
-      </div>
-    </div>
+      <!-- Kadın Giyim -->
+      <RouterLink to="/kategori/kadin-giyim" class="group">
+        <div class="bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden transform hover:-translate-y-2">
+          <div class="relative overflow-hidden h-56">
+            <img class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" 
+              src="../assets/kadın-giyim.jpg" alt="Kadın Giyim">
+            <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+            <div class="absolute bottom-4 left-4 right-4">
+              <h3 class="text-white font-bold text-xl mb-1">Kadın Giyim</h3>
+              <p class="text-gray-200 text-sm">Şık ve modern koleksiyon</p>
+            </div>
+          </div>
+          <div class="p-4">
+            <div class="flex flex-wrap gap-2">
+              <span class="inline-block bg-gray-100 rounded-full px-3 py-1 text-xs font-medium text-gray-700">
+                #kadın-giyim
+              </span>
+              <span class="inline-block bg-gray-100 rounded-full px-3 py-1 text-xs font-medium text-gray-700">
+                #kadın-kıyafetleri
+              </span>
+            </div>
+          </div>
+        </div>
+      </RouterLink>
 
-    <!-- Card 4 -->
-    <div class="rounded overflow-hidden shadow-lg h-full flex flex-col">
-      <img class="w-full h-60 object-cover" src="../assets/cocuk-giyim.jpg" alt="Çocuk Giyim">
-      <div class="px-6 py-4 flex-grow">
-        <div class="font-bold text-xl mb-2">Çocuk-Giyim Kategorisi</div>
-        <p class="text-gray-700 text-base">
-          Çocuk Giyim ürünlerimizde indirimler mevcuttur.
-        </p>
-      </div>
-      <div class="px-6 pt-4 pb-2">
-        <span
-          class="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#çocuk-giyim</span>
-        <span
-          class="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#çocuk</span>
-        <span
-          class="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#çocuk-kıyafetleri</span>
-      </div>
+      <!-- Ayakkabı -->
+      <RouterLink to="/kategori/ayakkabi" class="group">
+        <div class="bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden transform hover:-translate-y-2">
+          <div class="relative overflow-hidden h-56">
+            <img class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" 
+              src="../assets/ayakkabi3.jpg" alt="Ayakkabı">
+            <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+            <div class="absolute bottom-4 left-4 right-4">
+              <h3 class="text-white font-bold text-xl mb-1">Ayakkabı</h3>
+              <p class="text-gray-200 text-sm">Konforlu ve şık modeller</p>
+            </div>
+          </div>
+          <div class="p-4">
+            <div class="flex flex-wrap gap-2">
+              <span class="inline-block bg-gray-100 rounded-full px-3 py-1 text-xs font-medium text-gray-700">
+                #ayakkabı
+              </span>
+              <span class="inline-block bg-gray-100 rounded-full px-3 py-1 text-xs font-medium text-gray-700">
+                #ayakkabı-modelleri
+              </span>
+            </div>
+          </div>
+        </div>
+      </RouterLink>
+
+      <!-- Çocuk Giyim -->
+      <RouterLink to="/kategori/cocuk-giyim" class="group">
+        <div class="bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden transform hover:-translate-y-2">
+          <div class="relative overflow-hidden h-56">
+            <img class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" 
+              src="../assets/cocuk-giyim.jpg" alt="Çocuk Giyim">
+            <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+            <div class="absolute bottom-4 left-4 right-4">
+              <h3 class="text-white font-bold text-xl mb-1">Çocuk Giyim</h3>
+              <p class="text-gray-200 text-sm">Renkli ve eğlenceli</p>
+            </div>
+          </div>
+          <div class="p-4">
+            <div class="flex flex-wrap gap-2">
+              <span class="inline-block bg-gray-100 rounded-full px-3 py-1 text-xs font-medium text-gray-700">
+                #çocuk-giyim
+              </span>
+              <span class="inline-block bg-gray-100 rounded-full px-3 py-1 text-xs font-medium text-gray-700">
+                #çocuk-kıyafetleri
+              </span>
+            </div>
+          </div>
+        </div>
+      </RouterLink>
     </div>
   </div>
+</div>
 </template>
 
 <script setup lang="ts">

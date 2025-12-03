@@ -5,7 +5,6 @@ import { apiPost } from "../services/api";
 
 const router = useRouter();
 
-// Sepetteki her ürünün miktarını güncelleme
 const updateQuantity = (productId: number, delta: number) => {
   const item = cart.value.find(i => i.id === productId);
   if (item) {
@@ -18,7 +17,6 @@ const updateQuantity = (productId: number, delta: number) => {
   }
 };
 
-// Sepetten ürün kaldırma
 const removeFromCart = (productId: number) => {
   const index = cart.value.findIndex(i => i.id === productId);
   if (index > -1) {
@@ -27,17 +25,14 @@ const removeFromCart = (productId: number) => {
   }
 };
 
-// LocalStorage'a kaydetme
 const saveCart = () => {
   localStorage.setItem("cart", JSON.stringify(cart.value));
 };
 
-// Toplam fiyat hesaplama
 const totalPrice = () => {
   return cart.value.reduce((acc, i) => acc + i.price * i.quantity, 0);
 };
 
-// Tek ürün satın alma
 const buyProduct = async (product: any) => {
   const token = localStorage.getItem("token");
   if (!token) {
@@ -65,7 +60,6 @@ const buyProduct = async (product: any) => {
   }
 };
 
-// Tüm sepeti satın alma
 const buyAll = async () => {
   const token = localStorage.getItem("token");
   if (!token) {
@@ -203,17 +197,9 @@ const buyAll = async () => {
             <span>Toplam Ürün:</span>
             <span class="font-semibold">{{ cart.reduce((acc, i) => acc + i.quantity, 0) }} adet</span>
           </div>
-          <div class="flex justify-between text-gray-700">
-            <span>Ara Toplam:</span>
-            <span class="font-semibold">{{ totalPrice().toFixed(2) }} TL</span>
-          </div>
-          <div class="flex justify-between text-gray-700">
-            <span>KDV (%20):</span>
-            <span class="font-semibold">{{ (totalPrice() * 0.20).toFixed(2) }} TL</span>
-          </div>
-          <div class="flex justify-between text-slate-900 text-xl font-bold pt-2 border-t border-gray-300">
-            <span>Genel Toplam:</span>
-            <span>{{ (totalPrice() * 1.20).toFixed(2) }} TL</span>
+          <div class="flex justify-between text-slate-900 text-2xl font-bold pt-2 border-t border-gray-300">
+            <span>Toplam:</span>
+            <span>{{ totalPrice().toFixed(2) }} TL</span>
           </div>
         </div>
 
