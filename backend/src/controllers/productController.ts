@@ -33,6 +33,33 @@ export async function listProducts(req: Request, res: Response) {
   }
 }
 
+// YENİ: Popüler ürünleri getir (en çok satılan 5 ürün)
+export async function getPopularProducts(req: Request, res: Response) {
+  try {
+    const q = await pool.query(
+      `SELECT 
+        p.*, 
+        c.name as category_name, 
+        c.slug as category_slug, 
+        u.email as seller_email, 
+        u.name as seller_name,
+        COALESCE(SUM(o.quantity), 0) as total_sales
+       FROM products p
+       LEFT JOIN categories c ON p.category_id = c.id
+       LEFT JOIN users u ON p.seller_id = u.id
+       LEFT JOIN orders o ON p.id = o.product_id AND o.status != 'cancelled'
+       GROUP BY p.id, c.name, c.slug, u.email, u.name
+       ORDER BY total_sales DESC, p.id DESC
+       LIMIT 5`
+    );
+
+    res.json(q.rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Sunucu hatası" });
+  }
+}
+
 export async function createProduct(req: Request, res: Response) {
   const { title, description, price, category_id, image_url } = req.body;
   const seller_id = (req as any).user?.id;
@@ -56,11 +83,8 @@ export async function deleteProduct(req: Request, res: Response) {
   try {
     let query;
     if (user_role === 'admin') {
-      // Admin tüm ürünleri silebilir
       query = await pool.query("DELETE FROM products WHERE id = $1 RETURNING *", [id]);
     } else {
-      // Normal kullanıcı (customer rolü) sadece kendi ürünlerini silebilir
-      // Not: customer rolündeki kullanıcılar da ürün satabilir
       query = await pool.query("DELETE FROM products WHERE id = $1 AND seller_id = $2 RETURNING *", [id, user_id]);
     }
 
@@ -71,7 +95,6 @@ export async function deleteProduct(req: Request, res: Response) {
     res.json({ message: "Ürün başarıyla silindi" });
   } catch (err: any) {
     console.error(err);
-    // Foreign key constraint hatası kontrolü
     if (err.code === '23503') {
       return res.status(400).json({ error: "Bu ürünle ilişkili siparişler var, silinemez" });
     }

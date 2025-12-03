@@ -21,8 +21,11 @@ async function submit() {
   if (res.error) { error.value = res.error; return; }
   localStorage.setItem("token", res.token);
   localStorage.setItem("user", JSON.stringify(res.user));
-  router.push("/");
-  location.reload();
+  
+  await router.push("/");
+  setTimeout(() => {
+    location.reload();
+  }, 100);
 }
 </script>
 

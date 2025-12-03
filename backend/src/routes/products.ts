@@ -1,10 +1,11 @@
 import { Router } from "express";
-import { listProducts, createProduct, deleteProduct } from "../controllers/productController";
+import { listProducts, createProduct, deleteProduct, getPopularProducts } from "../controllers/productController";
 import { authenticateToken, requireAdmin } from "../middlewares/auth";
 
 const router = Router();
 
 router.get("/", listProducts);
+router.get("/popular", getPopularProducts); // YENİ: Popüler ürünler endpoint'i
 router.post("/", authenticateToken, createProduct);
 router.delete("/:id", authenticateToken, deleteProduct);
 

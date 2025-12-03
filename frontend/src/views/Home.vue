@@ -1,6 +1,94 @@
 <style scoped></style>
 
 <template>
+  <!-- Popüler Ürünler Bölümü -->
+  <div class="px-4 sm:px-6 lg:px-8 py-10 bg-gradient-to-b from-white to-gray-50">
+    <div class="max-w-7xl mx-auto">
+      <!-- Başlık -->
+      <div class="text-center mb-8">
+        <h2 class="text-3xl font-bold text-slate-900 mb-2">🔥 Popüler Ürünler</h2>
+        <p class="text-gray-600">En çok satın alınan ürünlerimiz</p>
+      </div>
+
+      <!-- Ürünler Grid -->
+      <div v-if="popularProducts.length > 0" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
+        <div v-for="product in popularProducts" :key="product.id" 
+             class="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-xl transition-shadow duration-300 relative group">
+          
+          <!-- Satış Badge -->
+          <div class="absolute top-3 right-3 z-10 bg-red-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg">
+            {{ product.total_sales || 0 }} Satış
+          </div>
+
+          <!-- Kendi ürünü badge -->
+          <div v-if="isOwnProduct(product)" class="absolute top-3 left-3 z-10">
+            <span class="bg-blue-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg">
+              Sizin Ürününüz
+            </span>
+          </div>
+          
+          <!-- Ürün Görseli -->
+          <div class="relative overflow-hidden h-48">
+            <img 
+              :src="product.image_url || 'https://via.placeholder.com/300x300?text=No+Image'" 
+              :alt="product.title"
+              class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+            />
+          </div>
+
+          <!-- Ürün Bilgileri -->
+          <div class="p-4">
+            <h3 class="font-semibold text-slate-900 mb-2 line-clamp-2 h-12">{{ product.title }}</h3>
+            <p class="text-sm text-gray-500 mb-2 line-clamp-2">{{ product.description }}</p>
+            
+            <div class="flex items-center justify-between mb-3">
+              <span class="text-2xl font-bold text-slate-900">{{ product.price }} TL</span>
+              <span class="text-xs text-gray-500">{{ product.category_name }}</span>
+            </div>
+
+            <!-- Butonlar -->
+            <div v-if="!isOwnProduct(product)" class="flex gap-2">
+              <button 
+                @click="handleAddToCart(product)"
+                class="flex-1 bg-gray-900 text-white text-sm font-medium py-2 rounded hover:bg-gray-800 transition"
+              >
+                Sepete Ekle
+              </button>
+              <button 
+                @click="handleBuyNow(product)"
+                class="flex-1 bg-green-600 text-white text-sm font-medium py-2 rounded hover:bg-green-700 transition"
+              >
+                Satın Al
+              </button>
+            </div>
+
+            <!-- Kendi ürünü için devre dışı butonlar -->
+            <div v-else class="flex gap-2">
+              <button 
+                disabled
+                class="flex-1 bg-gray-300 text-gray-500 text-sm font-medium py-2 rounded cursor-not-allowed"
+                title="Kendi ürününüzü satın alamazsınız"
+              >
+                Sepete Ekle
+              </button>
+              <button 
+                disabled
+                class="flex-1 bg-gray-300 text-gray-500 text-sm font-medium py-2 rounded cursor-not-allowed"
+                title="Kendi ürününüzü satın alamazsınız"
+              >
+                Satın Al
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Ürün Yoksa -->
+      <div v-else class="text-center py-10">
+        <p class="text-gray-500">Henüz popüler ürün bulunmuyor</p>
+      </div>
+    </div>
+  </div>
   <!-- Slider -->
   <div class="px-4 sm:px-6 lg:px-8 py-10">
     <div data-hs-carousel='{
@@ -215,4 +303,80 @@
 </template>
 
 <script setup lang="ts">
+import { ref, onMounted } from "vue";
+import { useRouter } from "vue-router";
+import { apiGet, apiPost } from "../services/api";
+import { addToCart } from "../services/cart";
+
+const router = useRouter();
+const popularProducts = ref<any[]>([]);
+const currentUserId = ref<number | null>(null);
+
+// Kullanıcı bilgisini al
+onMounted(async () => {
+  const userStr = localStorage.getItem("user");
+  if (userStr) {
+    const user = JSON.parse(userStr);
+    currentUserId.value = user.id;
+  }
+  
+  // Popüler ürünleri yükle
+  try {
+    const products = await apiGet("/products/popular");
+    popularProducts.value = products;
+  } catch (error) {
+    console.error("Popüler ürünler yüklenirken hata:", error);
+  }
+});
+
+// Ürünün kullanıcının kendisine ait olup olmadığını kontrol et
+function isOwnProduct(product: any) {
+  return currentUserId.value && product.seller_id === currentUserId.value;
+}
+
+const handleAddToCart = (product: any) => {
+  if (isOwnProduct(product)) {
+    alert("Kendi ürününüzü sepete ekleyemezsiniz!");
+    return;
+  }
+  
+  addToCart({
+    id: product.id,
+    title: product.title,
+    price: product.price,
+    image: product.image_url || "https://via.placeholder.com/300x300?text=No+Image",
+  });
+  alert(`${product.title} sepete eklendi!`);
+};
+
+const handleBuyNow = async (product: any) => {
+  const token = localStorage.getItem("token");
+  if (!token) {
+    alert("Satın almak için giriş yapmalısınız!");
+    router.push("/login");
+    return;
+  }
+
+  if (isOwnProduct(product)) {
+    alert("Kendi ürününüzü satın alamazsınız!");
+    return;
+  }
+
+  const quantity = 1;
+  const res = await apiPost("/orders", {
+    product_id: product.id,
+    quantity: quantity
+  });
+
+  if (res.error) {
+    alert(res.error);
+    return;
+  }
+
+  alert(`${product.title} başarıyla satın alındı! Siparişlerinizi panelden takip edebilirsiniz.`);
+  
+  // Popüler ürünleri yeniden yükle (satış sayısı değişti)
+  const products = await apiGet("/products/popular");
+  popularProducts.value = products;
+};
 </script>

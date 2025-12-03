@@ -15,10 +15,12 @@ async function submit() {
     if (res.error) { error.value = res.error; return; }
     localStorage.setItem("token", res.token);
     localStorage.setItem("user", JSON.stringify(res.user));
-    router.push("/");
+    await router.push("/");
+  setTimeout(() => {
     location.reload();
-  } catch (e: any) {
-    error.value = "Sunucu hatası";
+  }, 100);
+  } catch (e) {
+    error.value = "Giriş yapılırken bir hata oluştu.";
   }
 }
 </script>
