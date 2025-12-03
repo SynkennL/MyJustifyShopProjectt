@@ -26,7 +26,18 @@ const categoryTitles: Record<string, string> = {
 const products = ref<any[]>([]);
 const currentUserId = ref<number | null>(null);
 
-// Kullanıcı bilgisini al
+function parseFeatures(features: any) {
+  if (!features) return null;
+  if (typeof features === 'string') {
+    try {
+      return JSON.parse(features);
+    } catch {
+      return null;
+    }
+  }
+  return features;
+}
+
 onMounted(() => {
   const userStr = localStorage.getItem("user");
   if (userStr) {
@@ -42,7 +53,6 @@ async function loadProducts() {
   products.value = res;
 }
 
-// Ürünün kullanıcının kendisine ait olup olmadığını kontrol et
 function isOwnProduct(product: any) {
   return currentUserId.value && product.seller_id === currentUserId.value;
 }
@@ -96,7 +106,6 @@ const handleBuyNow = async (product: any) => {
 
     <div v-if="products.length" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
       <div v-for="item in products" :key="item.id" class="bg-white rounded-xl shadow hover:shadow-xl transition p-4 flex flex-col relative">
-        <!-- Kendi ürünü badge'i -->
         <div v-if="isOwnProduct(item)" class="absolute top-2 right-2 z-10">
           <span class="bg-blue-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg">
             Sizin Ürününüz
@@ -107,9 +116,20 @@ const handleBuyNow = async (product: any) => {
         <h2 class="text-lg font-semibold mb-1">{{ item.title }}</h2>
         <p class="text-gray-500 text-sm mb-2 line-clamp-3">{{ item.description }}</p>
         <p class="text-gray-600 text-xs mb-1" v-if="item.seller_email">Satıcı: {{ item.seller_email }}</p>
-        <p class="text-gray-900 font-bold text-lg mt-auto">{{ item.price }} TL</p>
         
-        <div v-if="!isOwnProduct(item)" class="flex gap-2 mt-3">
+        <div v-if="parseFeatures(item.features)" class="mb-3">
+          <div class="flex flex-wrap gap-1.5">
+            <span v-for="(value, key) in parseFeatures(item.features)" 
+                  :key="key"
+                  class="inline-flex items-center gap-1  text-black text-xs font-medium px-2.5 py-1.5 rounded-full mt-3 shadow-sm border">
+              <span class="font-semibold">{{ key }}:</span> {{ value }}
+            </span>
+          </div>
+        </div>
+        
+        <p class="text-gray-900 font-bold text-lg mt-auto mb-3">{{ item.price }} TL</p>
+        
+        <div v-if="!isOwnProduct(item)" class="flex gap-2">
           <button 
             @click="handleAddToCart(item)" 
             class="flex-1 bg-gray-900 text-white font-medium py-2 rounded hover:bg-gray-800 transition"
@@ -124,8 +144,7 @@ const handleBuyNow = async (product: any) => {
           </button>
         </div>
         
-        <!-- Kendi ürünü için devre dışı butonlar -->
-        <div v-else class="flex gap-2 mt-3">
+        <div v-else class="flex gap-2">
           <button 
             disabled
             class="flex-1 bg-gray-300 text-gray-500 font-medium py-2 rounded cursor-not-allowed"

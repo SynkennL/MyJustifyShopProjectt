@@ -33,7 +33,6 @@ export async function listProducts(req: Request, res: Response) {
   }
 }
 
-// YENİ: Popüler ürünleri getir (en çok satılan 5 ürün)
 export async function getPopularProducts(req: Request, res: Response) {
   try {
     const q = await pool.query(
@@ -61,15 +60,18 @@ export async function getPopularProducts(req: Request, res: Response) {
 }
 
 export async function createProduct(req: Request, res: Response) {
-  const { title, description, price, category_id, image_url } = req.body;
+  const { title, description, price, category_id, image_url, features } = req.body;
   const seller_id = (req as any).user?.id;
 
   if (!title || price == null) return res.status(400).json({ error: "title & price required" });
   if (!seller_id) return res.status(401).json({ error: "Unauthorized" });
 
+  // Features'ı JSON olarak kaydet
+  const featuresJson = features ? JSON.stringify(features) : null;
+
   const q = await pool.query(
-    "INSERT INTO products (title, description, price, category_id, image_url, seller_id) VALUES ($1,$2,$3,$4,$5,$6) RETURNING *",
-    [title, description || null, price, category_id || null, image_url || null, seller_id]
+    "INSERT INTO products (title, description, price, category_id, image_url, seller_id, features) VALUES ($1,$2,$3,$4,$5,$6,$7) RETURNING *",
+    [title, description || null, price, category_id || null, image_url || null, seller_id, featuresJson]
   );
 
   res.status(201).json(q.rows[0]);

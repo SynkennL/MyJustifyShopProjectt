@@ -10,6 +10,7 @@ interface Product {
   price: number;
   category_name: string;
   image_url?: string;
+  features?: any;
 }
 
 interface SoldOrder {
@@ -48,7 +49,13 @@ const newProduct = ref({
   description: "",
   price: 0,
   category_id: null as number | null,
-  image_url: ""
+  image_url: "",
+  features: {
+    beden: "",
+    renk: "",
+    malzeme: "",
+    marka: ""
+  }
 });
 
 async function loadData() {
@@ -57,11 +64,9 @@ async function loadData() {
     userId.value = user.id;
     userRole.value = user.role;
 
-    // Tüm ürünleri al ve sadece kendi ürünlerimi filtrele
     const allProducts = await apiGet("/products");
     myProducts.value = allProducts.filter((p: any) => p.seller_id === user.id);
     
-    // Tüm siparişleri al (hem satın aldığım hem de sattığım)
     const allOrders = await apiGet("/orders/my-orders");
     
     soldOrders.value = allOrders.filter((order: any) => 
@@ -72,7 +77,6 @@ async function loadData() {
       order.buyer_id === user.id
     );
 
-    // Kategorileri yükle
     const cats = await apiGet("/categories");
     categories.value = cats;
   } catch (error) {
@@ -82,19 +86,51 @@ async function loadData() {
 
 async function addProduct() {
   if (!newProduct.value.title || !newProduct.value.price || !newProduct.value.category_id) {
-    alert("Başlık,fiyat ve kategori zorunludur! Doldurduğunuzdan emin olun.");
+    alert("Başlık, fiyat ve kategori zorunludur!");
     return;
   }
 
   try {
-    const res = await apiPost("/products", newProduct.value);
+    // Özellikleri temizle (boş değerleri kaldır)
+    const cleanedFeatures: any = {};
+    
+    if (newProduct.value.features.beden) cleanedFeatures.Beden = newProduct.value.features.beden;
+    if (newProduct.value.features.renk) cleanedFeatures.Renk = newProduct.value.features.renk;
+    if (newProduct.value.features.malzeme) cleanedFeatures.Malzeme = newProduct.value.features.malzeme;
+    if (newProduct.value.features.marka) cleanedFeatures.Marka = newProduct.value.features.marka;
+
+    const productData = {
+      title: newProduct.value.title,
+      description: newProduct.value.description,
+      price: newProduct.value.price,
+      category_id: newProduct.value.category_id,
+      image_url: newProduct.value.image_url,
+      features: Object.keys(cleanedFeatures).length > 0 ? cleanedFeatures : null
+    };
+
+    const res = await apiPost("/products", productData);
     if (res.error) {
       alert(res.error);
       return;
     }
 
     alert("Ürün başarıyla eklendi!");
-    newProduct.value = { title: "", description: "", price: 0, category_id: null, image_url: "" };
+    
+    // Formu sıfırla
+    newProduct.value = {
+      title: "",
+      description: "",
+      price: 0,
+      category_id: null,
+      image_url: "",
+      features: {
+        beden: "",
+        renk: "",
+        malzeme: "",
+        marka: ""
+      }
+    };
+    
     await loadData();
   } catch (error) {
     console.error("Ürün ekleme hatası:", error);
@@ -154,6 +190,18 @@ async function updateOrderStatus(orderId: number, newStatus: string) {
   }
 }
 
+function parseFeatures(features: any) {
+  if (!features) return null;
+  if (typeof features === 'string') {
+    try {
+      return JSON.parse(features);
+    } catch {
+      return null;
+    }
+  }
+  return features;
+}
+
 onMounted(loadData);
 
 function formatDate(dateString: string) {
@@ -182,7 +230,6 @@ function getStatusText(status: string) {
   return texts[status] || status;
 }
 
-// Sadece admin veya müşterilerin erişebilmesi için kontrol
 onMounted(() => {
   const user = JSON.parse(localStorage.getItem("user") || "{}");
   if (user.role !== 'customer' && user.role !== 'admin') {
@@ -208,7 +255,6 @@ onMounted(() => {
       </button>
     </div>
 
-    <!-- Admin Bilgi Mesajı -->
     <div v-if="userRole === 'admin'" class="mb-6 p-4 bg-indigo-50 border border-indigo-200 rounded-lg">
       <div class="flex items-start gap-3">
         <svg class="w-5 h-5 text-indigo-600 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -231,8 +277,42 @@ onMounted(() => {
           <option :value="null">Kategori seç</option>
           <option v-for="c in categories" :key="c.id" :value="c.id">{{ c.name }}</option>
         </select>
-        <button @click="addProduct" class="btn">Ürün Ekle</button>
       </div>
+
+      <!-- ÖZELLİKLER BÖLÜMÜ -->
+      <div class="mt-4 p-4 rounded-lg border border-gray-200">
+        <h4 class="font-semibold mb-3 text-gray-700 flex items-center gap-2">
+          Ürün Özellikleri
+        </h4>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <div>
+            <label class="block text-sm font-medium text-gray-600 mb-1">Beden</label>
+            <input v-model="newProduct.features.beden" 
+                   placeholder="Örn: XL, 42, M-L" 
+                   class="input text-sm" />
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-600 mb-1">Renk</label>
+            <input v-model="newProduct.features.renk" 
+                   placeholder="Örn: Siyah, Mavi" 
+                   class="input text-sm" />
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-600 mb-1">Malzeme</label>
+            <input v-model="newProduct.features.malzeme" 
+                   placeholder="Örn: %100 Pamuk" 
+                   class="input text-sm" />
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-600 mb-1">Marka</label>
+            <input v-model="newProduct.features.marka" 
+                   placeholder="Örn: Nike, Adidas" 
+                   class="input text-sm" />
+          </div>
+        </div>
+      </div>
+
+      <button @click="addProduct" class="btn mt-4 w-full">Ürün Ekle</button>
     </section>
 
     <section class="mb-8 p-4 border rounded-lg">
@@ -243,7 +323,7 @@ onMounted(() => {
       </div>
 
       <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        <div v-for="product in myProducts" :key="product.id" class="border rounded-lg p-4 hover:shadow-lg transition">
+        <div v-for="product in myProducts" :key="product.id" class="border rounded-lg p-4 hover:shadow-lg transition bg-white">
           <img 
             :src="product.image_url || 'https://via.placeholder.com/300'" 
             alt="Ürün" 
@@ -252,7 +332,17 @@ onMounted(() => {
           <h4 class="font-semibold text-lg mb-1">{{ product.title }}</h4>
           <p class="text-gray-600 text-sm mb-2 line-clamp-2">{{ product.description }}</p>
           <p class="text-gray-500 text-xs mb-2">Kategori: {{ product.category_name }}</p>
-          <p class="font-bold text-lg mb-3">{{ product.price }} TL</p>
+          
+          <div v-if="parseFeatures(product.features)" class="mb-3">
+            <div class="flex flex-wrap gap-2">
+              <span v-for="(value, key) in parseFeatures(product.features)" :key="key"
+                    class="inline-flex items-center gap-1 text-black text-xs font-medium px-3 py-1.5 rounded-full border">
+                {{ key }}: {{ value }}
+              </span>
+            </div>
+          </div>
+          
+          <p class="font-bold text-lg mb-3 text-gray-900">{{ product.price }} TL</p>
           <button @click="deleteProduct(product.id)" class="w-full bg-red-600 text-white py-2 rounded hover:bg-red-700 transition">
             Sil
           </button>
