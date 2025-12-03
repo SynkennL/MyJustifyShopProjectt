@@ -125,11 +125,6 @@ const buyAll = async () => {
       <div class="bg-white rounded-2xl shadow-lg p-6 mb-6">
         <div class="flex items-center justify-between">
           <div class="flex items-center gap-3">
-            <div class="bg-gradient-to-r from-indigo-600 to-purple-600 p-3 rounded-xl">
-              <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-              </svg>
-            </div>
             <div>
               <h1 class="text-3xl font-bold text-gray-900">Alışveriş Sepetim</h1>
               <p class="text-gray-500 text-sm mt-1">{{ cart.length }} ürün sepetinizde</p>
@@ -161,7 +156,7 @@ const buyAll = async () => {
             <p class="text-gray-500 mb-6">Alışverişe başlamak için kategorilerimize göz atın</p>
             <button 
               @click="router.push('/')" 
-              class="bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-8 py-3 rounded-lg hover:from-indigo-700 hover:to-purple-700 transition font-bold shadow-lg"
+              class="bg-blue-700 text-white px-8 py-3 rounded-lg hover:from-indigo-700 hover:to-purple-700 transition font-bold shadow-lg"
             >
               Alışverişe Başla
             </button>
@@ -277,7 +272,7 @@ const buyAll = async () => {
             <!-- Satın Alma Butonu -->
             <button 
               @click="buyAll"
-              class="w-full bg-gradient-to-r from-green-600 to-emerald-600 text-white py-4 rounded-xl hover:from-green-700 hover:to-emerald-700 transition font-bold text-lg shadow-lg hover:shadow-xl transform hover:scale-[1.02] flex items-center justify-center gap-3"
+              class="w-full bg-green-500 text-white py-4 rounded-xl hover:from-green-700 hover:to-emerald-700 transition font-bold text-lg shadow-lg hover:shadow-xl transform hover:scale-[1.02] flex items-center justify-center gap-3"
             >
               <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
