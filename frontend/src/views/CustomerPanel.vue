@@ -85,8 +85,8 @@ async function loadData() {
 }
 
 async function addProduct() {
-  if (!newProduct.value.title || !newProduct.value.price) {
-    alert("Başlık ve fiyat zorunludur!");
+  if (!newProduct.value.title || !newProduct.value.price || !newProduct.value.category_id) {
+    alert("Başlık,fiyat ve kategori zorunludur! Doldurduğunuzdan emin olun.");
     return;
   }
 
