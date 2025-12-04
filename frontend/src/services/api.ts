@@ -6,7 +6,7 @@ function getToken() {
 
 function headers(json = true) {
   const token = getToken();
-  const h: Record<string,string> = {};
+  const h: Record<string, string> = {};
   if (json) h["Content-Type"] = "application/json";
   if (token) h["Authorization"] = `Bearer ${token}`;
   return h;

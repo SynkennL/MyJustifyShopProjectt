@@ -90,10 +90,6 @@ function logout() {
             <RouterLink to="/cart" class="relative group">
               <div
                 class="flex items-center gap-1.5 px-3 py-1.5 xl:px-4 xl:py-2 rounded-lg bg-blue-700 transition-all duration-300 shadow-md hover:shadow-lg transform hover:scale-105">
-                <svg class="w-4 h-4 xl:w-5 xl:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-                </svg>
                 <span class="font-bold text-xs xl:text-sm">Sepet</span>
                 <span v-if="cart.length"
                   class="absolute -top-1.5 -right-1.5 bg-red-500 text-white rounded-full w-5 h-5 text-xs font-bold flex items-center justify-center shadow-lg border-2 border-white">
@@ -107,20 +103,12 @@ function logout() {
               <RouterLink to="/login">
                 <div
                   class="flex items-center gap-1.5 px-3 py-1.5 xl:px-4 xl:py-2 rounded-lg bg-green-600 hover:bg-green-500 transition-all duration-300 shadow-md hover:shadow-lg transform hover:scale-105">
-                  <svg class="w-4 h-4 xl:w-5 xl:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
-                  </svg>
                   <span class="font-bold text-xs xl:text-sm">Giriş</span>
                 </div>
               </RouterLink>
               <RouterLink to="/register">
                 <div
                   class="flex items-center gap-1.5 px-3 py-1.5 xl:px-4 xl:py-2 rounded-lg bg-purple-600 hover:bg-purple-500 transition-all duration-300 shadow-md hover:shadow-lg transform hover:scale-105">
-                  <svg class="w-4 h-4 xl:w-5 xl:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
-                  </svg>
                   <span class="font-bold text-xs xl:text-sm">Kayıt</span>
                 </div>
               </RouterLink>
@@ -129,10 +117,6 @@ function logout() {
             <!-- Giriş yapılmışsa -->
             <div v-else class="flex items-center gap-2">
               <div class="hidden xl:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-gray-700 shadow-md">
-                <svg class="w-4 h-4 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                </svg>
                 <span class="text-xs font-medium truncate max-w-[120px]">{{ user.email }}</span>
               </div>
 
@@ -140,19 +124,8 @@ function logout() {
               <RouterLink to="/customer-panel">
                 <div
                   class="flex items-center gap-1.5 px-3 py-1.5 xl:px-4 xl:py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 transition-all duration-300 shadow-md hover:shadow-lg transform hover:scale-105">
-                  <svg v-if="user.role === 'admin'" class="w-4 h-4 xl:w-5 xl:h-5" fill="none" stroke="currentColor"
-                    viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                  </svg>
-                  <svg v-else class="w-4 h-4 xl:w-5 xl:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                  </svg>
-                  <span class="font-bold text-xs xl:text-sm hidden lg:inline">{{ user.role === 'admin' ? 'Yönetici Panel' :
-                    'Panelim' }}</span>
+                  <span class="font-bold text-xs xl:text-sm hidden lg:inline">{{ user.role === 'admin' ? 'Yönetici' :
+                    'Panel' }}</span>
                 </div>
               </RouterLink>
 
@@ -160,10 +133,6 @@ function logout() {
               <button @click="logout">
                 <div
                   class="flex items-center gap-1.5 px-3 py-1.5 xl:px-4 xl:py-2 rounded-lg bg-red-600 hover:bg-red-500 transition-all duration-300 shadow-md hover:shadow-lg transform hover:scale-105">
-                  <svg class="w-4 h-4 xl:w-5 xl:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                  </svg>
                   <span class="font-bold text-xs xl:text-sm hidden lg:inline">Çıkış</span>
                 </div>
               </button>
@@ -194,8 +163,8 @@ function logout() {
           <button @click="toggleDropdownMobile"
             class="w-full text-left py-2.5 flex justify-between items-center hover:underline text-sm font-medium">
             Kategoriler
-            <svg class="w-4 h-4 transition-transform duration-200" :class="{ 'rotate-180': isDropdownOpenMobile }"
-              fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <svg class="w-4 h-4 transition-transform duration-200" fill="none" stroke="currentColor" stroke-width="2"
+              viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
             </svg>
           </button>
@@ -300,7 +269,7 @@ function logout() {
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                   d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
               </svg>
-              <span class="font-bold text-sm">{{ user.role === 'admin' ? 'Yönetici Panel' : 'Panelim' }}</span>
+              <span class="font-bold text-sm">{{ user.role === 'admin' ? 'Yönetici' : 'Panel' }}</span>
             </div>
           </RouterLink>
 

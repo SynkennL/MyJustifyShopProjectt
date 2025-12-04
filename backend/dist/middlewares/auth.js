@@ -12,11 +12,12 @@ const JWT_SECRET = process.env.JWT_SECRET || "secret";
 function authenticateToken(req, res, next) {
     const authHeader = req.headers["authorization"];
     const token = authHeader && authHeader.split(" ")[1];
-    if (!token)
-        return res.status(401).json({ error: "Unauthorized" });
+    if (!token) return res.status(401).json({ error: "Unauthorized" });
+
     jsonwebtoken_1.default.verify(token, JWT_SECRET, (err, user) => {
-        if (err)
-            return res.status(403).json({ error: "Invalid token" });
+        console.log("Verifying token:", token);
+        console.log("Verification error:", err);
+        if (err) return res.status(403).json({ error: "Invalid token" });
         req.user = user;
         next();
     });
