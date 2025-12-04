@@ -10,7 +10,7 @@ const toggleMobileMenu = () => isMobileMenuOpen.value = !isMobileMenuOpen.value
 const toggleDropdownMobile = () => isDropdownOpenMobile.value = !isDropdownOpenMobile.value
 
 const router = useRouter();
-const user = ref<{ email?: string, role?: string } | null>(null);
+const user = ref<{ email?: string, role?: string, name: string } | null>(null);
 
 function loadUserFromStorage() {
   const u = localStorage.getItem("user");
@@ -90,7 +90,10 @@ function logout() {
             <RouterLink to="/cart" class="relative group">
               <div
                 class="flex items-center gap-1.5 px-3 py-1.5 xl:px-4 xl:py-2 rounded-lg bg-blue-700 transition-all duration-300 shadow-md hover:shadow-lg transform hover:scale-105">
-                <span class="font-bold text-xs xl:text-sm">Sepet</span>
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                </svg>
                 <span v-if="cart.length"
                   class="absolute -top-1.5 -right-1.5 bg-red-500 text-white rounded-full w-5 h-5 text-xs font-bold flex items-center justify-center shadow-lg border-2 border-white">
                   {{cart.reduce((acc, i) => acc + i.quantity, 0)}}
@@ -114,28 +117,34 @@ function logout() {
               </RouterLink>
             </div>
 
-            <!-- Giriş yapılmışsa -->
-            <div v-else class="flex items-center gap-2">
-              <div class="hidden xl:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-gray-700 shadow-md">
-                <span class="text-xs font-medium truncate max-w-[120px]">{{ user.email }}</span>
-              </div>
-
-              <!-- Panel -->
-              <RouterLink to="/customer-panel">
-                <div
-                  class="flex items-center gap-1.5 px-3 py-1.5 xl:px-4 xl:py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 transition-all duration-300 shadow-md hover:shadow-lg transform hover:scale-105">
-                  <span class="font-bold text-xs xl:text-sm hidden lg:inline">{{ user.role === 'admin' ? 'Yönetici' :
-                    'Panel' }}</span>
-                </div>
-              </RouterLink>
-
-              <!-- Çıkış -->
-              <button @click="logout">
-                <div
-                  class="flex items-center gap-1.5 px-3 py-1.5 xl:px-4 xl:py-2 rounded-lg bg-red-600 hover:bg-red-500 transition-all duration-300 shadow-md hover:shadow-lg transform hover:scale-105">
-                  <span class="font-bold text-xs xl:text-sm hidden lg:inline">Çıkış</span>
-                </div>
+            <!-- Giriş yapılmışsa - Kullanıcı Dropdown -->
+            <div v-else class="relative group">
+              <button
+                class="text-sm xl:text-base hover:text-gray-200 flex items-center font-bold hover:underline gap-1 transition">
+                {{ user.email && user.email.split('@')[0] }}
+                <svg class="w-3 h-3 xl:w-4 xl:h-4" fill="none" stroke="currentColor" stroke-width="2"
+                  viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+                </svg>
               </button>
+
+              <div
+                class="absolute right-0 mt-2 w-44 bg-white text-black rounded-lg shadow-lg z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
+                <RouterLink to="/customer-panel"
+                  class="block px-3 py-2 text-sm hover:bg-gray-100 rounded-t-lg transition">
+                  Kullanıcı Paneli
+                </RouterLink>
+
+                <RouterLink v-if="user.role === 'admin'" to="/admin"
+                  class="block px-3 py-2 text-sm hover:bg-gray-100 transition">
+                  Admin Paneli
+                </RouterLink>
+
+                <button @click="logout"
+                  class="w-full text-left px-3 py-2 text-sm hover:bg-gray-100 rounded-b-lg transition text-red-600">
+                  Çıkış Yap
+                </button>
+              </div>
             </div>
           </div>
         </div>

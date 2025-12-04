@@ -36,7 +36,7 @@ onMounted(async () => {
     const user = JSON.parse(userStr);
     currentUserId.value = user.id;
   }
-  
+
   try {
     const products = await apiGet("/products/popular");
     popularProducts.value = products;
@@ -74,7 +74,7 @@ const handleAddToCart = (product: any) => {
     alert("Kendi ürününüzü sepete ekleyemezsiniz!");
     return;
   }
-  
+
   addToCart({
     id: product.id,
     title: product.title,
@@ -109,13 +109,71 @@ const handleBuyNow = async (product: any) => {
   }
 
   alert(`${product.title} başarıyla satın alındı! Siparişlerinizi panelden takip edebilirsiniz.`);
-  
+
   const products = await apiGet("/products/popular");
   popularProducts.value = products;
 };
 </script>
 
 <template>
+  <!-- Slider -->
+  <div class="px-4 sm:px-6 lg:px-8 py-10">
+    <div data-hs-carousel='{"loadingClasses": "opacity-0"}' class="relative">
+      <div
+        class="hs-carousel relative overflow-hidden w-full h-120 md:h-[calc(100vh-106px)] bg-gray-100 rounded-2xl dark:bg-neutral-800">
+        <div
+          class="hs-carousel-body absolute top-0 bottom-0 start-0 flex flex-nowrap transition-transform duration-700 opacity-0">
+          <div class="hs-carousel-slide">
+            <div
+              class="h-120 md:h-[calc(100vh-106px)] flex flex-col bg-[url('./assets/herodiscountbanner1.png')] bg-cover bg-center bg-no-repeat">
+              <div class="mt-auto w-2/3 md:max-w-lg ps-5 pb-5 md:ps-10 md:pb-10">
+                <span class="block text-white">Yılbaşı İndirimleri</span>
+                <span class="block text-white text-xl md:text-3xl">Şuanda mevcut olan yılbaşı indirimlerinden
+                  ürünlerimizden satın alarak yararlanabilirsiniz!</span>
+              </div>
+            </div>
+          </div>
+          <div class="hs-carousel-slide">
+            <div
+              class="h-72 sm:h-96 md:h-[calc(100vh-106px)] flex flex-col bg-[url('./assets/herobanner2.png')] bg-cover bg-center bg-no-repeat">
+              <div class="mt-auto w-2/3 md:max-w-lg ps-5 pb-5 md:ps-10 md:pb-10">
+                <span class="block text-white">Açılışa Özel İndirim</span>
+                <span class="block text-white text-xl md:text-3xl">Açılışa özel uygun ve indirimli fiyatlı ürünler sizi
+                  bekliyor!</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <button type="button"
+        class="hs-carousel-prev hs-carousel-disabled:opacity-50 disabled:pointer-events-none absolute inset-y-0 start-0 inline-flex justify-center items-center w-12 h-full text-black hover:bg-white/20 rounded-s-2xl focus:outline-hidden focus:bg-white/20">
+        <span class="text-2xl" aria-hidden="true">
+          <svg class="shrink-0 size-3.5 md:size-4 text-white hover:scale-115" xmlns="http://www.w3.org/2000/svg"
+            width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+            <path fill-rule="evenodd"
+              d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z">
+            </path>
+          </svg>
+        </span>
+        <span class="sr-only">Önceki</span>
+      </button>
+
+      <button type="button"
+        class="hs-carousel-next hs-carousel-disabled:opacity-50 disabled:pointer-events-none absolute inset-y-0 end-0 inline-flex justify-center items-center w-12 h-full text-black hover:bg-white/20 rounded-e-2xl focus:outline-hidden focus:bg-white/20">
+        <span class="sr-only">Sonraki</span>
+        <span class="text-2xl" aria-hidden="true">
+          <svg class="shrink-0 size-3.5 md:size-4 text-white hover:scale-115" xmlns="http://www.w3.org/2000/svg"
+            width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+            <path fill-rule="evenodd"
+              d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z">
+            </path>
+          </svg>
+        </span>
+      </button>
+    </div>
+  </div>
+
   <!-- Popüler Ürünler -->
   <div class="px-4 sm:px-6 lg:px-8 py-10 bg-gradient-to-b from-white to-gray-50">
     <div class="max-w-7xl mx-auto">
@@ -129,7 +187,8 @@ const handleBuyNow = async (product: any) => {
         <div v-for="product in popularProducts" :key="product.id"
           class="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-xl transition-shadow duration-300 relative group">
 
-          <div class="absolute top-3 right-3 z-10 bg-red-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg">
+          <div
+            class="absolute top-3 right-3 z-10 bg-red-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg">
             {{ product.total_sales || 0 }} Satış
           </div>
 
@@ -148,11 +207,10 @@ const handleBuyNow = async (product: any) => {
             <h3 class="font-semibold text-slate-900 mb-2 line-clamp-2 h-12">{{ product.title }}</h3>
             <p class="text-sm text-gray-500 mb-2 line-clamp-2">{{ product.description }}</p>
 
-              <div v-if="parseFeatures(product.features)" class="mb-3">
+            <div v-if="parseFeatures(product.features)" class="mb-3">
               <div class="flex flex-wrap gap-1.5">
-                <span v-for="(value, key) in Object.entries(parseFeatures(product.features))" 
-                      :key="key"
-                      class="inline-flex items-center gap-1 text-black text-xs font-medium px-2.5 py-1 rounded-full border">
+                <span v-for="(value, key) in Object.entries(parseFeatures(product.features))" :key="key"
+                  class="inline-flex items-center gap-1 text-black text-xs font-medium px-2.5 py-1 rounded-full border">
                   {{ value[0] }}: {{ value[1] }}
                 </span>
               </div>
@@ -197,50 +255,6 @@ const handleBuyNow = async (product: any) => {
     </div>
   </div>
 
-  <!-- Slider - Aynı kalacak -->
-  <div class="px-4 sm:px-6 lg:px-8 py-10">
-    <div data-hs-carousel='{"loadingClasses": "opacity-0"}' class="relative">
-      <div class="hs-carousel relative overflow-hidden w-full h-120 md:h-[calc(100vh-106px)] bg-gray-100 rounded-2xl dark:bg-neutral-800">
-        <div class="hs-carousel-body absolute top-0 bottom-0 start-0 flex flex-nowrap transition-transform duration-700 opacity-0">
-          <div class="hs-carousel-slide">
-            <div class="h-120 md:h-[calc(100vh-106px)] flex flex-col bg-[url('./assets/herodiscountbanner1.png')] bg-cover bg-center bg-no-repeat">
-              <div class="mt-auto w-2/3 md:max-w-lg ps-5 pb-5 md:ps-10 md:pb-10">
-                <span class="block text-white">Yılbaşı İndirimleri</span>
-                <span class="block text-white text-xl md:text-3xl">Şuanda mevcut olan yılbaşı indirimlerinden ürünlerimizden satın alarak yararlanabilirsiniz!</span>
-              </div>
-            </div>
-          </div>
-          <div class="hs-carousel-slide">
-            <div class="h-72 sm:h-96 md:h-[calc(100vh-106px)] flex flex-col bg-[url('./assets/herobanner2.png')] bg-cover bg-center bg-no-repeat">
-              <div class="mt-auto w-2/3 md:max-w-lg ps-5 pb-5 md:ps-10 md:pb-10">
-                <span class="block text-white">Açılışa Özel İndirim</span>
-                <span class="block text-white text-xl md:text-3xl">Açılışa özel uygun ve indirimli fiyatlı ürünler sizi bekliyor!</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <button type="button" class="hs-carousel-prev hs-carousel-disabled:opacity-50 disabled:pointer-events-none absolute inset-y-0 start-0 inline-flex justify-center items-center w-12 h-full text-black hover:bg-white/20 rounded-s-2xl focus:outline-hidden focus:bg-white/20">
-        <span class="text-2xl" aria-hidden="true">
-          <svg class="shrink-0 size-3.5 md:size-4 text-white hover:scale-115" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-            <path fill-rule="evenodd" d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z"></path>
-          </svg>
-        </span>
-        <span class="sr-only">Önceki</span>
-      </button>
-
-      <button type="button" class="hs-carousel-next hs-carousel-disabled:opacity-50 disabled:pointer-events-none absolute inset-y-0 end-0 inline-flex justify-center items-center w-12 h-full text-black hover:bg-white/20 rounded-e-2xl focus:outline-hidden focus:bg-white/20">
-        <span class="sr-only">Sonraki</span>
-        <span class="text-2xl" aria-hidden="true">
-          <svg class="shrink-0 size-3.5 md:size-4 text-white hover:scale-115" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-            <path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z"></path>
-          </svg>
-        </span>
-      </button>
-    </div>
-  </div>
-
   <!-- Keşfedilebilir Ürünler -->
   <div class="px-4 sm:px-6 lg:px-8 py-16 bg-gradient-to-br from-blue-50 via-white to-purple-50">
     <div class="max-w-7xl mx-auto">
@@ -279,7 +293,9 @@ const handleBuyNow = async (product: any) => {
           <div class="relative overflow-hidden h-56">
             <img :src="product.image_url || 'https://via.placeholder.com/300x300?text=No+Image'" :alt="product.title"
               class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
-            <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+            <div
+              class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+            </div>
           </div>
 
           <div class="p-4">
@@ -289,9 +305,8 @@ const handleBuyNow = async (product: any) => {
             <!-- ÖZELLİKLER -->
             <div v-if="parseFeatures(product.features)" class="mb-3">
               <div class="flex flex-wrap gap-1.5">
-                <span v-for="(value, key) in Object.entries(parseFeatures(product.features))" 
-                      :key="key"
-                      class="inline-flex items-center gap-1 text-black text-xs font-medium px-2.5 py-1 rounded-full border">
+                <span v-for="(value, key) in Object.entries(parseFeatures(product.features))" :key="key"
+                  class="inline-flex items-center gap-1 text-black text-xs font-medium px-2.5 py-1 rounded-full border">
                   {{ value[0] }}: {{ value[1] }}
                 </span>
               </div>
@@ -316,12 +331,12 @@ const handleBuyNow = async (product: any) => {
               <button disabled
                 class="flex-1 bg-gray-300 text-gray-500 text-sm font-medium py-2.5 rounded-lg cursor-not-allowed"
                 title="Kendi ürününüzü satın alamazsınız">
-               Sepete Ekle
+                Sepete Ekle
               </button>
               <button disabled
                 class="flex-1 bg-gray-300 text-gray-500 text-sm font-medium py-2.5 rounded-lg cursor-not-allowed"
                 title="Kendi ürününüzü satın alamazsınız">
-                 Satın Al
+                Satın Al
               </button>
             </div>
           </div>
@@ -355,9 +370,10 @@ const handleBuyNow = async (product: any) => {
 
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         <RouterLink to="/kategori/erkek-giyim" class="group">
-          <div class="bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden transform hover:-translate-y-2">
+          <div
+            class="bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden transform hover:-translate-y-2">
             <div class="relative overflow-hidden h-56">
-              <img class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" 
+              <img class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                 src="../assets/erkek-giyim.jpeg" alt="Erkek Giyim">
               <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
               <div class="absolute bottom-4 left-4 right-4">
@@ -367,17 +383,20 @@ const handleBuyNow = async (product: any) => {
             </div>
             <div class="p-4">
               <div class="flex flex-wrap gap-2">
-                <span class="inline-block bg-gray-100 rounded-full px-3 py-1 text-xs font-medium text-gray-700">#erkek-giyim</span>
-                <span class="inline-block bg-gray-100 rounded-full px-3 py-1 text-xs font-medium text-gray-700">#erkek-kıyafetleri</span>
+                <span
+                  class="inline-block bg-gray-100 rounded-full px-3 py-1 text-xs font-medium text-gray-700">#erkek-giyim</span>
+                <span
+                  class="inline-block bg-gray-100 rounded-full px-3 py-1 text-xs font-medium text-gray-700">#erkek-kıyafetleri</span>
               </div>
             </div>
           </div>
         </RouterLink>
 
         <RouterLink to="/kategori/kadin-giyim" class="group">
-          <div class="bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden transform hover:-translate-y-2">
+          <div
+            class="bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden transform hover:-translate-y-2">
             <div class="relative overflow-hidden h-56">
-              <img class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" 
+              <img class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                 src="../assets/kadın-giyim.jpg" alt="Kadın Giyim">
               <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
               <div class="absolute bottom-4 left-4 right-4">
@@ -387,17 +406,20 @@ const handleBuyNow = async (product: any) => {
             </div>
             <div class="p-4">
               <div class="flex flex-wrap gap-2">
-                <span class="inline-block bg-gray-100 rounded-full px-3 py-1 text-xs font-medium text-gray-700">#kadın-giyim</span>
-                <span class="inline-block bg-gray-100 rounded-full px-3 py-1 text-xs font-medium text-gray-700">#kadın-kıyafetleri</span>
+                <span
+                  class="inline-block bg-gray-100 rounded-full px-3 py-1 text-xs font-medium text-gray-700">#kadın-giyim</span>
+                <span
+                  class="inline-block bg-gray-100 rounded-full px-3 py-1 text-xs font-medium text-gray-700">#kadın-kıyafetleri</span>
               </div>
             </div>
           </div>
         </RouterLink>
 
         <RouterLink to="/kategori/ayakkabi" class="group">
-          <div class="bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden transform hover:-translate-y-2">
+          <div
+            class="bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden transform hover:-translate-y-2">
             <div class="relative overflow-hidden h-56">
-              <img class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" 
+              <img class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                 src="../assets/ayakkabi3.jpg" alt="Ayakkabı">
               <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
               <div class="absolute bottom-4 left-4 right-4">
@@ -407,17 +429,20 @@ const handleBuyNow = async (product: any) => {
             </div>
             <div class="p-4">
               <div class="flex flex-wrap gap-2">
-                <span class="inline-block bg-gray-100 rounded-full px-3 py-1 text-xs font-medium text-gray-700">#ayakkabı</span>
-                <span class="inline-block bg-gray-100 rounded-full px-3 py-1 text-xs font-medium text-gray-700">#ayakkabı-modelleri</span>
+                <span
+                  class="inline-block bg-gray-100 rounded-full px-3 py-1 text-xs font-medium text-gray-700">#ayakkabı</span>
+                <span
+                  class="inline-block bg-gray-100 rounded-full px-3 py-1 text-xs font-medium text-gray-700">#ayakkabı-modelleri</span>
               </div>
             </div>
           </div>
         </RouterLink>
 
         <RouterLink to="/kategori/cocuk-giyim" class="group">
-          <div class="bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden transform hover:-translate-y-2">
+          <div
+            class="bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden transform hover:-translate-y-2">
             <div class="relative overflow-hidden h-56">
-              <img class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" 
+              <img class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                 src="../assets/cocuk-giyim.jpg" alt="Çocuk Giyim">
               <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
               <div class="absolute bottom-4 left-4 right-4">
@@ -427,8 +452,10 @@ const handleBuyNow = async (product: any) => {
             </div>
             <div class="p-4">
               <div class="flex flex-wrap gap-2">
-                <span class="inline-block bg-gray-100 rounded-full px-3 py-1 text-xs font-medium text-gray-700">#çocuk-giyim</span>
-                <span class="inline-block bg-gray-100 rounded-full px-3 py-1 text-xs font-medium text-gray-700">#çocuk-kıyafetleri</span>
+                <span
+                  class="inline-block bg-gray-100 rounded-full px-3 py-1 text-xs font-medium text-gray-700">#çocuk-giyim</span>
+                <span
+                  class="inline-block bg-gray-100 rounded-full px-3 py-1 text-xs font-medium text-gray-700">#çocuk-kıyafetleri</span>
               </div>
             </div>
           </div>
