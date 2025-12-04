@@ -148,15 +148,16 @@ const handleBuyNow = async (product: any) => {
             <h3 class="font-semibold text-slate-900 mb-2 line-clamp-2 h-12">{{ product.title }}</h3>
             <p class="text-sm text-gray-500 mb-2 line-clamp-2">{{ product.description }}</p>
 
-            <div v-if="parseFeatures(product.features)" class="mb-3">
-              <div class="flex flex-wrap gap-1">
-                <span v-for="(value, key) in Object.entries(parseFeatures(product.features)).slice(0, 2)" 
+              <div v-if="parseFeatures(product.features)" class="mb-3">
+              <div class="flex flex-wrap gap-1.5">
+                <span v-for="(value, key) in Object.entries(parseFeatures(product.features))" 
                       :key="key"
-                      class="inline-flex items-center gap-1 text-black text-xs font-medium px-2 py-1 border rounded-full">
-                  {{ value[1] }}
+                      class="inline-flex items-center gap-1 text-black text-xs font-medium px-2.5 py-1 rounded-full border">
+                  {{ value[0] }}: {{ value[1] }}
                 </span>
               </div>
             </div>
+
 
             <div class="flex items-center justify-between mb-3">
               <span class="text-2xl font-bold text-slate-900">{{ product.price }} TL</span>
@@ -288,7 +289,7 @@ const handleBuyNow = async (product: any) => {
             <!-- ÖZELLİKLER -->
             <div v-if="parseFeatures(product.features)" class="mb-3">
               <div class="flex flex-wrap gap-1.5">
-                <span v-for="(value, key) in Object.entries(parseFeatures(product.features)).slice(0, 3)" 
+                <span v-for="(value, key) in Object.entries(parseFeatures(product.features))" 
                       :key="key"
                       class="inline-flex items-center gap-1 text-black text-xs font-medium px-2.5 py-1 rounded-full border">
                   {{ value[0] }}: {{ value[1] }}
