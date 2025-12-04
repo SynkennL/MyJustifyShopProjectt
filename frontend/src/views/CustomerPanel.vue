@@ -91,7 +91,7 @@ async function addProduct() {
   }
 
   try {
-    // Özellikleri temizle (boş değerleri kaldır)
+    // Özellikleri temizle
     const cleanedFeatures: any = {};
     
     if (newProduct.value.features.beden) cleanedFeatures.Beden = newProduct.value.features.beden;
