@@ -66,7 +66,6 @@ export async function createProduct(req: Request, res: Response) {
   if (!title || price == null) return res.status(400).json({ error: "title & price required" });
   if (!seller_id) return res.status(401).json({ error: "Unauthorized" });
 
-  // Features'ı JSON olarak kaydet
   const featuresJson = features ? JSON.stringify(features) : null;
 
   const q = await pool.query(
