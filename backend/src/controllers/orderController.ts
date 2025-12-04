@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { pool } from "../db";
 
 export async function createOrder(req: Request, res: Response) {
-  const { product_id, quantity } = req.body;
+  const { product_id, quantity, sizes } = req.body;
   const buyer_id = (req as any).user?.id;
 
   if (!product_id || !quantity) return res.status(400).json({ error: "product_id & quantity required" });
@@ -28,16 +28,40 @@ export async function createOrder(req: Request, res: Response) {
 
     const total_price = product.price * quantity;
 
-    const orderQuery = await client.query(
-      `INSERT INTO orders (buyer_id, seller_id, product_id, quantity, total_price, status) 
-       VALUES ($1, $2, $3, $4, $5, $6) 
-       RETURNING *`,
-      [buyer_id, product.seller_id, product_id, quantity, total_price, 'pending']
-    );
+    let orderQuery;
+    try {
+      if (sizes && Array.isArray(sizes) && sizes.length > 0) {
+        const sizesJson = JSON.stringify(sizes);
+        orderQuery = await client.query(
+          `INSERT INTO orders (buyer_id, seller_id, product_id, quantity, total_price, status, sizes) 
+           VALUES ($1, $2, $3, $4, $5, $6, $7) 
+           RETURNING *`,
+          [buyer_id, product.seller_id, product_id, quantity, total_price, 'pending', sizesJson]
+        );
+      } else {
+        orderQuery = await client.query(
+          `INSERT INTO orders (buyer_id, seller_id, product_id, quantity, total_price, status) 
+           VALUES ($1, $2, $3, $4, $5, $6) 
+           RETURNING *`,
+          [buyer_id, product.seller_id, product_id, quantity, total_price, 'pending']
+        );
+      }
+    } catch (insertErr: any) {
+      if (insertErr.message && insertErr.message.includes('sizes')) {
+        orderQuery = await client.query(
+          `INSERT INTO orders (buyer_id, seller_id, product_id, quantity, total_price, status) 
+           VALUES ($1, $2, $3, $4, $5, $6) 
+           RETURNING *`,
+          [buyer_id, product.seller_id, product_id, quantity, total_price, 'pending']
+        );
+      } else {
+        throw insertErr;
+      }
+    }
 
     res.status(201).json(orderQuery.rows[0]);
   } catch (err) {
-    console.error(err);
+    console.error("Order creation error:", err);
     res.status(500).json({ error: "Server error" });
   } finally {
     client.release();
@@ -67,7 +91,18 @@ export async function getMyOrders(req: Request, res: Response) {
       [user_id]
     );
 
-    res.json(query.rows);
+    const parsedRows = query.rows.map((row: any) => {
+      if (row.sizes && typeof row.sizes === 'string') {
+        try {
+          row.sizes = JSON.parse(row.sizes);
+        } catch (e) {
+          row.sizes = null;
+        }
+      }
+      return row;
+    });
+
+    res.json(parsedRows);
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Server error" });

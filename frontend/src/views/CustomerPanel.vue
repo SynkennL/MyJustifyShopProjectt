@@ -22,6 +22,7 @@ interface SoldOrder {
   buyer_email: string;
   image_url?: string;
   created_at: string;
+  sizes?: string[] | null;
 }
 
 interface PurchasedOrder {
@@ -33,6 +34,7 @@ interface PurchasedOrder {
   seller_email: string;
   image_url?: string;
   created_at: string;
+  sizes?: string[] | null;
 }
 
 const router = useRouter();
@@ -57,6 +59,9 @@ const newProduct = ref({
     marka: ""
   }
 });
+const predefinedSizes = ["XS","S","M","L","XL","XXL","36","38","40","42","44"];
+
+const selectedProductSizes = ref<string[]>([]);
 
 async function loadData() {
   try {
@@ -94,7 +99,10 @@ async function addProduct() {
     // Özellikleri temizle
     const cleanedFeatures: any = {};
     
-    if (newProduct.value.features.beden) cleanedFeatures.Beden = newProduct.value.features.beden;
+    if (selectedProductSizes.value && selectedProductSizes.value.length > 0) {
+    } else if (newProduct.value.features.beden) {
+      cleanedFeatures.Beden = newProduct.value.features.beden;
+    }
     if (newProduct.value.features.renk) cleanedFeatures.Renk = newProduct.value.features.renk;
     if (newProduct.value.features.malzeme) cleanedFeatures.Malzeme = newProduct.value.features.malzeme;
     if (newProduct.value.features.marka) cleanedFeatures.Marka = newProduct.value.features.marka;
@@ -105,7 +113,8 @@ async function addProduct() {
       price: newProduct.value.price,
       category_id: newProduct.value.category_id,
       image_url: newProduct.value.image_url,
-      features: Object.keys(cleanedFeatures).length > 0 ? cleanedFeatures : null
+      features: Object.keys(cleanedFeatures).length > 0 ? cleanedFeatures : null,
+      sizes: selectedProductSizes.value.length > 0 ? selectedProductSizes.value : undefined
     };
 
     const res = await apiPost("/products", productData);
@@ -130,6 +139,7 @@ async function addProduct() {
         marka: ""
       }
     };
+    selectedProductSizes.value = [];
     
     await loadData();
   } catch (error) {
@@ -200,6 +210,18 @@ function parseFeatures(features: any) {
     }
   }
   return features;
+}
+
+function featureEntries(features: any) {
+  const f = parseFeatures(features);
+  if (!f) return [];
+  const hasSizes = Array.isArray(f.sizes) && f.sizes.length > 0;
+  return Object.entries(f).filter(([k]) => {
+    const lk = String(k).toLowerCase();
+    if (lk === 'sizes') return false;
+    if (hasSizes && (lk === 'beden' || lk === 'bede' || lk === 'size')) return false;
+    return true;
+  });
 }
 
 onMounted(loadData);
@@ -286,10 +308,13 @@ onMounted(() => {
         </h4>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
           <div>
-            <label class="block text-sm font-medium text-gray-600 mb-1">Beden</label>
-            <input v-model="newProduct.features.beden" 
-                   placeholder="Örn: XL, 42, M-L" 
-                   class="input text-sm" />
+            <label class="block text-sm font-medium text-gray-600 mb-1">Beden:</label>
+            <div class="flex flex-wrap gap-2">
+              <label v-for="s in predefinedSizes" :key="s" class="inline-flex items-center gap-2 text-sm">
+                <input type="checkbox" :value="s" v-model="selectedProductSizes" class="w-4 h-4" />
+                <span class="text-xs">{{ s }}</span>
+              </label>
+            </div>
           </div>
           <div>
             <label class="block text-sm font-medium text-gray-600 mb-1">Renk</label>
@@ -326,16 +351,16 @@ onMounted(() => {
         <div v-for="product in myProducts" :key="product.id" class="border rounded-lg p-4 hover:shadow-lg transition bg-white">
           <img 
             :src="product.image_url || 'https://via.placeholder.com/300'" 
-            alt="Ürün" 
+            alt="Ürün"
             class="w-full h-48 object-cover rounded-lg mb-3"
           />
           <h4 class="font-semibold text-lg mb-1">{{ product.title }}</h4>
           <p class="text-gray-600 text-sm mb-2 line-clamp-2">{{ product.description }}</p>
           <p class="text-gray-500 text-xs mb-2">Kategori: {{ product.category_name }}</p>
           
-          <div v-if="parseFeatures(product.features)" class="mb-3">
+          <div v-if="featureEntries(product.features).length" class="mb-3">
             <div class="flex flex-wrap gap-2">
-              <span v-for="(value, key) in parseFeatures(product.features)" :key="key"
+              <span v-for="([key,value]) in featureEntries(product.features)" :key="product.id"
                     class="inline-flex items-center gap-1 text-black text-xs font-medium px-3 py-1.5 rounded-full border">
                 {{ key }}: {{ value }}
               </span>
@@ -370,6 +395,7 @@ onMounted(() => {
               <h3 class="font-semibold text-lg">{{ order.product_title }}</h3>
               <p class="text-gray-600 text-sm">✉️ Alıcı: {{ order.buyer_email }}</p>
               <p class="text-gray-600 text-sm">📦 Adet: {{ order.quantity }}</p>
+              <p v-if="order.sizes && order.sizes.length" class="text-gray-600 text-sm">Bedenler: {{ order.sizes.join(", ") }}</p>
               <p class="font-bold text-lg mt-1">💰 {{ order.total_price }} TL</p>
               <p class="text-gray-500 text-xs mt-1">📅 {{ formatDate(order.created_at) }}</p>
             </div>
@@ -415,6 +441,7 @@ onMounted(() => {
               <h3 class="font-semibold text-lg">{{ order.product_title }}</h3>
               <p class="text-gray-600 text-sm">🏪 Satıcı: {{ order.seller_email }}</p>
               <p class="text-gray-600 text-sm">📦 Adet: {{ order.quantity }}</p>
+                <p v-if="order.sizes && order.sizes.length" class="text-gray-600 text-sm">Bedenler: {{ order.sizes.join(", ") }}</p>
               <p class="font-bold text-lg mt-1">💰 {{ order.total_price }} TL</p>
               <p class="text-gray-500 text-xs mt-1">📅 {{ formatDate(order.created_at) }}</p>
             </div>

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
+import { ref, onMounted, reactive } from "vue";
 import { useRouter } from "vue-router";
 import { apiGet, apiPost } from "../services/api";
 import { addToCart } from "../services/cart";
@@ -9,13 +9,14 @@ const popularProducts = ref<any[]>([]);
 const currentUserId = ref<number | null>(null);
 const selectedCategory = ref<string>("erkek-giyim");
 const categoryProducts = ref<any[]>([]);
+const selectedSizes = reactive<Record<number, string[]>>({});
 const isLoadingCategory = ref<boolean>(false);
 
 const categories = [
-  { name: "Erkek Giyim", slug: "erkek-giyim", icon: "👔" },
-  { name: "Kadın Giyim", slug: "kadin-giyim", icon: "👗" },
-  { name: "Ayakkabı", slug: "ayakkabi", icon: "👟" },
-  { name: "Çocuk Giyim", slug: "cocuk-giyim", icon: "👶" }
+  { name: "Erkek Giyim", slug: "erkek-giyim"},
+  { name: "Kadın Giyim", slug: "kadin-giyim"},
+  { name: "Ayakkabı", slug: "ayakkabi"},
+  { name: "Çocuk Giyim", slug: "cocuk-giyim"}
 ];
 
 function parseFeatures(features: any) {
@@ -30,6 +31,18 @@ function parseFeatures(features: any) {
   return features;
 }
 
+function featureEntries(features: any) {
+  const f = parseFeatures(features);
+  if (!f) return [];
+  const hasSizes = Array.isArray(f.sizes) && f.sizes.length > 0;
+  return Object.entries(f).filter(([k]) => {
+    const lk = String(k).toLowerCase();
+    if (lk === 'sizes') return false;
+    if (hasSizes && (lk === 'beden' || lk === 'bede' || lk === 'size')) return false;
+    return true;
+  });
+}
+
 onMounted(async () => {
   const userStr = localStorage.getItem("user");
   if (userStr) {
@@ -40,6 +53,12 @@ onMounted(async () => {
   try {
     const products = await apiGet("/products/popular");
     popularProducts.value = products;
+    products.forEach((p: any) => {
+      const f = parseFeatures(p.features);
+      if (f && Array.isArray(f.sizes) && f.sizes.length > 0) {
+        selectedSizes[p.id] = [];
+      }
+    });
   } catch (error) {
     console.error("Popüler ürünler yüklenirken hata:", error);
   }
@@ -52,6 +71,12 @@ async function loadCategoryProducts(categorySlug: string) {
   try {
     const products = await apiGet(`/products?category=${categorySlug}`);
     categoryProducts.value = products.slice(0, 4);
+    products.forEach((p: any) => {
+      const f = parseFeatures(p.features);
+      if (f && Array.isArray(f.sizes) && f.sizes.length > 0) {
+        selectedSizes[p.id] = [];
+      }
+    });
   } catch (error) {
     console.error("Kategori ürünleri yüklenirken hata:", error);
     categoryProducts.value = [];
@@ -75,11 +100,18 @@ const handleAddToCart = (product: any) => {
     return;
   }
 
+  const sizes = selectedSizes[product.id] || [];
+  if (parseFeatures(product.features)?.sizes && sizes.length === 0) {
+    alert("Lütfen en az bir beden seçiniz!");
+    return;
+  }
+
   addToCart({
     id: product.id,
     title: product.title,
     price: product.price,
     image: product.image_url || "https://via.placeholder.com/300x300?text=No+Image",
+    sizes: sizes.length > 0 ? sizes : undefined,
   });
   alert(`${product.title} sepete eklendi!`);
 };
@@ -98,9 +130,15 @@ const handleBuyNow = async (product: any) => {
   }
 
   const quantity = 1;
+  const sizes = selectedSizes[product.id] || [];
+  if (parseFeatures(product.features)?.sizes && sizes.length === 0) {
+    alert("Lütfen en az bir beden seçiniz!");
+    return;
+  }
   const res = await apiPost("/orders", {
     product_id: product.id,
-    quantity: quantity
+    quantity: quantity,
+    sizes: sizes.length > 0 ? sizes : undefined
   });
 
   if (res.error) {
@@ -207,15 +245,24 @@ const handleBuyNow = async (product: any) => {
             <h3 class="font-semibold text-slate-900 mb-2 line-clamp-2 h-12">{{ product.title }}</h3>
             <p class="text-sm text-gray-500 mb-2 line-clamp-2">{{ product.description }}</p>
 
-            <div v-if="parseFeatures(product.features)" class="mb-3">
+            <div v-if="parseFeatures(product.features) && featureEntries(product.features).length" class="mb-3">
               <div class="flex flex-wrap gap-1.5">
-                <span v-for="(value, key) in Object.entries(parseFeatures(product.features))" :key="key"
+                <span v-for="([key,value]) in featureEntries(product.features)" :key="product.id"
                   class="inline-flex items-center gap-1 text-black text-xs font-medium px-2.5 py-1 rounded-full border">
-                  {{ value[0] }}: {{ value[1] }}
+                  {{ key }}: {{ value }}
                 </span>
               </div>
             </div>
 
+            <div v-if="parseFeatures(product.features) && parseFeatures(product.features).sizes" class="mb-3">
+              <label class="text-sm text-gray-600 block mb-2">Beden:</label>
+              <div class="flex flex-wrap gap-2">
+                <label v-for="s in parseFeatures(product.features).sizes" :key="product.id + s" class="inline-flex items-center gap-2 text-sm cursor-pointer">
+                  <input type="checkbox" :value="s" v-model="selectedSizes[product.id]" class="w-4 h-4 rounded" />
+                  <span>{{ s }}</span>
+                </label>
+              </div>
+            </div>
 
             <div class="flex items-center justify-between mb-3">
               <span class="text-2xl font-bold text-slate-900">{{ product.price }} TL</span>
@@ -270,7 +317,6 @@ const handleBuyNow = async (product: any) => {
             ? 'bg-green-600 text-white hover:scale-115 scale-105'
             : 'bg-white text-gray-700 hover:bg-gray-100'
         ]">
-          <span class="mr-2">{{ category.icon }}</span>
           {{ category.name }}
         </button>
       </div>
@@ -303,12 +349,22 @@ const handleBuyNow = async (product: any) => {
             <p class="text-sm text-gray-500 mb-3 line-clamp-2 truncate">{{ product.description }}</p>
 
             <!-- ÖZELLİKLER -->
-            <div v-if="parseFeatures(product.features)" class="mb-3">
+            <div v-if="parseFeatures(product.features) && featureEntries(product.features).length" class="mb-3">
               <div class="flex flex-wrap gap-1.5">
-                <span v-for="(value, key) in Object.entries(parseFeatures(product.features))" :key="key"
+                <span v-for="([key,value]) in featureEntries(product.features)" :key="product.id"
                   class="inline-flex items-center gap-1 text-black text-xs font-medium px-2.5 py-1 rounded-full border">
-                  {{ value[0] }}: {{ value[1] }}
+                  {{ key }}: {{ value }}
                 </span>
+              </div>
+            </div>
+
+            <div v-if="parseFeatures(product.features) && parseFeatures(product.features).sizes" class="mb-3">
+              <label class="text-sm text-gray-600 block mb-2">Beden:</label>
+              <div class="flex flex-wrap gap-2">
+                <label v-for="s in parseFeatures(product.features).sizes" :key="product.id" class="inline-flex items-center gap-2 text-sm cursor-pointer">
+                  <input type="checkbox" :value="s" v-model="selectedSizes[product.id]" class="w-4 h-4 rounded" />
+                  <span>{{ s }}</span>
+                </label>
               </div>
             </div>
 

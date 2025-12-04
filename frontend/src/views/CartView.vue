@@ -5,20 +5,28 @@ import { apiPost } from "../services/api";
 
 const router = useRouter();
 
-const updateQuantity = (productId: number, delta: number) => {
-  const item = cart.value.find(i => i.id === productId);
+const updateQuantity = (productId: number, delta: number, sizes?: string[] | null) => {
+  const sizesKey = (sizes || []).sort().join('|');
+  const item = cart.value.find(i => {
+    const existingSizesKey = (i.sizes || []).sort().join('|');
+    return i.id === productId && existingSizesKey === sizesKey;
+  });
   if (item) {
     item.quantity += delta;
     if (item.quantity <= 0) {
-      removeFromCart(productId);
+      removeFromCart(productId, sizes);
     } else {
       saveCart();
     }
   }
 };
 
-const removeFromCart = (productId: number) => {
-  const index = cart.value.findIndex(i => i.id === productId);
+const removeFromCart = (productId: number, sizes?: string[] | null) => {
+  const sizesKey = (sizes || []).sort().join('|');
+  const index = cart.value.findIndex(i => {
+    const existingSizesKey = (i.sizes || []).sort().join('|');
+    return i.id === productId && existingSizesKey === sizesKey;
+  });
   if (index > -1) {
     cart.value.splice(index, 1);
     saveCart();
@@ -44,7 +52,8 @@ const buyProduct = async (product: any) => {
   try {
     const res = await apiPost("/orders", {
       product_id: product.id,
-      quantity: product.quantity
+      quantity: product.quantity,
+      sizes: product.sizes && product.sizes.length > 0 ? product.sizes : undefined
     });
 
     if (res.error) {
@@ -53,7 +62,8 @@ const buyProduct = async (product: any) => {
     }
 
     alert(`${product.title} başarıyla satın alındı!`);
-    removeFromCart(product.id);
+    removeFromCart(product.id, product.sizes);
+    window.location.href = "/customer-panel";
   } catch (error) {
     console.error("Satın alma hatası:", error);
     alert("Satın alma sırasında bir hata oluştu!");
@@ -79,27 +89,29 @@ const buyAll = async () => {
 
   let successCount = 0;
   let errorMessages: string[] = [];
+  const itemsToRemove: any[] = [];
 
   for (const item of cart.value) {
     try {
       const res = await apiPost("/orders", {
         product_id: item.id,
-        quantity: item.quantity
+        quantity: item.quantity,
+        sizes: item.sizes && item.sizes.length > 0 ? item.sizes : undefined
       });
 
       if (res.error) {
         errorMessages.push(`${item.title}: ${res.error}`);
       } else {
         successCount++;
+        itemsToRemove.push(item);
       }
     } catch (error) {
       errorMessages.push(`${item.title}: Satın alma hatası`);
     }
   }
 
-  if (successCount > 0) {
-    alert(`${successCount} ürün başarıyla satın alındı!`);
-    clearCart();
+  for (const item of itemsToRemove) {
+    removeFromCart(item.id, item.sizes);
   }
 
   if (errorMessages.length > 0) {
@@ -107,7 +119,8 @@ const buyAll = async () => {
   }
 
   if (successCount > 0) {
-    router.push("/customer-panel");
+    alert(`${successCount} ürün başarıyla satın alındı!`);
+    window.location.href = "/customer-panel";
   }
 };
 </script>
@@ -139,7 +152,7 @@ const buyAll = async () => {
     <!-- Sepet Ürünleri -->
     <div v-else class="space-y-4">
       <!-- Ürün Listesi -->
-      <div v-for="item in cart" :key="item.id" class="border border-gray-200 rounded p-4">
+      <div v-for="item in cart" :key="item.id + '-' + (item.sizes || []).join('|')" class="border border-gray-200 rounded p-4">
         <div class="flex gap-4">
           <img 
             :src="item.image || 'https://via.placeholder.com/150'" 
@@ -147,21 +160,23 @@ const buyAll = async () => {
             class="w-24 h-24 object-cover rounded"
           />
           
-          <div class="flex-1">
+            <div class="flex-1">
             <h3 class="font-semibold text-lg text-slate-900 mb-1">{{ item.title }}</h3>
             <p class="text-slate-900 font-bold text-xl mb-3">{{ item.price }} TL</p>
+
+            <p v-if="item.sizes && item.sizes.length" class="text-sm text-gray-600 mb-2">Seçilen Bedenler: <span class="font-semibold">{{ item.sizes.join(", ") }}</span></p>
             
             <div class="flex items-center gap-4">
               <div class="flex items-center gap-2">
                 <button 
-                  @click="updateQuantity(item.id, -1)"
+                  @click="updateQuantity(item.id, -1, item.sizes)"
                   class="w-8 h-8 border border-gray-300 rounded hover:bg-gray-100"
                 >
                   -
                 </button>
                 <span class="w-12 text-center font-medium">{{ item.quantity }}</span>
                 <button 
-                  @click="updateQuantity(item.id, 1)"
+                  @click="updateQuantity(item.id, 1, item.sizes)"
                   class="w-8 h-8 border border-gray-300 rounded hover:bg-gray-100"
                 >
                   +
@@ -176,7 +191,7 @@ const buyAll = async () => {
               </button>
               
               <button 
-                @click="removeFromCart(item.id)"
+                @click="removeFromCart(item.id, item.sizes)"
                 class="text-red-600 hover:underline text-sm font-medium"
               >
                 Kaldır

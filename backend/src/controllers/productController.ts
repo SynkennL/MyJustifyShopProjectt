@@ -60,13 +60,17 @@ export async function getPopularProducts(req: Request, res: Response) {
 }
 
 export async function createProduct(req: Request, res: Response) {
-  const { title, description, price, category_id, image_url, features } = req.body;
+  const { title, description, price, category_id, image_url, features, sizes } = req.body;
   const seller_id = (req as any).user?.id;
 
   if (!title || price == null) return res.status(400).json({ error: "title & price required" });
   if (!seller_id) return res.status(401).json({ error: "Unauthorized" });
 
-  const featuresJson = features ? JSON.stringify(features) : null;
+  const featuresObj = features && typeof features === 'object' ? { ...features } : (features ? JSON.parse(features) : {});
+  if (sizes && Array.isArray(sizes)) {
+    featuresObj.sizes = sizes;
+  }
+  const featuresJson = Object.keys(featuresObj).length ? JSON.stringify(featuresObj) : null;
 
   const q = await pool.query(
     "INSERT INTO products (title, description, price, category_id, image_url, seller_id, features) VALUES ($1,$2,$3,$4,$5,$6,$7) RETURNING *",

@@ -5,6 +5,7 @@ interface CartItem {
   title: string;
   price: number;
   image?: string;
+  sizes?: string[] | null;
   quantity: number;
 }
 
@@ -23,7 +24,12 @@ const saveCart = () => {
 
 // Sepete ekle
 const addToCart = (product: Omit<CartItem, "quantity">) => {
-  const existing = cart.value.find(item => item.id === product.id);
+  const productSizes = (product as any).sizes || [];
+  const sizeKey = productSizes.sort().join('|');
+  const existing = cart.value.find(item => {
+    const existingSizes = (item.sizes || []).sort().join('|');
+    return item.id === product.id && existingSizes === sizeKey;
+  });
   if (existing) {
     existing.quantity += 1;
   } else {
