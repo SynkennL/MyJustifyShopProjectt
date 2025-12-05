@@ -94,7 +94,7 @@ function logout() {
               <!-- Sepet -->
               <RouterLink to="/cart" class="relative group">
                 <div
-                  class="flex items-center gap-1.5 px-3 py-1.5 xl:px-4 xl:py-2 rounded-lg bg-gradient-to-r from-blue-600 to-blue-700 transition-all duration-300 shadow-lg hover:shadow-blue-500/50 transform hover:scale-110 hover:from-blue-500 hover:to-blue-600">
+                  class="flex items-center gap-1.5 px-3 py-1.5 xl:px-4 xl:py-2 rounded-lg bg-blue-700 transition-all duration-300 shadow-lg hover:shadow-blue-500/50 transform hover:scale-110">
                   <span class="font-bold text-xs xl:text-sm">Sepetim</span>
                   <span v-if="cart.length"
                     class="bg-red-500 text-white rounded-full px-2 py-0.5 text-xs font-bold shadow-lg animate-pulse">
@@ -105,13 +105,13 @@ function logout() {
 
               <RouterLink to="/login">
                 <div
-                  class="flex items-center gap-1.5 px-3 py-1.5 xl:px-4 xl:py-2 rounded-lg bg-gradient-to-r from-green-600 to-green-700 hover:from-green-500 hover:to-green-600 transition-all duration-300 shadow-lg hover:shadow-green-500/50 transform hover:scale-110">
+                  class="flex items-center gap-1.5 px-3 py-1.5 xl:px-4 xl:py-2 rounded-lg bg-green-700 transition-all duration-300 shadow-lg hover:shadow-green-500/50 transform hover:scale-110">
                   <span class="font-bold text-xs xl:text-sm">Giriş</span>
                 </div>
               </RouterLink>
               <RouterLink to="/register">
                 <div
-                  class="flex items-center gap-1.5 px-3 py-1.5 xl:px-4 xl:py-2 rounded-lg bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-500 hover:to-purple-600 transition-all duration-300 shadow-lg hover:shadow-purple-500/50 transform hover:scale-110">
+                  class="flex items-center gap-1.5 px-3 py-1.5 xl:px-4 xl:py-2 rounded-lg bg-purple-600 transition-all duration-300 shadow-lg hover:shadow-purple-500/50 transform hover:scale-110">
                   <span class="font-bold text-xs xl:text-sm">Kayıt</span>
                 </div>
               </RouterLink>
