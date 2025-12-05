@@ -2,6 +2,8 @@
 import { ref } from "vue";
 import { useRouter } from "vue-router";
 import { apiPost } from "../services/api";
+import { toast } from "vue3-toastify";
+
 
 const router = useRouter();
 const email = ref("");
@@ -9,7 +11,6 @@ const password = ref("");
 const error = ref("");
 
 async function submit() {
-  error.value = "";
   try {
     const res = await apiPost("/auth/login", { email: email.value, password: password.value });
     if (res.error) { error.value = res.error; return; }
@@ -20,7 +21,7 @@ async function submit() {
     location.reload();
   }, 100);
   } catch (e) {
-    error.value = "Giriş yapılırken bir hata oluştu.";
+    toast.error("Giriş yapılırken bir hata oluştu.");
   }
 }
 </script>
@@ -39,8 +40,6 @@ async function submit() {
     <button @click="submit"
       class="w-full bg-slate-900 text-white py-2.5 rounded-md hover:bg-slate-800 transition-transform duration-300 hover:scale-105">Giriş
       Yap</button>
-
-    <p v-if="error" class="text-red-500 mt-3">{{ error }}</p>
   </div>
 </template>
 

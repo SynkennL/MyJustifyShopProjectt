@@ -2,6 +2,7 @@
 import { useRouter } from "vue-router";
 import { cart, clearCart } from "../services/cart";
 import { apiPost } from "../services/api";
+import { toast } from "vue3-toastify";
 
 const router = useRouter();
 
@@ -44,7 +45,7 @@ const totalPrice = () => {
 const buyProduct = async (product: any) => {
   const token = localStorage.getItem("token");
   if (!token) {
-    alert("Satın almak için giriş yapmalısınız!");
+    toast.info("Satın almak için giriş yapmalısınız!");
     router.push("/login");
     return;
   }
@@ -57,33 +58,33 @@ const buyProduct = async (product: any) => {
     });
 
     if (res.error) {
-      alert(res.error);
+      toast.error(res.error);
       return;
     }
 
-    alert(`${product.title} başarıyla satın alındı!`);
+    toast.success(`${product.title} başarıyla satın alındı!`);
     removeFromCart(product.id, product.sizes);
     window.location.href = "/customer-panel";
   } catch (error) {
     console.error("Satın alma hatası:", error);
-    alert("Satın alma sırasında bir hata oluştu!");
+    toast.error("Satın alma sırasında bir hata oluştu!");
   }
 };
 
 const buyAll = async () => {
   const token = localStorage.getItem("token");
   if (!token) {
-    alert("Satın almak için giriş yapmalısınız!");
+    toast.info("Satın almak için giriş yapmalısınız!");
     router.push("/login");
     return;
   }
 
   if (cart.value.length === 0) {
-    alert("Sepetiniz boş!");
+    toast.info("Sepetiniz boş!");
     return;
   }
 
-  if (!confirm(`${cart.value.length} ürünü toplam ${totalPrice().toFixed(2)} TL'ye satın almak istediğinize emin misiniz?`)) {
+  if (!confirm(`"${cart.value.length}" ürünü toplam ${totalPrice().toFixed(2)} TL'ye satın almak istediğinize emin misiniz?`)) {
     return;
   }
 
@@ -115,11 +116,11 @@ const buyAll = async () => {
   }
 
   if (errorMessages.length > 0) {
-    alert("Bazı ürünler satın alınamadı:\n" + errorMessages.join("\n"));
+    toast.error("Bazı ürünler satın alınamadı:\n" + errorMessages.join("\n"));
   }
 
   if (successCount > 0) {
-    alert(`${successCount} ürün başarıyla satın alındı!`);
+    toast.success(`${successCount} ürün başarıyla satın alındı!`);
     window.location.href = "/customer-panel";
   }
 };

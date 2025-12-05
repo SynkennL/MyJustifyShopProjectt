@@ -2,6 +2,7 @@
 import { ref, onMounted } from "vue";
 import { apiGet, apiPost } from "../services/api";
 import { useRouter } from "vue-router";
+import { toast } from "vue3-toastify";
 
 interface Product {
   id: number;
@@ -91,7 +92,7 @@ async function loadData() {
 
 async function addProduct() {
   if (!newProduct.value.title || !newProduct.value.price || !newProduct.value.category_id) {
-    alert("Başlık, fiyat ve kategori zorunludur!");
+    toast.error("Başlık, fiyat ve kategori zorunludur!");
     return;
   }
 
@@ -119,11 +120,11 @@ async function addProduct() {
 
     const res = await apiPost("/products", productData);
     if (res.error) {
-      alert(res.error);
+      toast.error(res.error);
       return;
     }
 
-    alert("Ürün başarıyla eklendi!");
+    toast.success("Ürün başarıyla eklendi!");
     
     // Formu sıfırla
     newProduct.value = {
@@ -144,7 +145,7 @@ async function addProduct() {
     await loadData();
   } catch (error) {
     console.error("Ürün ekleme hatası:", error);
-    alert("Ürün eklenirken bir hata oluştu!");
+    toast.error("Ürün eklenirken bir hata oluştu!");
   }
 }
 
@@ -164,14 +165,14 @@ async function deleteProduct(productId: number) {
     const data = await res.json();
 
     if (res.ok) {
-      alert("Ürün başarıyla silindi!");
+      toast.success("Ürün başarıyla silindi!");
       await loadData();
     } else {
-      alert(data.error || "Ürün silinemedi!");
+      toast.error(data.error || "Ürün silinemedi!");
     }
   } catch (error) {
     console.error("Silme hatası:", error);
-    alert("Ürün silinirken bir hata oluştu!");
+    toast.error("Ürün silinirken bir hata oluştu!");
   }
 }
 
@@ -188,15 +189,15 @@ async function updateOrderStatus(orderId: number, newStatus: string) {
     });
     
     if (res.ok) {
-      alert("Sipariş durumu güncellendi!");
+      toast.success("Sipariş durumu güncellendi!");
       await loadData();
     } else {
       const data = await res.json();
-      alert(data.error || "Durum güncellenemedi!");
+      toast.error(data.error || "Durum güncellenemedi!");
     }
   } catch (error) {
     console.error("Durum güncelleme hatası:", error);
-    alert("Durum güncellenirken bir hata oluştu!");
+    toast.error("Durum güncellenirken bir hata oluştu!");
   }
 }
 
@@ -255,7 +256,7 @@ function getStatusText(status: string) {
 onMounted(() => {
   const user = JSON.parse(localStorage.getItem("user") || "{}");
   if (user.role !== 'customer' && user.role !== 'admin') {
-    alert("Bu sayfaya erişim yetkiniz yok!");
+    toast.error("Bu sayfaya erişim yetkiniz yok!");
     router.push("/");
     return;
   }

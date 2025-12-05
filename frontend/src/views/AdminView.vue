@@ -2,6 +2,7 @@
 import { ref, onMounted } from "vue";
 import { apiGet, apiPost } from "../services/api";
 import { useRouter } from "vue-router";
+import { toast } from "vue3-toastify";
 
 const router = useRouter();
 
@@ -37,7 +38,7 @@ async function load() {
 
 async function addCategory() {
   const res = await apiPost("/categories", { name: catName.value, slug: catSlug.value });
-  if (res.error) { alert(res.error); return; }
+  if (res.error) { toast.error(res.error); return; }
   catName.value = ""; catSlug.value = "";
   await load();
 }
@@ -54,10 +55,10 @@ async function deleteProduct(productId: number) {
   });
 
   if (res.ok) {
-    alert("Ürün silindi!");
+    toast.success("Ürün silindi!");
     await load();
   } else {
-    alert("Ürün silinemedi!");
+    toast.error("Ürün silinemedi!");
   }
 }
 
@@ -65,7 +66,7 @@ async function deleteProduct(productId: number) {
 onMounted(() => {
   const user = JSON.parse(localStorage.getItem("user") || "{}");
   if (user.role !== 'admin') {
-    alert("Bu sayfaya erişim yetkiniz yok!");
+    toast.error("Bu sayfaya erişim yetkiniz yok!");
     router.push("/");
     return;
   }

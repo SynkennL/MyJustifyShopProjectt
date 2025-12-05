@@ -3,7 +3,7 @@ import { ref, onMounted, reactive } from "vue";
 import { useRouter } from "vue-router";
 import { apiGet, apiPost } from "../services/api";
 import { addToCart } from "../services/cart";
-
+import { toast } from "vue3-toastify";
 const router = useRouter();
 const popularProducts = ref<any[]>([]);
 const currentUserId = ref<number | null>(null);
@@ -13,10 +13,10 @@ const selectedSizes = reactive<Record<number, string[]>>({});
 const isLoadingCategory = ref<boolean>(false);
 
 const categories = [
-  { name: "Erkek Giyim", slug: "erkek-giyim"},
-  { name: "Kadın Giyim", slug: "kadin-giyim"},
-  { name: "Ayakkabı", slug: "ayakkabi"},
-  { name: "Çocuk Giyim", slug: "cocuk-giyim"}
+  { name: "Erkek Giyim", slug: "erkek-giyim" },
+  { name: "Kadın Giyim", slug: "kadin-giyim" },
+  { name: "Ayakkabı", slug: "ayakkabi" },
+  { name: "Çocuk Giyim", slug: "cocuk-giyim" }
 ];
 
 function parseFeatures(features: any) {
@@ -52,8 +52,14 @@ onMounted(async () => {
 
   try {
     const products = await apiGet("/products/popular");
-    popularProducts.value = products;
-    products.forEach((p: any) => {
+
+    const filtered = products.filter(
+      (p: any) => p.seller_id !== currentUserId.value
+    );
+
+    popularProducts.value = filtered;
+
+    filtered.forEach((p: any) => {
       const f = parseFeatures(p.features);
       if (f && Array.isArray(f.sizes) && f.sizes.length > 0) {
         selectedSizes[p.id] = [];
@@ -70,8 +76,14 @@ async function loadCategoryProducts(categorySlug: string) {
   isLoadingCategory.value = true;
   try {
     const products = await apiGet(`/products?category=${categorySlug}`);
-    categoryProducts.value = products.slice(0, 4);
-    products.forEach((p: any) => {
+
+    const filtered = products.filter(
+      (p: any) => p.seller_id !== currentUserId.value
+    );
+
+    categoryProducts.value = filtered.slice(0, 4);
+
+    filtered.forEach((p: any) => {
       const f = parseFeatures(p.features);
       if (f && Array.isArray(f.sizes) && f.sizes.length > 0) {
         selectedSizes[p.id] = [];
@@ -85,6 +97,7 @@ async function loadCategoryProducts(categorySlug: string) {
   }
 }
 
+
 async function selectCategory(categorySlug: string) {
   selectedCategory.value = categorySlug;
   await loadCategoryProducts(categorySlug);
@@ -96,13 +109,13 @@ function isOwnProduct(product: any) {
 
 const handleAddToCart = (product: any) => {
   if (isOwnProduct(product)) {
-    alert("Kendi ürününüzü sepete ekleyemezsiniz!");
+    toast.error("Kendi ürününüzü sepete ekleyemezsiniz!");
     return;
   }
 
   const sizes = selectedSizes[product.id] || [];
   if (parseFeatures(product.features)?.sizes && sizes.length === 0) {
-    alert("Lütfen en az bir beden seçiniz!");
+    toast.error("Lütfen en az bir beden seçiniz!");
     return;
   }
 
@@ -113,26 +126,26 @@ const handleAddToCart = (product: any) => {
     image: product.image_url || "https://via.placeholder.com/300x300?text=No+Image",
     sizes: sizes.length > 0 ? sizes : undefined,
   });
-  alert(`${product.title} sepete eklendi!`);
+  toast.success(`"${product.title}" sepete eklendi!`);
 };
 
 const handleBuyNow = async (product: any) => {
   const token = localStorage.getItem("token");
   if (!token) {
-    alert("Satın almak için giriş yapmalısınız!");
+    toast.info("Lütfen satın alma işlemi için giriş yapınız.");
     router.push("/login");
     return;
   }
 
   if (isOwnProduct(product)) {
-    alert("Kendi ürününüzü satın alamazsınız!");
+    toast.error("Kendi ürününüzü satın alamazsınız!");
     return;
   }
 
   const quantity = 1;
   const sizes = selectedSizes[product.id] || [];
   if (parseFeatures(product.features)?.sizes && sizes.length === 0) {
-    alert("Lütfen en az bir beden seçiniz!");
+    toast.error("Lütfen en az bir beden seçiniz!");
     return;
   }
   const res = await apiPost("/orders", {
@@ -142,11 +155,11 @@ const handleBuyNow = async (product: any) => {
   });
 
   if (res.error) {
-    alert(res.error);
+    toast.error(`Satın alma işlemi başarısız: ${res.error}`);
     return;
   }
 
-  alert(`${product.title} başarıyla satın alındı! Siparişlerinizi panelden takip edebilirsiniz.`);
+  toast.success(`"${product.title}" başarıyla satın alındı! Siparişlerinizi panelden takip edebilirsiniz.`);
 
   const products = await apiGet("/products/popular");
   popularProducts.value = products;
@@ -157,8 +170,7 @@ const handleBuyNow = async (product: any) => {
   <!-- Slider -->
   <div class="px-4 sm:px-6 lg:px-8 py-8">
     <div data-hs-carousel='{"loadingClasses": "opacity-0"}' class="relative">
-      <div
-        class="hs-carousel relative overflow-hidden w-full h-96 md:h-[500px] bg-gray-100 rounded-xl">
+      <div class="hs-carousel relative overflow-hidden w-full h-96 md:h-[500px] bg-gray-100 rounded-xl">
         <div
           class="hs-carousel-body absolute top-0 bottom-0 start-0 flex flex-nowrap transition-transform duration-700 opacity-0">
           <div class="hs-carousel-slide">
@@ -166,7 +178,8 @@ const handleBuyNow = async (product: any) => {
               class="h-96 md:h-[500px] flex flex-col bg-[url('./assets/herodiscountbanner1.png')] bg-cover bg-center bg-no-repeat">
               <div class="mt-auto w-2/3 md:max-w-lg ps-6 pb-6 md:ps-12 md:pb-12">
                 <span class="block text-white text-sm font-medium mb-2">Yılbaşı İndirimleri</span>
-                <span class="block text-white text-2xl md:text-3xl font-bold">Şuanda mevcut olan yılbaşı indirimlerinden ürünlerimizden satın alarak yararlanabilirsiniz!</span>
+                <span class="block text-white text-2xl md:text-3xl font-bold">Şuanda mevcut olan yılbaşı indirimlerinden
+                  ürünlerimizden satın alarak yararlanabilirsiniz!</span>
               </div>
             </div>
           </div>
@@ -175,7 +188,8 @@ const handleBuyNow = async (product: any) => {
               class="h-96 md:h-[500px] flex flex-col bg-[url('./assets/herobanner2.png')] bg-cover bg-center bg-no-repeat">
               <div class="mt-auto w-2/3 md:max-w-lg ps-6 pb-6 md:ps-12 md:pb-12">
                 <span class="block text-white text-sm font-medium mb-2">Açılışa Özel İndirim</span>
-                <span class="block text-white text-2xl md:text-3xl font-bold">Açılışa özel uygun ve indirimli fiyatlı ürünler sizi bekliyor!</span>
+                <span class="block text-white text-2xl md:text-3xl font-bold">Açılışa özel uygun ve indirimli fiyatlı
+                  ürünler sizi bekliyor!</span>
               </div>
             </div>
           </div>
@@ -185,14 +199,16 @@ const handleBuyNow = async (product: any) => {
       <button type="button"
         class="hs-carousel-prev hs-carousel-disabled:opacity-50 disabled:pointer-events-none absolute inset-y-0 start-0 inline-flex justify-center items-center w-10 h-full text-white hover:bg-black/20 rounded-s-xl">
         <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16">
-          <path fill-rule="evenodd" d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z"/>
+          <path fill-rule="evenodd"
+            d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z" />
         </svg>
       </button>
 
       <button type="button"
         class="hs-carousel-next hs-carousel-disabled:opacity-50 disabled:pointer-events-none absolute inset-y-0 end-0 inline-flex justify-center items-center w-10 h-full text-white hover:bg-black/20 rounded-e-xl">
         <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16">
-          <path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z"/>
+          <path fill-rule="evenodd"
+            d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z" />
         </svg>
       </button>
     </div>
@@ -209,7 +225,7 @@ const handleBuyNow = async (product: any) => {
       <div v-if="popularProducts.length > 0"
         class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-6">
         <div v-for="product in popularProducts" :key="product.id"
-          class="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg transition-shadow relative group">
+          class="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg transition-shadow relative group flex flex-col h-full">
 
           <div class="absolute top-2 right-2 z-10 bg-red-500 text-white text-xs font-semibold px-2 py-1 rounded">
             {{ product.total_sales || 0 }} Satış
@@ -226,13 +242,13 @@ const handleBuyNow = async (product: any) => {
               class="w-full h-full object-cover" />
           </div>
 
-          <div class="p-3">
+          <div class="p-3 flex flex-col flex-1">
             <h3 class="font-semibold text-sm text-gray-900 mb-1 line-clamp-2 min-h-[40px]">{{ product.title }}</h3>
             <p class="text-xs text-gray-500 mb-2 line-clamp-1">{{ product.description }}</p>
 
             <div v-if="parseFeatures(product.features) && featureEntries(product.features).length" class="mb-2">
               <div class="flex flex-wrap gap-1">
-                <span v-for="([key,value]) in featureEntries(product.features)" :key="product.id"
+                <span v-for="([key, value]) in featureEntries(product.features)" :key="product.id"
                   class="text-xs bg-gray-100 px-2 py-0.5 rounded">
                   {{ key }}: {{ value }}
                 </span>
@@ -242,14 +258,15 @@ const handleBuyNow = async (product: any) => {
             <div v-if="parseFeatures(product.features) && parseFeatures(product.features).sizes" class="mb-2">
               <label class="text-xs text-gray-600 block mb-1">Beden:</label>
               <div class="flex flex-wrap gap-1">
-                <label v-for="s in parseFeatures(product.features).sizes" :key="product.id + s" class="inline-flex items-center text-xs cursor-pointer">
-                  <input type="checkbox" :value="s" v-model="selectedSizes[product.id]" class="w-3 h-3 rounded mr-1" />
+                <label v-for="s in parseFeatures(product.features).sizes" :key="product.id + s"
+                  class="inline-flex items-center text-xs cursor-pointer">
+                  <input type="radio" :value="s" v-model="selectedSizes[product.id]" class="w-3 h-3 rounded mr-1" />
                   <span>{{ s }}</span>
                 </label>
               </div>
             </div>
 
-            <div class="flex items-center justify-between mb-3">
+            <div class="flex items-center justify-between mb-3 mt-auto">
               <span class="text-lg font-bold text-gray-900">{{ product.price }} TL</span>
               <span class="text-xs text-gray-500">{{ product.category_name }}</span>
             </div>
@@ -311,28 +328,23 @@ const handleBuyNow = async (product: any) => {
         <p class="text-gray-600 mt-3">Ürünler yükleniyor...</p>
       </div>
 
-      <div v-else-if="categoryProducts.length > 0" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 md:gap-6">
+      <div v-else-if="categoryProducts.length > 0"
+        class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 md:gap-6">
         <div v-for="product in categoryProducts" :key="product.id"
-          class="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg transition-shadow relative group">
-
-          <div v-if="isOwnProduct(product)" class="absolute top-2 left-2 z-10">
-            <span class="bg-blue-500 text-white text-xs font-semibold px-2 py-1 rounded">
-              Sizin Ürününüz
-            </span>
-          </div>
+          class="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg transition-shadow relative group flex flex-col h-full">
 
           <div class="relative overflow-hidden aspect-square">
             <img :src="product.image_url || 'https://via.placeholder.com/300x300?text=No+Image'" :alt="product.title"
               class="w-full h-full object-cover" />
           </div>
 
-          <div class="p-3">
+          <div class="p-3 flex flex-col flex-1">
             <h3 class="font-semibold text-sm text-gray-900 mb-1 line-clamp-2 min-h-[40px]">{{ product.title }}</h3>
             <p class="text-xs text-gray-500 mb-2 line-clamp-1">{{ product.description }}</p>
 
             <div v-if="parseFeatures(product.features) && featureEntries(product.features).length" class="mb-2">
               <div class="flex flex-wrap gap-1">
-                <span v-for="([key,value]) in featureEntries(product.features)" :key="product.id"
+                <span v-for="([key, value]) in featureEntries(product.features)" :key="product.id"
                   class="text-xs bg-gray-100 px-2 py-0.5 rounded">
                   {{ key }}: {{ value }}
                 </span>
@@ -342,14 +354,15 @@ const handleBuyNow = async (product: any) => {
             <div v-if="parseFeatures(product.features) && parseFeatures(product.features).sizes" class="mb-2">
               <label class="text-xs text-gray-600 block mb-1">Beden:</label>
               <div class="flex flex-wrap gap-1">
-                <label v-for="s in parseFeatures(product.features).sizes" :key="product.id" class="inline-flex items-center text-xs cursor-pointer">
-                  <input type="checkbox" :value="s" v-model="selectedSizes[product.id]" class="w-3 h-3 rounded mr-1" />
+                <label v-for="s in parseFeatures(product.features).sizes" :key="product.id"
+                  class="inline-flex items-center text-xs cursor-pointer">
+                  <input type="radio" :value="s" v-model="selectedSizes[product.id]" class="w-3 h-3 rounded mr-1" />
                   <span>{{ s }}</span>
                 </label>
               </div>
             </div>
 
-            <div class="mb-3">
+            <div class="flex items-center justify-between mb-3 mt-auto">
               <span class="text-lg font-bold text-gray-900">{{ product.price }} TL</span>
             </div>
 
@@ -360,19 +373,6 @@ const handleBuyNow = async (product: any) => {
               </button>
               <button @click="handleBuyNow(product)"
                 class="flex-1 bg-green-600 text-white text-xs font-medium py-2 rounded hover:bg-green-700 transition">
-                Satın Al
-              </button>
-            </div>
-
-            <div v-else class="flex gap-2">
-              <button disabled
-                class="flex-1 bg-gray-300 text-gray-500 text-xs font-medium py-2 rounded cursor-not-allowed"
-                title="Kendi ürününüzü satın alamazsınız">
-                Sepete Ekle
-              </button>
-              <button disabled
-                class="flex-1 bg-gray-300 text-gray-500 text-xs font-medium py-2 rounded cursor-not-allowed"
-                title="Kendi ürününüzü satın alamazsınız">
                 Satın Al
               </button>
             </div>
