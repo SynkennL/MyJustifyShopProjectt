@@ -1,15 +1,17 @@
 <script setup lang="ts">
+
 import { ref, onMounted, reactive } from "vue";
 import { useRouter } from "vue-router";
 import { apiGet, apiPost } from "../services/api";
 import { addToCart } from "../services/cart";
 import { toast } from "vue3-toastify";
+
 const router = useRouter();
 const popularProducts = ref<any[]>([]);
 const currentUserId = ref<number | null>(null);
 const selectedCategory = ref<string>("erkek-giyim");
 const categoryProducts = ref<any[]>([]);
-const selectedSizes = reactive<Record<number, string[]>>({});
+const selectedSizes = reactive<Record<number, string>>({}); // string olarak değiştirildi
 const isLoadingCategory = ref<boolean>(false);
 
 const categories = [
@@ -62,7 +64,7 @@ onMounted(async () => {
     filtered.forEach((p: any) => {
       const f = parseFeatures(p.features);
       if (f && Array.isArray(f.sizes) && f.sizes.length > 0) {
-        selectedSizes[p.id] = [];
+        selectedSizes[p.id] = ""; // boş string ile başlat
       }
     });
   } catch (error) {
@@ -86,7 +88,7 @@ async function loadCategoryProducts(categorySlug: string) {
     filtered.forEach((p: any) => {
       const f = parseFeatures(p.features);
       if (f && Array.isArray(f.sizes) && f.sizes.length > 0) {
-        selectedSizes[p.id] = [];
+        selectedSizes[p.id] = ""; // boş string ile başlat
       }
     });
   } catch (error) {
@@ -96,7 +98,6 @@ async function loadCategoryProducts(categorySlug: string) {
     isLoadingCategory.value = false;
   }
 }
-
 
 async function selectCategory(categorySlug: string) {
   selectedCategory.value = categorySlug;
@@ -113,9 +114,11 @@ const handleAddToCart = (product: any) => {
     return;
   }
 
-  const sizes = selectedSizes[product.id] || [];
-  if (parseFeatures(product.features)?.sizes && sizes.length === 0) {
-    toast.error("Lütfen en az bir beden seçiniz!");
+  const selectedSize = selectedSizes[product.id]; // string değeri al
+  const hasRequiredSize = parseFeatures(product.features)?.sizes; // beden gerekli mi
+
+  if (hasRequiredSize && !selectedSize) {
+    toast.error("Lütfen bir beden seçiniz!");
     return;
   }
 
@@ -124,7 +127,7 @@ const handleAddToCart = (product: any) => {
     title: product.title,
     price: product.price,
     image: product.image_url || "https://via.placeholder.com/300x300?text=No+Image",
-    sizes: sizes.length > 0 ? sizes : undefined,
+    sizes: selectedSize ? [selectedSize] : null, // string'i array'e çevir veya null
   });
   toast.success(`"${product.title}" sepete eklendi!`);
 };
@@ -143,15 +146,18 @@ const handleBuyNow = async (product: any) => {
   }
 
   const quantity = 1;
-  const sizes = selectedSizes[product.id] || [];
-  if (parseFeatures(product.features)?.sizes && sizes.length === 0) {
-    toast.error("Lütfen en az bir beden seçiniz!");
+  const selectedSize = selectedSizes[product.id]; // string değeri al
+  const hasRequiredSize = parseFeatures(product.features)?.sizes; // beden gerekli mi
+
+  if (hasRequiredSize && !selectedSize) {
+    toast.error("Lütfen bir beden seçiniz!");
     return;
   }
+
   const res = await apiPost("/orders", {
     product_id: product.id,
     quantity: quantity,
-    sizes: sizes.length > 0 ? sizes : undefined
+    sizes: selectedSize ? [selectedSize] : undefined // string'i array'e çevir
   });
 
   if (res.error) {
@@ -162,7 +168,10 @@ const handleBuyNow = async (product: any) => {
   toast.success(`"${product.title}" başarıyla satın alındı! Siparişlerinizi panelden takip edebilirsiniz.`);
 
   const products = await apiGet("/products/popular");
-  popularProducts.value = products;
+  const filtered = products.filter(
+    (p: any) => p.seller_id !== currentUserId.value
+  );
+  popularProducts.value = filtered;
 };
 </script>
 

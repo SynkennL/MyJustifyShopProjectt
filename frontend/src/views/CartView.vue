@@ -62,7 +62,7 @@ const buyProduct = async (product: any) => {
       return;
     }
 
-    toast.success(`${product.title} başarıyla satın alındı!`);
+    toast.success(`"${product.title}" başarıyla satın alındı!`);
     removeFromCart(product.id, product.sizes);
     window.location.href = "/customer-panel";
   } catch (error) {
@@ -121,7 +121,6 @@ const buyAll = async () => {
 
   if (successCount > 0) {
     toast.success(`${successCount} ürün başarıyla satın alındı!`);
-    window.location.href = "/customer-panel";
   }
 };
 </script>
