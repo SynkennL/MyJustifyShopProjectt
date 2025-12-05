@@ -278,7 +278,7 @@ function logout() {
             </div>
           </RouterLink>
 
-          <!-- Admin Paneli (sadece admin için) -->
+          <!-- Admin Paneli -->
           <RouterLink v-if="user.role === 'admin'" to="/admin" @click="isMobileMenuOpen = false">
             <div
               class="flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-500 hover:to-purple-600 transition-all duration-300 shadow-lg hover:shadow-purple-500/50 transform hover:scale-105">
