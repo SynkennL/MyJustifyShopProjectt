@@ -116,7 +116,7 @@ function logout() {
             <button 
               @click="isUserDropdownOpen = !isUserDropdownOpen"
               class="flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-gray-700 hover:text-slate-900 hover:bg-slate-50 rounded-lg transition-all">
-              <span class="hidden xl:inline">{{ user?.email?.split('@')[0] || 'Kullanıcı' }}</span>
+              <span class="hidden xl:inline">{{ user?.name }}</span>
               <svg class="w-4 h-4 transition-transform" :class="{ 'rotate-180': isUserDropdownOpen }" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
               </svg>
