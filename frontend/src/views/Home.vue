@@ -11,7 +11,7 @@ const popularProducts = ref<any[]>([]);
 const currentUserId = ref<number | null>(null);
 const selectedCategory = ref<string>("erkek-giyim");
 const categoryProducts = ref<any[]>([]);
-const selectedSizes = reactive<Record<number, string>>({}); // string olarak değiştirildi
+const selectedSizes = reactive<Record<number, string>>({});
 const isLoadingCategory = ref<boolean>(false);
 
 const categories = [
@@ -64,7 +64,7 @@ onMounted(async () => {
     filtered.forEach((p: any) => {
       const f = parseFeatures(p.features);
       if (f && Array.isArray(f.sizes) && f.sizes.length > 0) {
-        selectedSizes[p.id] = ""; // boş string ile başlat
+        selectedSizes[p.id] = "";
       }
     });
   } catch (error) {
@@ -88,7 +88,7 @@ async function loadCategoryProducts(categorySlug: string) {
     filtered.forEach((p: any) => {
       const f = parseFeatures(p.features);
       if (f && Array.isArray(f.sizes) && f.sizes.length > 0) {
-        selectedSizes[p.id] = ""; // boş string ile başlat
+        selectedSizes[p.id] = "";
       }
     });
   } catch (error) {
@@ -114,8 +114,8 @@ const handleAddToCart = (product: any) => {
     return;
   }
 
-  const selectedSize = selectedSizes[product.id]; // string değeri al
-  const hasRequiredSize = parseFeatures(product.features)?.sizes; // beden gerekli mi
+  const selectedSize = selectedSizes[product.id];
+  const hasRequiredSize = parseFeatures(product.features)?.sizes;
 
   if (hasRequiredSize && !selectedSize) {
     toast.error("Lütfen bir beden seçiniz!");
@@ -127,7 +127,8 @@ const handleAddToCart = (product: any) => {
     title: product.title,
     price: product.price,
     image: product.image_url || "https://via.placeholder.com/300x300?text=No+Image",
-    sizes: selectedSize ? [selectedSize] : null, // string'i array'e çevir veya null
+    sizes: selectedSize ? [selectedSize] : null,
+    seller_id: product.seller_id,
   });
   toast.success(`"${product.title}" sepete eklendi!`);
 };
@@ -146,8 +147,8 @@ const handleBuyNow = async (product: any) => {
   }
 
   const quantity = 1;
-  const selectedSize = selectedSizes[product.id]; // string değeri al
-  const hasRequiredSize = parseFeatures(product.features)?.sizes; // beden gerekli mi
+  const selectedSize = selectedSizes[product.id];
+  const hasRequiredSize = parseFeatures(product.features)?.sizes; 
 
   if (hasRequiredSize && !selectedSize) {
     toast.error("Lütfen bir beden seçiniz!");
@@ -157,7 +158,7 @@ const handleBuyNow = async (product: any) => {
   const res = await apiPost("/orders", {
     product_id: product.id,
     quantity: quantity,
-    sizes: selectedSize ? [selectedSize] : undefined // string'i array'e çevir
+    sizes: selectedSize ? [selectedSize] : undefined
   });
 
   if (res.error) {

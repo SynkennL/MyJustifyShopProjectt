@@ -27,7 +27,7 @@ const categoryTitles: Record<string, string> = {
 
 const products = ref<any[]>([]);
 const currentUserId = ref<number | null>(null);
-const selectedSizes = reactive<Record<number, string>>({}); // string olarak değiştirildi
+const selectedSizes = reactive<Record<number, string>>({});
 
 function parseFeatures(features: any) {
   if (!features) return null;
@@ -72,7 +72,7 @@ async function loadProducts() {
   products.value.forEach((p: any) => {
     const f = parseFeatures(p.features);
     if (f && Array.isArray(f.sizes) && f.sizes.length > 0) {
-      selectedSizes[p.id] = ""; // boş string ile başlat
+      selectedSizes[p.id] = "";
     }
   });
 }
@@ -87,8 +87,8 @@ const handleAddToCart = (product: any) => {
     return;
   }
 
-  const selectedSize = selectedSizes[product.id]; // string değeri al
-  const hasRequiredSize = parseFeatures(product.features)?.sizes; // beden gerekli mi
+  const selectedSize = selectedSizes[product.id];
+  const hasRequiredSize = parseFeatures(product.features)?.sizes;
 
   if (hasRequiredSize && !selectedSize) {
     toast.error("Lütfen bir beden seçiniz!");
@@ -100,7 +100,8 @@ const handleAddToCart = (product: any) => {
     title: product.title,
     price: product.price,
     image: product.image_url || "https://via.placeholder.com/300x300?text=No+Image",
-    sizes: selectedSize ? [selectedSize] : null, // string'i array'e çevir veya null
+    sizes: selectedSize ? [selectedSize] : null,
+    seller_id: product.seller_id,
   });
   toast.success(`"${product.title}" sepete eklendi!`);
 };

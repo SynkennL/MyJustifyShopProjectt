@@ -3,6 +3,7 @@ import { ref } from "vue";
 import { useRouter } from "vue-router";
 import { apiPost } from "../services/api";
 import { toast } from "vue3-toastify";
+import { removeOwnedProductsFromCart } from "../services/cart";
 
 
 const router = useRouter();
@@ -16,6 +17,7 @@ async function submit() {
     if (res.error) { error.value = res.error; return; }
     localStorage.setItem("token", res.token);
     localStorage.setItem("user", JSON.stringify(res.user));
+    await removeOwnedProductsFromCart(res.user.id);
     await router.push("/");
   setTimeout(() => {
     location.reload();

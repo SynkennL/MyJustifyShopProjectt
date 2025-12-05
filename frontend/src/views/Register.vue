@@ -2,6 +2,7 @@
 import { ref } from "vue";
 import { useRouter } from "vue-router";
 import { apiPost } from "../services/api";
+import { clearGuestCart } from "../services/cart";
 
 const router = useRouter();
 const name = ref("");
@@ -21,6 +22,7 @@ async function submit() {
   if (res.error) { error.value = res.error; return; }
   localStorage.setItem("token", res.token);
   localStorage.setItem("user", JSON.stringify(res.user));
+  clearGuestCart();
 
   await router.push("/");
   setTimeout(() => {
@@ -144,7 +146,6 @@ async function submit() {
         Hesap Oluştur
       </button>
 
-      <!-- Error Message -->
       <p v-if="error" class="text-red-500 text-center text-sm bg-red-50 py-2 px-4 rounded-lg border border-red-200">
         {{ error }}
       </p>

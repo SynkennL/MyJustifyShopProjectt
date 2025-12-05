@@ -1,4 +1,5 @@
 import { ref } from "vue";
+import { apiGet } from "./api";
 
 interface CartItem {
   id: number;
@@ -6,6 +7,7 @@ interface CartItem {
   price: number;
   image?: string;
   sizes?: string[] | null;
+  seller_id?: number | null;
   quantity: number;
 }
 
@@ -24,7 +26,6 @@ const saveCart = () => {
 
 // Sepete ekle
 const addToCart = (product: Omit<CartItem, "quantity">) => {
-  // sizes array olarak gelir
   const productSizes = (product as any).sizes || [];
   const sizeKey = Array.isArray(productSizes) ? productSizes.sort().join('|') : '';
   
@@ -47,6 +48,46 @@ const clearCart = () => {
   saveCart();
 };
 
+const clearGuestCart = () => {
+  cart.value = [];
+  localStorage.removeItem("cart");
+};
+
+// Oturum açan kullanıcının sahibi olduğu ürünleri sepetten sil
+const removeOwnedProductsFromCart = async (userId: number) => {
+  if (userId == null) return;
+
+  // İlk olarak seller bilgisi olanları filtrele
+  let remaining = cart.value.filter(item => {
+    const seller = (item as any).seller_id ?? (item as any).sellerId ?? null;
+    return seller !== userId;
+  });
+
+  // Eğer bazı öğelerde seller bilgisi yoksa, backend'den ürünleri çekip eksik bilgiyi tamamla
+  const missing = remaining.filter(i => (i as any).seller_id == null && (i as any).sellerId == null);
+  if (missing.length > 0) {
+    try {
+      const products: any[] = await apiGet(`/products`);
+      const map = new Map<number, any>();
+      products.forEach(p => map.set(p.id, p));
+
+      remaining = remaining.filter(item => {
+        const seller = (item as any).seller_id ?? (item as any).sellerId ?? null;
+        if (seller != null) return seller !== userId;
+        const prod = map.get(item.id);
+        if (!prod) return true; // ürün bulunamazsa koru
+        return prod.seller_id !== userId;
+      });
+    } catch (err) {
+      // Eğer ürünleri çekemezsek, mevcut davranışı koru (silme yapma)
+      console.error("removeOwnedProductsFromCart: ürün bilgisi alınamadı", err);
+    }
+  }
+
+  cart.value = remaining;
+  saveCart();
+};
+
 loadCart();
 
-export { cart, addToCart, clearCart };
+export { cart, addToCart, clearCart, clearGuestCart, removeOwnedProductsFromCart };

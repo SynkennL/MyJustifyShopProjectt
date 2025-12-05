@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { RouterLink, useRouter } from 'vue-router'
-import { cart } from "../services/cart";
+import { cart, clearGuestCart } from "../services/cart";
 
 const isMobileMenuOpen = ref(false)
 const isDropdownOpenMobile = ref(false)
@@ -24,6 +24,7 @@ function logout() {
   localStorage.removeItem("token");
   localStorage.removeItem("user");
   user.value = null;
+  clearGuestCart();
   router.push("/");
 }
 </script>
