@@ -64,7 +64,6 @@ const buyProduct = async (product: any) => {
 
     toast.success(`"${product.title}" başarıyla satın alındı!`);
     removeFromCart(product.id, product.sizes);
-    window.location.href = "/customer-panel";
   } catch (error) {
     console.error("Satın alma hatası:", error);
     toast.error("Satın alma sırasında bir hata oluştu!");
@@ -84,7 +83,7 @@ const buyAll = async () => {
     return;
   }
 
-  if (!confirm(`"${cart.value.length}" ürünü toplam ${totalPrice().toFixed(2)} TL'ye satın almak istediğinize emin misiniz?`)) {
+  if (!confirm(`"${cart.value.length}" ürünü toplam ${totalPrice()} TL'ye satın almak istediğinize emin misiniz?`)) {
     return;
   }
 
