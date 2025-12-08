@@ -5,6 +5,7 @@ import { useRouter } from "vue-router";
 import { apiGet, apiPost } from "../services/api";
 import { addToCart } from "../services/cart";
 import { toast } from "vue3-toastify";
+import { isFavorite, toggleFavorite, loadFavoriteIds } from "../services/favorites";
 
 const router = useRouter();
 const popularProducts = ref<any[]>([]);
@@ -72,6 +73,7 @@ onMounted(async () => {
   }
 
   await loadCategoryProducts(selectedCategory.value);
+  await loadFavoriteIds();
 });
 
 async function loadCategoryProducts(categorySlug: string) {
@@ -133,6 +135,27 @@ const handleAddToCart = (product: any) => {
   toast.success(`"${product.title}" sepete eklendi!`);
 };
 
+const handleToggleFavorite = async (productId: number, productTitle: string) => {
+  const token = localStorage.getItem("token");
+  if (!token) {
+    toast.info("Favorilere eklemek için giriş yapmalısınız!");
+    router.push("/login");
+    return;
+  }
+
+  try {
+    const added = await toggleFavorite(productId);
+    if (added) {
+      toast.success(`"${productTitle}" favorilere eklendi!`);
+    } else {
+      toast.success(`"${productTitle}" favorilerden çıkarıldı!`);
+    }
+  } catch (error) {
+    toast.error("Bir hata oluştu!");
+  }
+};
+
+
 const handleBuyNow = async (product: any) => {
   const token = localStorage.getItem("token");
   if (!token) {
@@ -148,7 +171,7 @@ const handleBuyNow = async (product: any) => {
 
   const quantity = 1;
   const selectedSize = selectedSizes[product.id];
-  const hasRequiredSize = parseFeatures(product.features)?.sizes; 
+  const hasRequiredSize = parseFeatures(product.features)?.sizes;
 
   if (hasRequiredSize && !selectedSize) {
     toast.error("Lütfen bir beden seçiniz!");
@@ -241,19 +264,27 @@ const handleBuyNow = async (product: any) => {
             {{ product.total_sales || 0 }} Satış
           </div>
 
-          <div v-if="isOwnProduct(product)" class="absolute top-2 left-2 z-10">
-            <span class="bg-blue-500 text-white text-xs font-semibold px-2 py-1 rounded">
-              Sizin Ürününüz
-            </span>
-          </div>
 
-         <RouterLink :to="`/urun/${product.id}`" class="relative overflow-hidden aspect-square">
+          <button @click.prevent="handleToggleFavorite(product.id, product.title)"
+            class="absolute top-2 left-2 z-10 bg-white/90 hover:bg-white p-2 rounded-full shadow-lg transition"
+            title="Favorilere ekle">
+            <svg class="w-5 h-5" :class="isFavorite(product.id) ? 'text-red-500 fill-current' : 'text-gray-400'"
+              fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+            </svg>
+          </button>
+
+
+          <RouterLink :to="`/urun/${product.id}`" class="relative overflow-hidden aspect-square">
             <img :src="product.image_url || 'https://via.placeholder.com/300x300?text=No+Image'" :alt="product.title"
               class="w-full h-full object-cover" />
-         </RouterLink>
+          </RouterLink>
 
           <div class="p-3 flex flex-col flex-1">
-            <RouterLink :to="`/urun/${product.id}`" class="font-semibold text-sm hover:text-blue-600 text-gray-900 mb-1 line-clamp-2 min-h-[40px]">{{ product.title }}</RouterLink>
+            <RouterLink :to="`/urun/${product.id}`"
+              class="font-semibold text-sm hover:text-blue-600 text-gray-900 mb-1 line-clamp-2 min-h-[40px]">{{
+                product.title }}</RouterLink>
             <p class="text-xs text-gray-500 mb-2 line-clamp-1">{{ product.description }}</p>
 
             <div v-if="parseFeatures(product.features) && featureEntries(product.features).length" class="mb-2">
@@ -348,8 +379,20 @@ const handleBuyNow = async (product: any) => {
               class="w-full h-full object-cover" />
           </RouterLink>
 
+          <button @click.prevent="handleToggleFavorite(product.id, product.title)"
+            class="absolute top-2 right-2 z-10 bg-white/90 hover:bg-white p-2 rounded-full shadow-lg transition"
+            title="Favorilere ekle">
+            <svg class="w-5 h-5" :class="isFavorite(product.id) ? 'text-red-500 fill-current' : 'text-gray-400'"
+              fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+            </svg>
+          </button>
+
           <div class="p-3 flex flex-col flex-1">
-            <RouterLink :to="`/urun/${product.id}`" class="font-semibold text-sm hover:text-blue-600 text-gray-900 mb-1 line-clamp-2 min-h-[40px]">{{ product.title }}</RouterLink>
+            <RouterLink :to="`/urun/${product.id}`"
+              class="font-semibold text-sm hover:text-blue-600 text-gray-900 mb-1 line-clamp-2 min-h-[40px]">{{
+                product.title }}</RouterLink>
             <p class="text-xs text-gray-500 mb-2 line-clamp-1">{{ product.description }}</p>
 
             <div v-if="parseFeatures(product.features) && featureEntries(product.features).length" class="mb-2">

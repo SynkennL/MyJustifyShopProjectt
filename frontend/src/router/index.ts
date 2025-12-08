@@ -10,6 +10,8 @@ import AdminView from '../views/AdminView.vue'
 import CustomerPanel from '../views/CustomerPanel.vue'
 import CartView from '../views/CartView.vue'
 import ProductDetailView from '../views/ProductDetailView.vue'
+import FavoritesView from '../views/FavoritesView.vue'
+
 const routes = [
   { path: '/', component: HomeView },
   { path: '/hakkimizda', component: AboutView },
@@ -19,11 +21,9 @@ const routes = [
   { path: '/admin', component: AdminView },
   { path: '/customer-panel', component: CustomerPanel },
   { path: "/cart", name: "Cart", component: CartView },
+  { path: "/kategori/:name", name: "category", component: CategoryView },
   { path: "/urun/:id", name: "ProductDetail", component: ProductDetailView },
-
-  {
-    path: "/kategori/:name", name: "category", component: CategoryView,
-  }
+  { path: '/favorilerim', component: FavoritesView }
 ]
 
 export const router = createRouter({

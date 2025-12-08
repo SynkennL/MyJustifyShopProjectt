@@ -2,6 +2,7 @@
 import { ref, onMounted } from 'vue'
 import { RouterLink, useRouter } from 'vue-router'
 import { cart, clearGuestCart } from "../services/cart";
+import {favoriteIds,loadFavoriteIds, clearFavorites } from "../services/favorites";
 
 const isMobileMenuOpen = ref(false)
 const isDropdownOpenMobile = ref(false)
@@ -18,13 +19,17 @@ function loadUserFromStorage() {
   user.value = u ? JSON.parse(u) : null;
 }
 
-onMounted(() => loadUserFromStorage());
+onMounted(() => {
+  loadUserFromStorage();
+  loadFavoriteIds();
+});
 
 function logout() {
   localStorage.removeItem("token");
   localStorage.removeItem("user");
   user.value = null;
   clearGuestCart();
+  clearFavorites();
   router.push("/");
 }
 </script>
@@ -33,34 +38,38 @@ function logout() {
   <nav class="bg-white border-b border-gray-200 sticky top-0 z-50 shadow-sm">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex items-center justify-between h-20">
-        
+
         <RouterLink to="/" class="flex-shrink-0 mr-8 mt-4">
-          <img src="../assets/justlogopurplee.png" class="h-35 w-auto hover:opacity-90 transition-opacity" alt="JustifyShop" />
+          <img src="../assets/justlogopurplee.png" class="h-35 w-auto hover:opacity-90 transition-opacity"
+            alt="JustifyShop" />
         </RouterLink>
 
         <div class="hidden lg:flex items-center space-x-1 flex-1">
-          <RouterLink to="/" 
+          <RouterLink to="/"
             class="px-3 py-2 text-sm font-medium text-gray-700 hover:text-slate-500 hover:bg-slate-50 rounded-md transition-all">
             Anasayfa
           </RouterLink>
 
           <div class="relative group">
-            <button class="px-3 py-2 text-sm font-medium text-gray-700 hover:text-slate-800 hover:bg-slate-50 rounded-md transition-all flex items-center gap-1">
+            <button
+              class="px-3 py-2 text-sm font-medium text-gray-700 hover:text-slate-800 hover:bg-slate-50 rounded-md transition-all flex items-center gap-1">
               Kategoriler
-              <svg class="w-4 h-4 transition-transform group-hover:rotate-180" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <svg class="w-4 h-4 transition-transform group-hover:rotate-180" fill="none" stroke="currentColor"
+                stroke-width="2" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
               </svg>
             </button>
-            <div class="absolute left-0 mt-2 w-56 bg-white rounded-lg shadow-xl border border-gray-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all transform translate-y-1 group-hover:translate-y-0">
+            <div
+              class="absolute left-0 mt-2 w-56 bg-white rounded-lg shadow-xl border border-gray-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all transform translate-y-1 group-hover:translate-y-0">
               <RouterLink to="/kategori/erkek-giyim"
                 class="flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-slate-50 hover:text-slate-500 first:rounded-t-lg transition-colors">
                 Erkek Giyim
               </RouterLink>
-              <RouterLink to="/kategori/kadin-giyim" 
+              <RouterLink to="/kategori/kadin-giyim"
                 class="flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-slate-50 hover:text-slate-500 transition-colors">
                 Kadın Giyim
               </RouterLink>
-              <RouterLink to="/kategori/ayakkabi" 
+              <RouterLink to="/kategori/ayakkabi"
                 class="flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-slate-50 hover:text-slate-500 transition-colors">
                 Ayakkabı
               </RouterLink>
@@ -83,9 +92,26 @@ function logout() {
         </div>
 
         <div class="hidden lg:flex items-center space-x-2">
-          
+
+          <RouterLink to="/favorilerim" class="relative group">
+            <button
+              class="flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-gray-700 hover:text-slate-900 hover:bg-slate-50 rounded-lg transition-all">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+              </svg>
+              <span class="hidden xl:inline">Favorilerim</span>
+              <span v-if="favoriteIds.size"
+                class="absolute -top-1 -right-1 bg-slate-900 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs font-bold shadow-md">
+                {{ favoriteIds.size }}
+              </span>
+
+            </button>
+          </RouterLink>
+
           <RouterLink to="/cart" class="relative group">
-            <button class="flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-gray-700 hover:text-slate-900 hover:bg-slate-50 rounded-lg transition-all">
+            <button
+              class="flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-gray-700 hover:text-slate-900 hover:bg-slate-50 rounded-lg transition-all">
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                   d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
@@ -98,40 +124,39 @@ function logout() {
             </button>
           </RouterLink>
 
-          <!-- Giriş yapılmamışsa -->
           <div v-if="!user" class="flex items-center gap-2 pr-3 border-gray-200">
             <RouterLink to="/login">
-              <button class="flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-gray-700 hover:text-slate-900 hover:bg-slate-50 rounded-lg transition-all">
+              <button
+                class="flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-gray-700 hover:text-slate-900 hover:bg-slate-50 rounded-lg transition-all">
                 <span>Giriş Yap</span>
               </button>
             </RouterLink>
             <RouterLink to="/register">
-              <button class="flex items-center gap-2 px-5 py-2.5 text-sm font-medium text-white bg-slate-900 hover:bg-slate-800 rounded-lg transition-all shadow-sm hover:shadow-md">
+              <button
+                class="flex items-center gap-2 px-5 py-2.5 text-sm font-medium text-white bg-slate-900 hover:bg-slate-800 rounded-lg transition-all shadow-sm hover:shadow-md">
                 <span>Kayıt Ol</span>
               </button>
             </RouterLink>
           </div>
 
-          <!-- Giriş yapılmışsa -->
           <div v-else class="relative border-gray-200">
-            <button 
-              @click="isUserDropdownOpen = !isUserDropdownOpen"
+            <button @click="isUserDropdownOpen = !isUserDropdownOpen"
               class="flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-gray-700 hover:text-slate-900 hover:bg-slate-50 rounded-lg transition-all">
               <span class="hidden xl:inline">{{ user?.name }}</span>
-              <svg class="w-4 h-4 transition-transform" :class="{ 'rotate-180': isUserDropdownOpen }" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <svg class="w-4 h-4 transition-transform" :class="{ 'rotate-180': isUserDropdownOpen }" fill="none"
+                stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
               </svg>
             </button>
 
-            <div v-if="isUserDropdownOpen" 
-              @click="isUserDropdownOpen = false"
+            <div v-if="isUserDropdownOpen" @click="isUserDropdownOpen = false"
               class="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-xl border border-gray-100 py-1">
-              
+
               <div class="px-4 py-3 border-b border-gray-100">
                 <p class="text-sm font-medium text-gray-900">{{ user?.email || '' }}</p>
               </div>
 
-              <RouterLink to="/customer-panel" 
+              <RouterLink to="/customer-panel"
                 class="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-slate-50 hover:text-slate-500 transition-colors">
                 Kullanıcı Paneli
               </RouterLink>
@@ -149,9 +174,7 @@ function logout() {
           </div>
         </div>
 
-        <!-- Mobile Menu Button -->
-        <button 
-          @click="toggleMobileMenu" 
+        <button @click="toggleMobileMenu"
           class="lg:hidden p-2 text-gray-700 hover:text-slate-500 hover:bg-slate-50 rounded-lg transition-all">
           <svg v-if="!isMobileMenuOpen" class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
@@ -163,7 +186,6 @@ function logout() {
       </div>
     </div>
 
-    <!-- Mobile Menu -->
     <div v-if="isMobileMenuOpen" class="lg:hidden bg-white border-t border-gray-200">
       <div class="px-4 py-3 space-y-1">
         <RouterLink to="/" @click="isMobileMenuOpen = false"
@@ -171,11 +193,11 @@ function logout() {
           Anasayfa
         </RouterLink>
 
-        <button 
-          @click="toggleDropdownMobile"
+        <button @click="toggleDropdownMobile"
           class="w-full flex items-center justify-between px-4 py-2.5 text-sm font-medium text-gray-700 hover:text-slate-500 hover:bg-slate-50 rounded-lg transition-all">
           Kategoriler
-          <svg class="w-4 h-4 transition-transform" :class="{ 'rotate-180': isDropdownOpenMobile }" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <svg class="w-4 h-4 transition-transform" :class="{ 'rotate-180': isDropdownOpenMobile }" fill="none"
+            stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
           </svg>
         </button>
@@ -209,9 +231,18 @@ function logout() {
           İletişim
         </RouterLink>
 
-        <!-- Mobile Sepet -->
-        <RouterLink to="/cart" @click="isMobileMenuOpen = false"
+        <RouterLink to="/favorilerim" @click="isMobileMenuOpen = false"
           class="flex items-center justify-between px-4 py-2.5 text-sm font-medium text-gray-700 hover:text-slate-500 hover:bg-slate-50 rounded-lg transition-all border-t border-gray-100 mt-2 pt-3">
+          <div class="flex items-center gap-2">
+            Favorilerim
+          </div>
+             <span class="bg-slate-900 text-white rounded-full px-2.5 py-0.5 text-xs font-bold">
+            {{favoriteIds.size}}
+          </span>
+        </RouterLink>
+
+        <RouterLink to="/cart" @click="isMobileMenuOpen = false"
+          class="flex items-center justify-between px-4 py-2.5 text-sm font-medium text-gray-700 hover:text-slate-500 hover:bg-slate-50 rounded-lg transition-all">
           <div class="flex items-center gap-2">
             Sepetim
           </div>
@@ -220,7 +251,6 @@ function logout() {
           </span>
         </RouterLink>
 
-        <!-- Mobile Auth -->
         <div v-if="!user" class="pt-3 space-y-2 border-t border-gray-100">
           <RouterLink to="/login" @click="isMobileMenuOpen = false"
             class="block px-4 py-3 text-sm font-medium text-center text-gray-700 bg-gray-50 hover:bg-gray-100 rounded-lg transition-all">
@@ -234,19 +264,19 @@ function logout() {
 
         <div v-else class="pt-3 space-y-1 border-t border-gray-100">
           <div class="px-4 py-3 bg-slate-50 rounded-lg mb-2">
-            <p class="text-sm font-medium text-gray-900">{{ user?.email || ''}}</p>
+            <p class="text-sm font-medium text-gray-900">{{ user?.email || '' }}</p>
           </div>
-          
+
           <RouterLink to="/customer-panel" @click="isMobileMenuOpen = false"
             class="block px-4 py-2.5 text-sm font-medium text-gray-700 hover:text-slate-500 hover:bg-slate-50 rounded-lg transition-all">
             Kullanıcı Paneli
           </RouterLink>
-          
+
           <RouterLink v-if="user.role === 'admin'" to="/admin" @click="isMobileMenuOpen = false"
             class="block px-4 py-2.5 text-sm font-medium text-gray-700 hover:text-slate-500 hover:bg-slate-50 rounded-lg transition-all">
             Admin Paneli
           </RouterLink>
-          
+
           <button @click="logout"
             class="w-full text-left px-4 py-2.5 text-sm font-medium text-red-600 hover:bg-red-50 rounded-lg transition-all">
             Çıkış Yap
@@ -257,5 +287,4 @@ function logout() {
   </nav>
 </template>
 
-<style scoped>
-</style>
+<style scoped></style>

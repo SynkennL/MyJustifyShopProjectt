@@ -5,7 +5,7 @@ import { useRoute, useRouter } from "vue-router";
 import { apiGet, apiPost } from "../services/api";
 import { addToCart } from "../services/cart";
 import { toast } from "vue3-toastify";
-
+import { isFavorite, toggleFavorite, loadFavoriteIds } from "../services/favorites";
 const route = useRoute();
 const router = useRouter();
 const categorySlug = ref(String(route.params.name));
@@ -60,6 +60,7 @@ onMounted(() => {
     currentUserId.value = user.id;
   }
   loadProducts();
+  loadFavoriteIds();
 });
 
 async function loadProducts() {
@@ -105,6 +106,27 @@ const handleAddToCart = (product: any) => {
   });
   toast.success(`"${product.title}" sepete eklendi!`);
 };
+
+const handleToggleFavorite = async (productId: number, productTitle: string) => {
+  const token = localStorage.getItem("token");
+  if (!token) {
+    toast.info("Favorilere eklemek için giriş yapmalısınız!");
+    router.push("/login");
+    return;
+  }
+
+  try {
+    const added = await toggleFavorite(productId);
+    if (added) {
+      toast.success(`"${productTitle}" favorilere eklendi!`);
+    } else {
+      toast.success(`"${productTitle}" favorilerden çıkarıldı!`);
+    }
+  } catch (error) {
+    toast.error("Bir hata oluştu!");
+  }
+};
+
 
 const handleBuyNow = async (product: any) => {
   const token = localStorage.getItem("token");
@@ -158,6 +180,16 @@ const handleBuyNow = async (product: any) => {
         <RouterLink :to="`/urun/${item.id}`">
           <h2 class="text-lg font-semibold mb-1 hover:text-blue-600 transition cursor-pointer">{{ item.title }}</h2>
         </RouterLink>
+
+        <button @click.prevent="handleToggleFavorite(item.id, item.title)"
+          class="absolute top-6 right-6 z-10 bg-white/90 hover:bg-white p-2 rounded-full shadow-lg transition"
+          title="Favorilere ekle">
+          <svg class="w-5 h-5" :class="isFavorite(item.id) ? 'text-red-500 fill-current' : 'text-gray-400'" fill="none"
+            stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+          </svg>
+        </button>
         <p class="text-gray-500 text-sm mb-2 line-clamp-3">{{ item.description }}</p>
         <p class="text-gray-600 text-xs mb-1" v-if="item.seller_email">Satıcı: {{ item.seller_email }}</p>
 

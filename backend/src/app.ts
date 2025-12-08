@@ -5,6 +5,7 @@ import authRoutes from "./routes/auth";
 import catRoutes from "./routes/categories";
 import prodRoutes from "./routes/products";
 import orderRoutes from "./routes/orders";
+import favoriteRoutes from "./routes/favorites";
 import { errorHandler } from "./middlewares/errorHandler";
 
 dotenv.config();
@@ -16,6 +17,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/categories", catRoutes);
 app.use("/api/products", prodRoutes);
 app.use("/api/orders", orderRoutes);
+app.use("/api/favorites", favoriteRoutes);
 
 app.use(errorHandler);
 
