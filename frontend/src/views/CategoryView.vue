@@ -151,9 +151,13 @@ const handleBuyNow = async (product: any) => {
       <div v-for="item in products" :key="item.id"
         class="bg-white rounded-xl shadow hover:shadow-xl transition p-4 flex flex-col relative">
 
-        <img :src="item.image_url || 'https://via.placeholder.com/300x300?text=No+Image'" alt="Ürün Resmi"
-          class="w-full h-48 object-cover rounded-lg mb-4" />
-        <h2 class="text-lg font-semibold mb-1">{{ item.title }}</h2>
+        <RouterLink :to="`/urun/${item.id}`" class="block">
+          <img :src="item.image_url || 'https://via.placeholder.com/300x300?text=No+Image'" alt="Ürün Resmi"
+            class="w-full h-80 object-cover rounded-lg mb-4 hover:opacity-90 transition" />
+        </RouterLink>
+        <RouterLink :to="`/urun/${item.id}`">
+          <h2 class="text-lg font-semibold mb-1 hover:text-blue-600 transition cursor-pointer">{{ item.title }}</h2>
+        </RouterLink>
         <p class="text-gray-500 text-sm mb-2 line-clamp-3">{{ item.description }}</p>
         <p class="text-gray-600 text-xs mb-1" v-if="item.seller_email">Satıcı: {{ item.seller_email }}</p>
 

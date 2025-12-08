@@ -33,6 +33,31 @@ export async function listProducts(req: Request, res: Response) {
   }
 }
 
+// YENİ FONKSİYON: Tekil ürün detayı
+export async function getProductById(req: Request, res: Response) {
+  try {
+    const { id } = req.params;
+    
+    const q = await pool.query(
+      `SELECT p.*, c.name as category_name, c.slug as category_slug, u.email as seller_email, u.name as seller_name
+       FROM products p
+       LEFT JOIN categories c ON p.category_id = c.id
+       LEFT JOIN users u ON p.seller_id = u.id
+       WHERE p.id = $1`,
+      [id]
+    );
+
+    if (q.rows.length === 0) {
+      return res.status(404).json({ error: "Ürün bulunamadı" });
+    }
+
+    res.json(q.rows[0]);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Sunucu hatası" });
+  }
+}
+
 export async function getPopularProducts(req: Request, res: Response) {
   try {
     const q = await pool.query(
@@ -60,7 +85,7 @@ export async function getPopularProducts(req: Request, res: Response) {
 }
 
 export async function createProduct(req: Request, res: Response) {
-  const { title, description, price, category_id, image_url, features, sizes } = req.body;
+  const { title, description, price, category_id, images, features, sizes } = req.body;
   const seller_id = (req as any).user?.id;
 
   if (!title || price == null) return res.status(400).json({ error: "title & price required" });
@@ -72,9 +97,12 @@ export async function createProduct(req: Request, res: Response) {
   }
   const featuresJson = Object.keys(featuresObj).length ? JSON.stringify(featuresObj) : null;
 
+  // images array'i JSON string'e çevir
+  const imagesJson = images && Array.isArray(images) && images.length > 0 ? JSON.stringify(images) : null;
+
   const q = await pool.query(
     "INSERT INTO products (title, description, price, category_id, image_url, seller_id, features) VALUES ($1,$2,$3,$4,$5,$6,$7) RETURNING *",
-    [title, description || null, price, category_id || null, image_url || null, seller_id, featuresJson]
+    [title, description || null, price, category_id || null, imagesJson, seller_id, featuresJson]
   );
 
   res.status(201).json(q.rows[0]);

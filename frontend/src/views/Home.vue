@@ -247,13 +247,13 @@ const handleBuyNow = async (product: any) => {
             </span>
           </div>
 
-          <div class="relative overflow-hidden aspect-square">
+         <RouterLink :to="`/urun/${product.id}`" class="relative overflow-hidden aspect-square">
             <img :src="product.image_url || 'https://via.placeholder.com/300x300?text=No+Image'" :alt="product.title"
               class="w-full h-full object-cover" />
-          </div>
+         </RouterLink>
 
           <div class="p-3 flex flex-col flex-1">
-            <h3 class="font-semibold text-sm text-gray-900 mb-1 line-clamp-2 min-h-[40px]">{{ product.title }}</h3>
+            <RouterLink :to="`/urun/${product.id}`" class="font-semibold text-sm hover:text-blue-600 text-gray-900 mb-1 line-clamp-2 min-h-[40px]">{{ product.title }}</RouterLink>
             <p class="text-xs text-gray-500 mb-2 line-clamp-1">{{ product.description }}</p>
 
             <div v-if="parseFeatures(product.features) && featureEntries(product.features).length" class="mb-2">
@@ -343,13 +343,13 @@ const handleBuyNow = async (product: any) => {
         <div v-for="product in categoryProducts" :key="product.id"
           class="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg transition-shadow relative group flex flex-col h-full">
 
-          <div class="relative overflow-hidden aspect-square">
+          <RouterLink :to="`/urun/${product.id}`" class="relative overflow-hidden aspect-square">
             <img :src="product.image_url || 'https://via.placeholder.com/300x300?text=No+Image'" :alt="product.title"
               class="w-full h-full object-cover" />
-          </div>
+          </RouterLink>
 
           <div class="p-3 flex flex-col flex-1">
-            <h3 class="font-semibold text-sm text-gray-900 mb-1 line-clamp-2 min-h-[40px]">{{ product.title }}</h3>
+            <RouterLink :to="`/urun/${product.id}`" class="font-semibold text-sm hover:text-blue-600 text-gray-900 mb-1 line-clamp-2 min-h-[40px]">{{ product.title }}</RouterLink>
             <p class="text-xs text-gray-500 mb-2 line-clamp-1">{{ product.description }}</p>
 
             <div v-if="parseFeatures(product.features) && featureEntries(product.features).length" class="mb-2">

@@ -52,7 +52,7 @@ const newProduct = ref({
   description: "",
   price: 0,
   category_id: null as number | null,
-  image_url: "",
+  image_urls: [] as string[],
   features: {
     beden: "",
     renk: "",
@@ -60,9 +60,21 @@ const newProduct = ref({
     marka: ""
   }
 });
-const predefinedSizes = ["XS","S","M","L","XL","XXL","36","38","40","42","44"];
 
+const newImageUrl = ref("");
+const predefinedSizes = ["XS","S","M","L","XL","XXL","36","38","40","42","44"];
 const selectedProductSizes = ref<string[]>([]);
+
+function addImageUrl() {
+  if (newImageUrl.value.trim()) {
+    newProduct.value.image_urls.push(newImageUrl.value.trim());
+    newImageUrl.value = "";
+  }
+}
+
+function removeImageUrl(index: number) {
+  newProduct.value.image_urls.splice(index, 1);
+}
 
 async function loadData() {
   try {
@@ -96,14 +108,14 @@ async function addProduct() {
     return;
   }
 
+  if (newProduct.value.image_urls.length === 0) {
+    toast.error("En az bir resim URL'si ekleyin!");
+    return;
+  }
+
   try {
-    // Özellikleri temizle
     const cleanedFeatures: any = {};
     
-    if (selectedProductSizes.value && selectedProductSizes.value.length > 0) {
-    } else if (newProduct.value.features.beden) {
-      cleanedFeatures.Beden = newProduct.value.features.beden;
-    }
     if (newProduct.value.features.renk) cleanedFeatures.Renk = newProduct.value.features.renk;
     if (newProduct.value.features.malzeme) cleanedFeatures.Malzeme = newProduct.value.features.malzeme;
     if (newProduct.value.features.marka) cleanedFeatures.Marka = newProduct.value.features.marka;
@@ -113,7 +125,7 @@ async function addProduct() {
       description: newProduct.value.description,
       price: newProduct.value.price,
       category_id: newProduct.value.category_id,
-      image_url: newProduct.value.image_url,
+      images: newProduct.value.image_urls,
       features: Object.keys(cleanedFeatures).length > 0 ? cleanedFeatures : null,
       sizes: selectedProductSizes.value.length > 0 ? selectedProductSizes.value : undefined
     };
@@ -126,13 +138,12 @@ async function addProduct() {
 
     toast.success("Ürün başarıyla eklendi!");
     
-    // Formu sıfırla
     newProduct.value = {
       title: "",
       description: "",
       price: 0,
       category_id: null,
-      image_url: "",
+      image_urls: [],
       features: {
         beden: "",
         renk: "",
@@ -211,6 +222,19 @@ function parseFeatures(features: any) {
     }
   }
   return features;
+}
+
+function getFirstImage(imageUrl: string | null | undefined): string {
+  if (!imageUrl) return 'https://via.placeholder.com/300';
+  try {
+    const parsed = JSON.parse(imageUrl);
+    if (Array.isArray(parsed) && parsed.length > 0) {
+      return parsed[0];
+    }
+  } catch {
+    return imageUrl;
+  }
+  return imageUrl;
 }
 
 function featureEntries(features: any) {
@@ -295,11 +319,48 @@ onMounted(() => {
         <input v-model="newProduct.title" placeholder="Ürün başlığı" class="input" />
         <input v-model.number="newProduct.price" type="number" placeholder="Fiyat" class="input" />
         <textarea v-model="newProduct.description" placeholder="Açıklama" class="input" rows="3"></textarea>
-        <input v-model="newProduct.image_url" placeholder="Resim URL" class="input" />
         <select v-model="newProduct.category_id" class="input">
           <option :value="null">Kategori seç</option>
           <option v-for="c in categories" :key="c.id" :value="c.id">{{ c.name }}</option>
         </select>
+      </div>
+
+      <!-- Resim URL'leri -->
+      <div class="mt-4 p-4 rounded-lg border border-gray-200">
+        <h4 class="font-semibold mb-3 text-gray-700">📷 Ürün Resimleri</h4>
+        <div class="flex gap-2 mb-3">
+          <input 
+            v-model="newImageUrl" 
+            placeholder="Resim URL'si ekle (https://...)" 
+            class="input flex-1"
+            @keyup.enter="addImageUrl"
+          />
+          <button @click="addImageUrl" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+            Ekle
+          </button>
+        </div>
+        
+        <div v-if="newProduct.image_urls.length > 0" class="grid grid-cols-3 gap-3">
+          <div 
+            v-for="(url, index) in newProduct.image_urls" 
+            :key="index"
+            class="relative group aspect-square border-2 border-gray-200 rounded-lg overflow-hidden"
+          >
+            <img :src="url" alt="Ürün resmi" class="w-full h-full object-cover" />
+            <button 
+              @click="removeImageUrl(index)"
+              class="absolute top-1 right-1 bg-red-500 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition"
+            >
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+            <div class="absolute bottom-1 left-1 bg-black/60 text-white text-xs px-2 py-1 rounded">
+              {{ index + 1 }}
+            </div>
+          </div>
+        </div>
+        <p v-else class="text-sm text-gray-500 text-center py-4">Henüz resim eklenmedi</p>
       </div>
 
       <!-- ÖZELLİKLER BÖLÜMÜ -->
@@ -350,12 +411,16 @@ onMounted(() => {
 
       <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         <div v-for="product in myProducts" :key="product.id" class="border rounded-lg p-4 hover:shadow-lg transition bg-white">
-          <img 
-            :src="product.image_url || 'https://via.placeholder.com/300'" 
-            alt="Ürün"
-            class="w-full h-48 object-cover rounded-lg mb-3"
-          />
-          <h4 class="font-semibold text-lg mb-1">{{ product.title }}</h4>
+          <RouterLink :to="`/urun/${product.id}`" class="block">
+            <img 
+              :src="getFirstImage(product.image_url)" 
+              alt="Ürün"
+              class="w-full h-48 object-cover rounded-lg mb-3 hover:opacity-90 transition"
+            />
+          </RouterLink>
+          <RouterLink :to="`/urun/${product.id}`">
+            <h4 class="font-semibold text-lg mb-1 hover:text-blue-600 transition">{{ product.title }}</h4>
+          </RouterLink>
           <p class="text-gray-600 text-sm mb-2 line-clamp-2">{{ product.description }}</p>
           <p class="text-gray-500 text-xs mb-2">Kategori: {{ product.category_name }}</p>
           
@@ -388,7 +453,7 @@ onMounted(() => {
         <div v-for="order in soldOrders" :key="order.id" class="bg-white border rounded-lg p-4 hover:shadow-lg transition">
           <div class="flex items-start gap-4">
             <img 
-              :src="order.image_url || 'https://via.placeholder.com/100'" 
+              :src="getFirstImage(order.image_url)" 
               alt="Ürün" 
               class="w-24 h-24 object-cover rounded-lg"
             />
@@ -434,7 +499,7 @@ onMounted(() => {
         <div v-for="order in purchasedOrders" :key="order.id" class="bg-white border rounded-lg p-4 hover:shadow-lg transition">
           <div class="flex items-start gap-4">
             <img 
-              :src="order.image_url || 'https://via.placeholder.com/100'" 
+              :src="getFirstImage(order.image_url)" 
               alt="Ürün" 
               class="w-24 h-24 object-cover rounded-lg"
             />
@@ -442,7 +507,7 @@ onMounted(() => {
               <h3 class="font-semibold text-lg">{{ order.product_title }}</h3>
               <p class="text-gray-600 text-sm">🏪 Satıcı: {{ order.seller_email }}</p>
               <p class="text-gray-600 text-sm">📦 Adet: {{ order.quantity }}</p>
-                <p v-if="order.sizes && order.sizes.length" class="text-gray-600 text-sm">Bedenler: {{ order.sizes.join(", ") }}</p>
+              <p v-if="order.sizes && order.sizes.length" class="text-gray-600 text-sm">Bedenler: {{ order.sizes.join(", ") }}</p>
               <p class="font-bold text-lg mt-1">💰 {{ order.total_price }} TL</p>
               <p class="text-gray-500 text-xs mt-1">📅 {{ formatDate(order.created_at) }}</p>
             </div>
