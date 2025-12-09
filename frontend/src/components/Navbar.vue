@@ -1,12 +1,18 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import { RouterLink, useRouter } from 'vue-router'
 import { cart, clearGuestCart } from "../services/cart";
-import {favoriteIds,loadFavoriteIds, clearFavorites } from "../services/favorites";
+import { favoriteIds, loadFavoriteIds, clearFavorites } from "../services/favorites";
+import { apiGet } from "../services/api";
 
 const isMobileMenuOpen = ref(false)
 const isDropdownOpenMobile = ref(false)
 const isUserDropdownOpen = ref(false)
+const isSearchOpen = ref(false)
+const searchQuery = ref('')
+const searchResults = ref<any[]>([])
+const isSearching = ref(false)
+const showSearchResults = ref(false)
 
 const toggleMobileMenu = () => isMobileMenuOpen.value = !isMobileMenuOpen.value
 const toggleDropdownMobile = () => isDropdownOpenMobile.value = !isDropdownOpenMobile.value
@@ -31,6 +37,67 @@ function logout() {
   clearGuestCart();
   clearFavorites();
   router.push("/");
+}
+
+let searchTimeout: any = null;
+
+watch(searchQuery, async (newVal) => {
+  if (searchTimeout) clearTimeout(searchTimeout);
+  
+  if (!newVal.trim()) {
+    searchResults.value = [];
+    showSearchResults.value = false;
+    return;
+  }
+
+  searchTimeout = setTimeout(async () => {
+    await performSearch(newVal);
+  }, 300);
+});
+
+async function performSearch(query: string) {
+  if (!query.trim()) return;
+  
+  isSearching.value = true;
+  try {
+    const products = await apiGet("/products");
+    const filtered = products.filter((p: any) => 
+      p.title.toLowerCase().includes(query.toLowerCase()) ||
+      p.description?.toLowerCase().includes(query.toLowerCase()) ||
+      p.category_name?.toLowerCase().includes(query.toLowerCase())
+    );
+    searchResults.value = filtered.slice(0, 5);
+    showSearchResults.value = true;
+  } catch (error) {
+    console.error("Arama hatası:", error);
+  } finally {
+    isSearching.value = false;
+  }
+}
+
+function selectProduct(productId: number) {
+  router.push(`/urun/${productId}`);
+  closeSearch();
+}
+
+function closeSearch() {
+  searchQuery.value = '';
+  searchResults.value = [];
+  showSearchResults.value = false;
+  isSearchOpen.value = false;
+}
+
+function getFirstImage(imageUrl: string | null | undefined): string {
+  if (!imageUrl) return 'https://via.placeholder.com/80';
+  try {
+    const parsed = JSON.parse(imageUrl);
+    if (Array.isArray(parsed) && parsed.length > 0) {
+      return parsed[0];
+    }
+  } catch {
+    return imageUrl;
+  }
+  return imageUrl;
 }
 </script>
 
@@ -92,6 +159,65 @@ function logout() {
         </div>
 
         <div class="hidden lg:flex items-center space-x-2">
+          <div class="relative">
+            <button 
+              @click="isSearchOpen = !isSearchOpen"
+              class="flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-gray-700 hover:text-slate-900 hover:bg-slate-50 rounded-lg transition-all">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+            </button>
+
+            <!-- Arama Popup -->
+            <div v-if="isSearchOpen" class="fixed inset-0 bg-black/20 z-50" @click="closeSearch"></div>
+            <div v-if="isSearchOpen" class="absolute right-0 mt-2 w-96 bg-white rounded-lg shadow-2xl border border-gray-200 z-50">
+              <div class="p-4">
+                <div class="relative">
+                  <input 
+                    v-model="searchQuery"
+                    type="text"
+                    placeholder="Ürün ara..."
+                    class="w-full pl-10 pr-4 py-2.5 border-2 border-gray-200 rounded-lg focus:border-slate-900 focus:outline-none text-sm"
+                    autofocus
+                  />
+                  <svg class="absolute left-3 top-3 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                  </svg>
+                </div>
+              </div>
+
+              <!-- Arama Sonuçları -->
+              <div v-if="showSearchResults" class="max-h-96 overflow-y-auto border-t border-gray-100">
+                <div v-if="isSearching" class="p-8 text-center">
+                  <div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-gray-300 border-t-gray-900"></div>
+                </div>
+
+                <div v-else-if="searchResults.length === 0" class="p-8 text-center">
+                  <p class="text-gray-500 text-sm">Sonuç bulunamadı</p>
+                </div>
+
+                <div v-else>
+                  <button
+                    v-for="product in searchResults"
+                    :key="product.id"
+                    @click="selectProduct(product.id)"
+                    class="w-full flex items-center gap-3 p-3 hover:bg-slate-50 transition border-b border-gray-100 last:border-b-0"
+                  >
+                    <img 
+                      :src="getFirstImage(product.image_url)" 
+                      :alt="product.title"
+                      class="w-16 h-16 object-cover rounded-lg"
+                    />
+                    <div class="flex-1 text-left">
+                      <p class="font-medium text-sm text-gray-900 line-clamp-1">{{ product.title }}</p>
+                      <p class="text-xs text-gray-500 line-clamp-1 mt-0.5">{{ product.category_name }}</p>
+                      <p class="font-bold text-sm text-gray-900 mt-1">{{ product.price }} TL</p>
+                    </div>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
 
           <RouterLink to="/favorilerim" class="relative group">
             <button
@@ -105,7 +231,6 @@ function logout() {
                 class="absolute -top-1 -right-1 bg-slate-900 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs font-bold shadow-md">
                 {{ favoriteIds.size }}
               </span>
-
             </button>
           </RouterLink>
 
@@ -151,7 +276,6 @@ function logout() {
 
             <div v-if="isUserDropdownOpen" @click="isUserDropdownOpen = false"
               class="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-xl border border-gray-100 py-1">
-
               <div class="px-4 py-3 border-b border-gray-100">
                 <p class="text-sm font-medium text-gray-900">{{ user?.email || '' }}</p>
               </div>
@@ -188,6 +312,51 @@ function logout() {
 
     <div v-if="isMobileMenuOpen" class="lg:hidden bg-white border-t border-gray-200">
       <div class="px-4 py-3 space-y-1">
+        <!-- Mobil Arama -->
+        <div class="mb-3 pb-3 border-b border-gray-200">
+          <div class="relative">
+            <input 
+              v-model="searchQuery"
+              type="text"
+              placeholder="Ürün ara..."
+              class="w-full pl-10 pr-4 py-2.5 border-2 border-gray-200 rounded-lg focus:border-slate-900 focus:outline-none text-sm"
+            />
+            <svg class="absolute left-3 top-3 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+          </div>
+
+          <!-- Mobil Arama Sonuçları -->
+          <div v-if="showSearchResults && searchQuery" class="mt-2 max-h-64 overflow-y-auto bg-gray-50 rounded-lg">
+            <div v-if="isSearching" class="p-4 text-center">
+              <div class="inline-block animate-spin rounded-full h-6 w-6 border-2 border-gray-300 border-t-gray-900"></div>
+            </div>
+
+            <div v-else-if="searchResults.length === 0" class="p-4 text-center text-sm text-gray-500">
+              Sonuç bulunamadı
+            </div>
+
+            <div v-else>
+              <button
+                v-for="product in searchResults"
+                :key="product.id"
+                @click="selectProduct(product.id); toggleMobileMenu()"
+                class="w-full flex items-center gap-3 p-2 hover:bg-white transition"
+              >
+                <img 
+                  :src="getFirstImage(product.image_url)" 
+                  :alt="product.title"
+                  class="w-12 h-12 object-cover rounded"
+                />
+                <div class="flex-1 text-left">
+                  <p class="font-medium text-xs text-gray-900 line-clamp-1">{{ product.title }}</p>
+                  <p class="font-bold text-xs text-gray-900">{{ product.price }} TL</p>
+                </div>
+              </button>
+            </div>
+          </div>
+        </div>
+
         <RouterLink to="/" @click="isMobileMenuOpen = false"
           class="block px-4 py-2.5 text-sm font-medium text-gray-700 hover:text-slate-500 hover:bg-slate-50 rounded-lg transition-all">
           Anasayfa
@@ -236,7 +405,7 @@ function logout() {
           <div class="flex items-center gap-2">
             Favorilerim
           </div>
-             <span class="bg-slate-900 text-white rounded-full px-2.5 py-0.5 text-xs font-bold">
+          <span class="bg-slate-900 text-white rounded-full px-2.5 py-0.5 text-xs font-bold">
             {{favoriteIds.size}}
           </span>
         </RouterLink>
