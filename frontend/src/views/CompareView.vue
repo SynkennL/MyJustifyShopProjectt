@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { computed } from "vue";
 import { useRouter } from "vue-router";
 import { compareList, removeFromCompare, clearCompare } from "../services/compare";
 import { addToCart } from "../services/cart";
