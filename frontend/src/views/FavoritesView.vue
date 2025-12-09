@@ -193,8 +193,7 @@ const handleBuyNow = async (product: any) => {
         <div 
           v-for="product in favorites" 
           :key="product.id"
-          class="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg transition relative group"
-        >
+          class="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg transition relative group">
           <button 
             @click="handleRemoveFavorite(product.id)"
             class="absolute top-3 right-3 z-10 bg-white/90 hover:bg-white p-2 rounded-full shadow-lg transition"
