@@ -3,6 +3,7 @@ import { ref, onMounted, watch } from 'vue'
 import { RouterLink, useRouter } from 'vue-router'
 import { cart, clearGuestCart } from "../services/cart";
 import { favoriteIds, loadFavoriteIds, clearFavorites } from "../services/favorites";
+import { compareList } from "../services/compare";
 import { apiGet } from "../services/api";
 
 const isMobileMenuOpen = ref(false)
@@ -168,7 +169,6 @@ function getFirstImage(imageUrl: string | null | undefined): string {
               </svg>
             </button>
 
-            <!-- Arama Popup -->
             <div v-if="isSearchOpen" class="fixed inset-0 bg-black/20 z-50" @click="closeSearch"></div>
             <div v-if="isSearchOpen" class="absolute right-0 mt-2 w-96 bg-white rounded-lg shadow-2xl border border-gray-200 z-50">
               <div class="p-4">
@@ -186,7 +186,6 @@ function getFirstImage(imageUrl: string | null | undefined): string {
                 </div>
               </div>
 
-              <!-- Arama Sonuçları -->
               <div v-if="showSearchResults" class="max-h-96 overflow-y-auto border-t border-gray-100">
                 <div v-if="isSearching" class="p-8 text-center">
                   <div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-gray-300 border-t-gray-900"></div>
@@ -218,6 +217,22 @@ function getFirstImage(imageUrl: string | null | undefined): string {
               </div>
             </div>
           </div>
+
+          <!-- Karşılaştırma Butonu -->
+          <RouterLink to="/karsilastir" class="relative group">
+            <button
+              class="flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-gray-700 hover:text-slate-900 hover:bg-slate-50 rounded-lg transition-all">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+              </svg>
+              <span class="hidden xl:inline">Karşılaştır</span>
+              <span v-if="compareList.length"
+                class="absolute -top-1 -right-1 bg-blue-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs font-bold shadow-md">
+                {{ compareList.length }}
+              </span>
+            </button>
+          </RouterLink>
 
           <RouterLink to="/favorilerim" class="relative group">
             <button
@@ -312,7 +327,6 @@ function getFirstImage(imageUrl: string | null | undefined): string {
 
     <div v-if="isMobileMenuOpen" class="lg:hidden bg-white border-t border-gray-200">
       <div class="px-4 py-3 space-y-1">
-        <!-- Mobil Arama -->
         <div class="mb-3 pb-3 border-b border-gray-200">
           <div class="relative">
             <input 
@@ -326,7 +340,6 @@ function getFirstImage(imageUrl: string | null | undefined): string {
             </svg>
           </div>
 
-          <!-- Mobil Arama Sonuçları -->
           <div v-if="showSearchResults && searchQuery" class="mt-2 max-h-64 overflow-y-auto bg-gray-50 rounded-lg">
             <div v-if="isSearching" class="p-4 text-center">
               <div class="inline-block animate-spin rounded-full h-6 w-6 border-2 border-gray-300 border-t-gray-900"></div>
@@ -400,8 +413,19 @@ function getFirstImage(imageUrl: string | null | undefined): string {
           İletişim
         </RouterLink>
 
-        <RouterLink to="/favorilerim" @click="isMobileMenuOpen = false"
+        <!-- Mobil Karşılaştırma -->
+        <RouterLink to="/karsilastir" @click="isMobileMenuOpen = false"
           class="flex items-center justify-between px-4 py-2.5 text-sm font-medium text-gray-700 hover:text-slate-500 hover:bg-slate-50 rounded-lg transition-all border-t border-gray-100 mt-2 pt-3">
+          <div class="flex items-center gap-2">
+            Karşılaştır
+          </div>
+          <span v-if="compareList.length" class="bg-blue-600 text-white rounded-full px-2.5 py-0.5 text-xs font-bold">
+            {{compareList.length}}
+          </span>
+        </RouterLink>
+
+        <RouterLink to="/favorilerim" @click="isMobileMenuOpen = false"
+          class="flex items-center justify-between px-4 py-2.5 text-sm font-medium text-gray-700 hover:text-slate-500 hover:bg-slate-50 rounded-lg transition-all">
           <div class="flex items-center gap-2">
             Favorilerim
           </div>

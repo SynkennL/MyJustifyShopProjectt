@@ -1,11 +1,11 @@
 <script setup lang="ts">
-
 import { ref, onMounted, reactive } from "vue";
 import { useRouter } from "vue-router";
 import { apiGet, apiPost } from "../services/api";
 import { addToCart } from "../services/cart";
 import { toast } from "vue3-toastify";
 import { isFavorite, toggleFavorite, loadFavoriteIds } from "../services/favorites";
+import { addToCompare, removeFromCompare, isInCompare, MAX_COMPARE, compareList } from "../services/compare";
 
 const router = useRouter();
 const popularProducts = ref<any[]>([]);
@@ -45,6 +45,44 @@ function featureEntries(features: any) {
     return true;
   });
 }
+
+function getFirstImage(imageUrl: string | null | undefined): string {
+  if (!imageUrl) return 'https://via.placeholder.com/300';
+  try {
+    const parsed = JSON.parse(imageUrl);
+    if (Array.isArray(parsed) && parsed.length > 0) {
+      return parsed[0];
+    }
+  } catch {
+    return imageUrl;
+  }
+  return imageUrl;
+}
+
+// Karşılaştırma fonksiyonu - DÜZELTİLDİ
+const handleToggleCompare = (product: any) => {
+  if (isInCompare(product.id)) {
+    removeFromCompare(product.id);
+    toast.success("Ürün karşılaştırmadan kaldırıldı!");
+  } else {
+    if (compareList.value.length >= MAX_COMPARE) {
+      toast.error(`En fazla ${MAX_COMPARE} ürün karşılaştırabilirsiniz!`);
+      return;
+    }
+    const success = addToCompare({
+      id: product.id,
+      title: product.title,
+      price: product.price,
+      image_url: getFirstImage(product.image_url),
+      category_name: product.category_name,
+      features: product.features,
+      description: product.description
+    });
+    if (success) {
+      toast.success("Ürün karşılaştırmaya eklendi!");
+    }
+  }
+};
 
 onMounted(async () => {
   const userStr = localStorage.getItem("user");
@@ -155,7 +193,6 @@ const handleToggleFavorite = async (productId: number, productTitle: string) => 
   }
 };
 
-
 const handleBuyNow = async (product: any) => {
   const token = localStorage.getItem("token");
   if (!token) {
@@ -198,6 +235,7 @@ const handleBuyNow = async (product: any) => {
   popularProducts.value = filtered;
 };
 </script>
+
 
 <template>
   <!-- Slider -->
@@ -265,6 +303,7 @@ const handleBuyNow = async (product: any) => {
           </div>
 
 
+
           <button @click.prevent="handleToggleFavorite(product.id, product.title)"
             class="absolute top-2 left-2 z-10 bg-white/90 hover:bg-white p-2 rounded-full shadow-lg transition"
             title="Favorilere ekle">
@@ -274,6 +313,24 @@ const handleBuyNow = async (product: any) => {
                 d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
             </svg>
           </button>
+
+
+          <!-- Karşılaştırma Butonu -->
+          <button @click.prevent="handleToggleCompare(product)"
+            :title="isInCompare(product.id) ? 'Karşılaştırmadan çıkar' : 'Karşılaştırmaya ekle'" :class="[
+              'absolute top-14 left-2 z-10 p-2 rounded-full shadow-lg transition-all',
+              isInCompare(product.id)
+                ? 'bg-blue-500 text-white hover:bg-blue-600'
+                : 'bg-white/90 hover:bg-white text-gray-600 hover:text-blue-600'
+            ]">
+            <svg class="w-5 h-5" :class="{ 'fill-current': isInCompare(product.id) }" fill="none" stroke="currentColor"
+              viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+            </svg>
+          </button>
+
+
 
 
           <RouterLink :to="`/urun/${product.id}`" class="relative overflow-hidden aspect-square">
@@ -295,6 +352,8 @@ const handleBuyNow = async (product: any) => {
                 </span>
               </div>
             </div>
+
+
 
             <div v-if="parseFeatures(product.features) && parseFeatures(product.features).sizes" class="mb-2">
               <label class="text-xs text-gray-600 block mb-1">Beden:</label>
@@ -380,12 +439,28 @@ const handleBuyNow = async (product: any) => {
           </RouterLink>
 
           <button @click.prevent="handleToggleFavorite(product.id, product.title)"
-            class="absolute top-2 right-2 z-10 bg-white/90 hover:bg-white p-2 rounded-full shadow-lg transition"
+            class="absolute top-2 left-2 z-10 bg-white/90 hover:bg-white p-2 rounded-full shadow-lg transition"
             title="Favorilere ekle">
             <svg class="w-5 h-5" :class="isFavorite(product.id) ? 'text-red-500 fill-current' : 'text-gray-400'"
               fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                 d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+            </svg>
+          </button>
+
+
+            <!-- Karşılaştırma Butonu -->
+          <button @click.prevent="handleToggleCompare(product)"
+            :title="isInCompare(product.id) ? 'Karşılaştırmadan çıkar' : 'Karşılaştırmaya ekle'" :class="[
+              'absolute top-14 left-2 z-10 p-2 rounded-full shadow-lg transition-all',
+              isInCompare(product.id)
+                ? 'bg-blue-500 text-white hover:bg-blue-600'
+                : 'bg-white/90 hover:bg-white text-gray-600 hover:text-blue-600'
+            ]">
+            <svg class="w-5 h-5" :class="{ 'fill-current': isInCompare(product.id) }" fill="none" stroke="currentColor"
+              viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
             </svg>
           </button>
 
