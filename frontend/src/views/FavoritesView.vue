@@ -5,6 +5,7 @@ import { apiGet, apiPost } from "../services/api";
 import { addToCart } from "../services/cart";
 import { removeFromFavorites } from "../services/favorites";
 import { toast } from "vue3-toastify";
+import { addToCompare, removeFromCompare, isInCompare, MAX_COMPARE, compareList } from "../services/compare";
 
 const router = useRouter();
 const favorites = ref<any[]>([]);
@@ -28,6 +29,32 @@ onMounted(async () => {
 
   await loadFavorites();
 });
+
+// Karşılaştırma fonksiyonu
+const handleToggleCompare = (product: any) => {
+  if (isInCompare(product.id)) {
+    removeFromCompare(product.id);
+    toast.success("Ürün karşılaştırmadan kaldırıldı!");
+  } else {
+    if (compareList.value.length >= MAX_COMPARE) {
+      toast.error(`En fazla ${MAX_COMPARE} ürün karşılaştırabilirsiniz!`);
+      return;
+    }
+    const success = addToCompare({
+      id: product.id,
+      title: product.title,
+      price: product.price,
+      image_url: getFirstImage(product.image_url),
+      category_name: product.category_name,
+      features: product.features,
+      description: product.description
+    });
+    if (success) {
+      toast.success("Ürün karşılaştırmaya eklendi!");
+    }
+  }
+};
+
 
 async function loadFavorites() {
   try {
@@ -162,10 +189,8 @@ const handleBuyNow = async (product: any) => {
         <h1 class="text-3xl font-bold text-gray-900">Favorilerim</h1>
         <p class="text-gray-600 mt-1">Beğendiğiniz ürünleri buradan takip edebilirsiniz</p>
       </div>
-      <button 
-        @click="router.push('/')"
-        class="flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-gray-900 transition"
-      >
+      <button @click="router.push('/')"
+        class="flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-gray-900 transition">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
         </svg>
@@ -180,36 +205,43 @@ const handleBuyNow = async (product: any) => {
     <div v-else-if="favorites.length === 0" class="text-center py-16">
       <h2 class="text-2xl font-bold text-gray-900 mb-2">Henüz favori ürününüz yok</h2>
       <p class="text-gray-600 mb-6">Beğendiğiniz ürünleri favorilere ekleyerek kolayca takip edebilirsiniz</p>
-      <button 
-        @click="router.push('/')"
-        class="bg-gray-900 text-white px-6 py-3 rounded-lg hover:bg-gray-800 transition font-medium"
-      >
+      <button @click="router.push('/')"
+        class="bg-gray-900 text-white px-6 py-3 rounded-lg hover:bg-gray-800 transition font-medium">
         Ürünleri Keşfet
       </button>
     </div>
 
     <div v-else>
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-        <div 
-          v-for="product in favorites" 
-          :key="product.id"
+        <div v-for="product in favorites" :key="product.id"
           class="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg transition relative group">
-          <button 
-            @click="handleRemoveFavorite(product.id)"
+          <button @click="handleRemoveFavorite(product.id)"
             class="absolute top-3 right-3 z-10 bg-white/90 hover:bg-white p-2 rounded-full shadow-lg transition"
-            title="Favorilerden çıkar"
-          >
+            title="Favorilerden çıkar">
             <svg class="w-5 h-5 text-red-500" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+              <path
+                d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+            </svg>
+          </button>
+
+          <!-- Karşılaştırma Butonu -->
+          <button @click.prevent="handleToggleCompare(product)"
+            :title="isInCompare(product.id) ? 'Karşılaştırmadan çıkar' : 'Karşılaştırmaya ekle'" :class="[
+              'absolute top-14 right-3 z-10 p-2 rounded-full shadow-lg transition-all',
+              isInCompare(product.id)
+                ? 'bg-blue-500 text-white hover:bg-blue-600'
+                : 'bg-white/90 hover:bg-white text-gray-600 hover:text-blue-600'
+            ]">
+            <svg class="w-5 h-5" :class="{ 'fill-current': isInCompare(product.id) }" fill="none" stroke="currentColor"
+              viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
             </svg>
           </button>
 
           <RouterLink :to="`/urun/${product.id}`" class="block relative overflow-hidden aspect-square">
-            <img 
-              :src="getFirstImage(product.image_url)" 
-              :alt="product.title"
-              class="w-full h-full object-cover hover:opacity-90 transition"
-            />
+            <img :src="getFirstImage(product.image_url)" :alt="product.title"
+              class="w-full h-full object-cover hover:opacity-90 transition" />
           </RouterLink>
 
           <div class="p-4">
@@ -222,11 +254,8 @@ const handleBuyNow = async (product: any) => {
 
             <div v-if="featureEntries(product.features).length" class="mb-3">
               <div class="flex flex-wrap gap-1.5">
-                <span 
-                  v-for="([key, value]) in featureEntries(product.features)" 
-                  :key="key"
-                  class="text-xs bg-gray-100 px-2 py-1 rounded"
-                >
+                <span v-for="([key, value]) in featureEntries(product.features)" :key="key"
+                  class="text-xs bg-gray-100 px-2 py-1 rounded">
                   {{ key }}: {{ value }}
                 </span>
               </div>
@@ -235,9 +264,7 @@ const handleBuyNow = async (product: any) => {
             <div v-if="parseFeatures(product.features)?.sizes" class="mb-3">
               <label class="text-xs text-gray-600 block mb-2">Beden:</label>
               <div class="flex flex-wrap gap-1.5">
-                <label 
-                  v-for="size in parseFeatures(product.features).sizes" 
-                  :key="size">
+                <label v-for="size in parseFeatures(product.features).sizes" :key="size">
                   <input type="radio" :value="size" v-model="selectedSizes" name="sizeGroup" class="w-3 h-3" />
                   {{ size }}
                 </label>
@@ -250,16 +277,12 @@ const handleBuyNow = async (product: any) => {
             </div>
 
             <div v-if="!isOwnProduct(product)" class="flex gap-2">
-              <button 
-                @click="handleAddToCart(product)"
-                class="flex-1 bg-gray-900 text-white py-2.5 rounded-lg hover:bg-gray-800 transition font-medium text-sm"
-              >
+              <button @click="handleAddToCart(product)"
+                class="flex-1 bg-gray-900 text-white py-2.5 rounded-lg hover:bg-gray-800 transition font-medium text-sm">
                 Sepete Ekle
               </button>
-              <button 
-                @click="handleBuyNow(product)"
-                class="flex-1 bg-green-600 text-white py-2.5 rounded-lg hover:bg-green-700 transition font-medium text-sm"
-              >
+              <button @click="handleBuyNow(product)"
+                class="flex-1 bg-green-600 text-white py-2.5 rounded-lg hover:bg-green-700 transition font-medium text-sm">
                 Satın Al
               </button>
             </div>
