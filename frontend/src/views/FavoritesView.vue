@@ -238,15 +238,8 @@ const handleBuyNow = async (product: any) => {
               <div class="flex flex-wrap gap-1.5">
                 <label 
                   v-for="size in parseFeatures(product.features).sizes" 
-                  :key="size"
-                  :class="[
-                    'px-3 py-1.5 border-2 rounded cursor-pointer transition text-sm',
-                    selectedSizes[product.id] === size 
-                      ? 'border-gray-900 bg-gray-900 text-white' 
-                      : 'border-gray-300 hover:border-gray-400'
-                  ]"
-                >
-                  <input type="radio" :value="size" v-model="selectedSizes[product.id]" class="sr-only" />
+                  :key="size">
+                  <input type="radio" :value="size" v-model="selectedSizes" name="sizeGroup" class="w-3 h-3" />
                   {{ size }}
                 </label>
               </div>

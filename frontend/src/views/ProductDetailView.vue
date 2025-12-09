@@ -30,7 +30,6 @@ async function loadProduct() {
     const data = await apiGet(`/products/${productId}`);
     product.value = data;
 
-    // image_url'i parse et (artık JSON array olabilir)
     if (product.value.image_url) {
       try {
         const parsed = JSON.parse(product.value.image_url);
@@ -106,7 +105,7 @@ const handleAddToCart = () => {
       seller_id: product.value.seller_id,
     });
   }
-  
+
   toast.success(`"${product.value.title}" (${quantity.value} adet) sepete eklendi!`);
 };
 
@@ -158,207 +157,125 @@ function nextImage() {
 
 function prevImage() {
   if (product.value.images.length > 1) {
-    currentImageIndex.value = currentImageIndex.value === 0 
-      ? product.value.images.length - 1 
+    currentImageIndex.value = currentImageIndex.value === 0
+      ? product.value.images.length - 1
       : currentImageIndex.value - 1;
   }
 }
 </script>
 
 <template>
-  <div v-if="loading" class="flex justify-center items-center min-h-screen">
-    <div class="animate-spin rounded-full h-16 w-16 border-4 border-gray-300 border-t-gray-900"></div>
+  <div v-if="loading" class="flex justify-center items-center py-20">
+    <div class="animate-spin rounded-full h-12 w-12 border-4 border-gray-300 border-t-gray-900"></div>
   </div>
 
-  <div v-else-if="product" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-    <!-- Geri Dön Butonu -->
-    <button 
-      @click="router.back()"
-      class="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-6 transition"
-    >
-      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-      </svg>
-      Geri Dön
+  <div v-else-if="product" class="max-w-6xl mx-auto px-4 py-6">
+    <button @click="router.back()" class="text-gray-600 hover:text-gray-900 mb-4 text-sm flex items-center gap-1">
+      ← Geri
     </button>
 
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-      <!-- Resim Galerisi -->
-      <div class="space-y-4">
-        <!-- Ana Resim -->
-        <div class="relative aspect-square bg-gray-100 rounded-xl overflow-hidden group">
-          <img 
-            :src="product.images[currentImageIndex]" 
-            :alt="product.title"
-            class="w-full h-full object-cover"
-          />
-          
-          <!-- Resim Navigasyon Butonları -->
-          <div v-if="product.images.length > 1" class="absolute inset-0 flex items-center justify-between p-4 opacity-0 group-hover:opacity-100 transition-opacity">
-            <button 
-              @click="prevImage"
-              class="bg-white/80 hover:bg-white p-2 rounded-full shadow-lg transition"
-            >
-              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-              </svg>
-            </button>
-            <button 
-              @click="nextImage"
-              class="bg-white/80 hover:bg-white p-2 rounded-full shadow-lg transition"
-            >
-              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-              </svg>
-            </button>
-          </div>
-
-          <!-- Resim Sayacı -->
-          <div v-if="product.images.length > 1" class="absolute bottom-4 right-4 bg-black/60 text-white px-3 py-1 rounded-full text-sm">
-            {{ currentImageIndex + 1 }} / {{ product.images.length }}
-          </div>
+    <div class="grid md:grid-cols-2 gap-6">
+      <!-- Sol: Resimler -->
+      <div>
+        <div class="relative border rounded-lg overflow-hidden bg-white mb-3">
+          <img :src="product.images[currentImageIndex]" :alt="product.title"
+            class="w-full aspect-square object-cover" />
+          <button v-if="product.images.length > 1" @click="prevImage"
+            class="absolute left-2 top-1/2 -translate-y-1/2 bg-white rounded-full p-1.5 shadow hover:bg-gray-100">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+            </svg>
+          </button>
+          <button v-if="product.images.length > 1" @click="nextImage"
+            class="absolute right-2 top-1/2 -translate-y-1/2 bg-white rounded-full p-1.5 shadow hover:bg-gray-100">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+            </svg>
+          </button>
         </div>
 
-        <!-- Küçük Resimler -->
-        <div v-if="product.images.length > 1" class="grid grid-cols-4 sm:grid-cols-5 gap-3">
-          <button
-            v-for="(image, index) in product.images"
-            :key="index"
-            @click="changeImage(index)"
-            :class="[
-              'aspect-square rounded-lg overflow-hidden border-2 transition',
-              currentImageIndex === index 
-                ? 'border-gray-900 ring-2 ring-gray-900' 
-                : 'border-gray-200 hover:border-gray-400'
-            ]"
-          >
-            <img :src="image" :alt="`${product.title} - ${index + 1}`" class="w-full h-full object-cover" />
+        <div v-if="product.images.length > 1" class="flex gap-2 overflow-x-auto">
+          <button v-for="(image, index) in product.images" :key="index" @click="changeImage(index)" :class="[
+            'flex-shrink-0 w-16 h-16 rounded border-2',
+            currentImageIndex === index ? 'border-gray-900' : 'border-gray-200'
+          ]">
+            <img :src="image" class="w-full h-full object-cover rounded" />
           </button>
         </div>
       </div>
 
-      <!-- Ürün Bilgileri -->
-      <div class="space-y-6">
-        <div>
-          <h1 class="text-3xl font-bold text-gray-900 mb-2">{{ product.title }}</h1>
-          <p class="text-gray-600">{{ product.description }}</p>
+      <!-- Sağ: Bilgiler -->
+      <div>
+        <h1 class="text-2xl font-bold mb-2">{{ product.title }}</h1>
+        <p class="text-gray-600 text-sm mb-3">{{ product.description }}</p>
+
+        <div class="text-3xl font-bold text-gray-900 mb-4">{{ product.price }} TL</div>
+
+        <div class="text-sm text-gray-600 mb-4">
+          Satıcı: <span class="font-medium text-gray-900">{{ product.seller_name || product.seller_email }}</span>
         </div>
 
-        <!-- Fiyat -->
-        <div class="border-t border-b border-gray-200 py-4">
-          <div class="flex items-baseline gap-2">
-            <span class="text-4xl font-bold text-gray-900">{{ product.price }} TL</span>
-          </div>
-        </div>
-
-        <!-- Satıcı Bilgisi -->
-        <div class="flex items-center gap-3 p-4 bg-gray-50 rounded-lg">
-          <div>
-            <p class="text-sm text-gray-600">Satıcı</p>
-            <p class="font-semibold text-gray-900">{{ product.seller_name || product.seller_email }}</p>
-          </div>
-        </div>
-
-        <!-- Özellikler -->
-        <div v-if="featureEntries(product.features).length" class="space-y-3">
-          <h3 class="font-semibold text-gray-900">Ürün Özellikleri</h3>
-          <div class="grid grid-cols-2 gap-3">
-            <div 
-              v-for="([key, value]) in featureEntries(product.features)" 
-              :key="key"
-              class="p-3 bg-gray-50 rounded-lg"
-            >
-              <p class="text-xs text-gray-600 mb-1">{{ key }}</p>
-              <p class="font-semibold text-gray-900">{{ value }}</p>
+        <div v-if="featureEntries(product.features).length" class="mb-2 pb-4">
+          <div class="text-sm font-semibold mb-2">Özellikler</div>
+          <div class="text-sm space-y-1">
+            <div v-for="([key, value]) in featureEntries(product.features)" :key="key" class="flex">
+              <span class="text-gray-600 w-24">{{ key }}:</span>
+              <span class="font-medium">{{ value }}</span>
             </div>
           </div>
         </div>
 
-        <!-- Beden Seçimi -->
-        <div v-if="parseFeatures(product.features)?.sizes" class="space-y-3">
-          <h3 class="font-semibold text-gray-900">Beden Seçimi</h3>
+        <div v-if="parseFeatures(product.features)?.sizes" class="mb-4">
+          <div class="text-sm font-semibold mb-2">Beden</div>
+
           <div class="flex flex-wrap gap-2">
-            <label 
-              v-for="size in parseFeatures(product.features).sizes" 
-              :key="size"
-              :class="[
-                'px-6 py-3 border-2 rounded-lg cursor-pointer transition font-medium',
-                selectedSize === size 
-                  ? 'border-gray-900 bg-gray-900 text-white' 
-                  : 'border-gray-300 hover:border-gray-400'
-              ]"
-            >
-              <input type="radio" :value="size" v-model="selectedSize" class="sr-only" />
+            <label v-for="size in parseFeatures(product.features).sizes" :key="size"
+              class="flex items-center gap-1 cursor-pointer">
+              <input type="radio" :value="size" v-model="selectedSize" name="sizeGroup" class="w-3 h-3" />
               {{ size }}
             </label>
           </div>
         </div>
 
-        <!-- Miktar Seçimi -->
-        <div class="space-y-3">
-          <h3 class="font-semibold text-gray-900">Miktar</h3>
-          <div class="flex items-center gap-3">
-            <button 
-              @click="quantity = Math.max(1, quantity - 1)"
-              class="w-10 h-10 border-2 border-gray-300 rounded-lg hover:bg-gray-100 transition font-semibold"
-            >
+        <div class="mb-4">
+          <div class="text-sm font-semibold mb-2">Miktar</div>
+          <div class="flex items-center gap-2">
+            <button @click="quantity = Math.max(1, quantity - 1)" class="w-8 h-8 border rounded hover:bg-gray-50">
               -
             </button>
-            <span class="w-16 text-center text-xl font-semibold">{{ quantity }}</span>
-            <button 
-              @click="quantity = quantity + 1"
-              class="w-10 h-10 border-2 border-gray-300 rounded-lg hover:bg-gray-100 transition font-semibold"
-            >
+            <span class="w-12 text-center">{{ quantity }}</span>
+            <button @click="quantity = quantity + 1" class="w-8 h-8 border rounded hover:bg-gray-50">
               +
             </button>
           </div>
         </div>
 
-        <!-- Uyarı Mesajı (Kendi Ürünü) -->
-        <div v-if="isOwnProduct()" class="p-4 bg-blue-50 border border-blue-200 rounded-lg">
-          <div class="flex gap-3">
-            <svg class="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            <p class="text-sm text-blue-800">Bu sizin ürününüz. Kendi ürününüzü satın alamazsınız.</p>
-          </div>
+        <div v-if="isOwnProduct()" class="mb-4 p-2 bg-blue-50 border border-blue-200 rounded text-sm text-blue-800">
+          Kendi ürününüzü satın alamazsınız
         </div>
 
-        <!-- Aksiyon Butonları -->
-        <div class="flex gap-3">
-          <button 
-            @click="handleAddToCart"
-            :disabled:="isOwnProduct()"
-            :class="[
-              'flex-1 py-4 rounded-lg font-semibold transition text-lg',
-              isOwnProduct() 
-                ? 'bg-gray-300 text-gray-500 cursor-not-allowed' 
-                : 'bg-gray-900 text-white hover:bg-gray-800'
-            ]"
-          >
+        <div class="flex gap-2">
+          <button @click="handleAddToCart" :disabled:="isOwnProduct()" :class="[
+            'flex-1 py-2.5 rounded font-medium',
+            isOwnProduct()
+              ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+              : 'bg-gray-900 text-white hover:bg-gray-800'
+          ]">
             Sepete Ekle
           </button>
-          <button 
-            @click="handleBuyNow"
-            :disabled:="isOwnProduct()"
-            :class="[
-              'flex-1 py-4 rounded-lg font-semibold transition text-lg',
-              isOwnProduct() 
-                ? 'bg-gray-300 text-gray-500 cursor-not-allowed' 
-                : 'bg-green-600 text-white hover:bg-green-700'
-            ]"
-          >
-            Hemen Satın Al
+          <button @click="handleBuyNow" :disabled:="isOwnProduct()" :class="[
+            'flex-1 py-2.5 rounded font-medium',
+            isOwnProduct()
+              ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+              : 'bg-green-600 text-white hover:bg-green-700'
+          ]">
+            Satın Al
           </button>
         </div>
 
-        <!-- Kategori -->
-        <div class="border-gray-200">
-          <RouterLink 
-            :to="`/kategori/${product.category_slug}`"
-            class="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 transition"
-          >
-            {{ product.category_name }}
+        <div class="mt-1 pt-3">
+          <RouterLink :to="`/kategori/${product.category_slug}`" class="text-sm text-gray-600 hover:text-gray-900">
+            Kategori: {{ product.category_name }}
           </RouterLink>
         </div>
       </div>
