@@ -44,7 +44,7 @@ let searchTimeout: any = null;
 
 watch(searchQuery, async (newVal) => {
   if (searchTimeout) clearTimeout(searchTimeout);
-  
+
   if (!newVal.trim()) {
     searchResults.value = [];
     showSearchResults.value = false;
@@ -58,11 +58,11 @@ watch(searchQuery, async (newVal) => {
 
 async function performSearch(query: string) {
   if (!query.trim()) return;
-  
+
   isSearching.value = true;
   try {
     const products = await apiGet("/products");
-    const filtered = products.filter((p: any) => 
+    const filtered = products.filter((p: any) =>
       p.title.toLowerCase().includes(query.toLowerCase()) ||
       p.description?.toLowerCase().includes(query.toLowerCase()) ||
       p.category_name?.toLowerCase().includes(query.toLowerCase())
@@ -105,22 +105,23 @@ function getFirstImage(imageUrl: string | null | undefined): string {
 <template>
   <nav class="bg-white border-b border-gray-200 sticky top-0 z-50 shadow-sm">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="flex items-center justify-between h-20">
+      <div class="flex items-center justify-between h-16">
 
-        <RouterLink to="/" class="flex-shrink-0 mr-8 mt-4">
-          <img src="../assets/justlogopurplee.png" class="h-35 w-auto hover:opacity-90 transition-opacity"
+        <!-- Logo -->
+        <RouterLink to="/" class="flex-shrink-0">
+          <img src="../assets/justlogopurplee.png" class="h-32 mt-3 w-auto hover:opacity-90 transition-opacity"
             alt="JustifyShop" />
         </RouterLink>
 
-        <div class="hidden lg:flex items-center space-x-1 flex-1">
-          <RouterLink to="/"
-            class="px-3 py-2 text-sm font-medium text-gray-700 hover:text-slate-500 hover:bg-slate-50 rounded-md transition-all">
+        <!-- Desktop Navigation -->
+        <div class="hidden lg:flex items-center space-x-8 flex-1 justify-center">
+          <RouterLink to="/" class="text-sm font-medium text-gray-700 hover:text-slate-900 transition-colors">
             Anasayfa
           </RouterLink>
 
           <div class="relative group">
             <button
-              class="px-3 py-2 text-sm font-medium text-gray-700 hover:text-slate-800 hover:bg-slate-50 rounded-md transition-all flex items-center gap-1">
+              class="text-sm font-medium text-gray-700 hover:text-slate-900 transition-colors flex items-center gap-1">
               Kategoriler
               <svg class="w-4 h-4 transition-transform group-hover:rotate-180" fill="none" stroke="currentColor"
                 stroke-width="2" viewBox="0 0 24 24">
@@ -128,161 +129,110 @@ function getFirstImage(imageUrl: string | null | undefined): string {
               </svg>
             </button>
             <div
-              class="absolute left-0 mt-2 w-56 bg-white rounded-lg shadow-xl border border-gray-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all transform translate-y-1 group-hover:translate-y-0">
+              class="absolute left-0 mt-2 w-48 bg-white rounded-lg shadow-xl border border-gray-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all">
               <RouterLink to="/kategori/erkek-giyim"
-                class="flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-slate-50 hover:text-slate-500 first:rounded-t-lg transition-colors">
+                class="block px-4 py-2.5 text-sm text-gray-700 hover:bg-slate-50 first:rounded-t-lg transition-colors">
                 Erkek Giyim
               </RouterLink>
               <RouterLink to="/kategori/kadin-giyim"
-                class="flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-slate-50 hover:text-slate-500 transition-colors">
+                class="block px-4 py-2.5 text-sm text-gray-700 hover:bg-slate-50 transition-colors">
                 Kadın Giyim
               </RouterLink>
               <RouterLink to="/kategori/ayakkabi"
-                class="flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-slate-50 hover:text-slate-500 transition-colors">
+                class="block px-4 py-2.5 text-sm text-gray-700 hover:bg-slate-50 transition-colors">
                 Ayakkabı
               </RouterLink>
               <RouterLink to="/kategori/cocuk-giyim"
-                class="flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-slate-50 hover:text-slate-500 last:rounded-b-lg transition-colors">
+                class="block px-4 py-2.5 text-sm text-gray-700 hover:bg-slate-50 last:rounded-b-lg transition-colors">
                 Çocuk Giyim
               </RouterLink>
             </div>
           </div>
 
-          <RouterLink to="/hakkimizda"
-            class="px-3 py-2 text-sm font-medium text-gray-700 hover:text-slate-500 hover:bg-slate-50 rounded-md transition-all">
+          <RouterLink to="/hakkimizda" class="text-sm font-medium text-gray-700 hover:text-slate-900 transition-colors">
             Hakkımızda
           </RouterLink>
 
-          <RouterLink to="/iletisim"
-            class="px-3 py-2 text-sm font-medium text-gray-700 hover:text-slate-500 hover:bg-slate-50 rounded-md transition-all">
+          <RouterLink to="/iletisim" class="text-sm font-medium text-gray-700 hover:text-slate-900 transition-colors">
             İletişim
           </RouterLink>
         </div>
 
+        <!-- Desktop Actions -->
         <div class="hidden lg:flex items-center space-x-2">
-          <div class="relative">
-            <button 
-              @click="isSearchOpen = !isSearchOpen"
-              class="flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-gray-700 hover:text-slate-900 hover:bg-slate-50 rounded-lg transition-all">
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
-            </button>
+          <!-- Search -->
+          <button @click="isSearchOpen = true"
+            class="p-2.5 text-gray-700 hover:text-slate-900 hover:bg-slate-50 rounded-lg transition-all" title="Ara">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+          </button>
 
-            <div v-if="isSearchOpen" class="fixed inset-0 bg-black/20 z-50" @click="closeSearch"></div>
-            <div v-if="isSearchOpen" class="absolute right-0 mt-2 w-96 bg-white rounded-lg shadow-2xl border border-gray-200 z-50">
-              <div class="p-4">
-                <div class="relative">
-                  <input 
-                    v-model="searchQuery"
-                    type="text"
-                    placeholder="Ürün ara..."
-                    class="w-full pl-10 pr-4 py-2.5 border-2 border-gray-200 rounded-lg focus:border-slate-900 focus:outline-none text-sm"
-                    autofocus
-                  />
-                  <svg class="absolute left-3 top-3 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                  </svg>
-                </div>
-              </div>
-
-              <div v-if="showSearchResults" class="max-h-96 overflow-y-auto border-t border-gray-100">
-                <div v-if="isSearching" class="p-8 text-center">
-                  <div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-gray-300 border-t-gray-900"></div>
-                </div>
-
-                <div v-else-if="searchResults.length === 0" class="p-8 text-center">
-                  <p class="text-gray-500 text-sm">Sonuç bulunamadı</p>
-                </div>
-
-                <div v-else>
-                  <button
-                    v-for="product in searchResults"
-                    :key="product.id"
-                    @click="selectProduct(product.id)"
-                    class="w-full flex items-center gap-3 p-3 hover:bg-slate-50 transition border-b border-gray-100 last:border-b-0"
-                  >
-                    <img 
-                      :src="getFirstImage(product.image_url)" 
-                      :alt="product.title"
-                      class="w-16 h-16 object-cover rounded-lg"
-                    />
-                    <div class="flex-1 text-left">
-                      <p class="font-medium text-sm text-gray-900 line-clamp-1">{{ product.title }}</p>
-                      <p class="text-xs text-gray-500 line-clamp-1 mt-0.5">{{ product.category_name }}</p>
-                      <p class="font-bold text-sm text-gray-900 mt-1">{{ product.price }} TL</p>
-                    </div>
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Karşılaştırma Butonu -->
-          <RouterLink to="/karsilastir" class="relative group">
-            <button
-              class="flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-gray-700 hover:text-slate-900 hover:bg-slate-50 rounded-lg transition-all">
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-              </svg>
-              <span class="hidden xl:inline">Karşılaştır</span>
-              <span v-if="compareList.length"
-                class="absolute -top-1 -right-1 bg-blue-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs font-bold shadow-md">
-                {{ compareList.length }}
-              </span>
-            </button>
+          <!-- Compare -->
+          <RouterLink to="/karsilastir"
+            class="relative p-2.5 text-gray-700 hover:text-slate-900 hover:bg-slate-50 rounded-lg transition-all"
+            title="Karşılaştır">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+            </svg>
+            <span v-if="compareList.length"
+              class="absolute -top-1 -right-1 bg-blue-600 text-white rounded-full w-4 h-4 flex items-center justify-center text-xs font-bold">
+              {{ compareList.length }}
+            </span>
           </RouterLink>
 
-          <RouterLink to="/favorilerim" class="relative group">
-            <button
-              class="flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-gray-700 hover:text-slate-900 hover:bg-slate-50 rounded-lg transition-all">
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-              </svg>
-              <span class="hidden xl:inline">Favorilerim</span>
-              <span v-if="favoriteIds.size"
-                class="absolute -top-1 -right-1 bg-slate-900 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs font-bold shadow-md">
-                {{ favoriteIds.size }}
-              </span>
-            </button>
+          <!-- Favorites -->
+          <RouterLink to="/favorilerim"
+            class="relative p-2.5 text-gray-700 hover:text-slate-900 hover:bg-slate-50 rounded-lg transition-all"
+            title="Favorilerim">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+            </svg>
+            <span v-if="favoriteIds.size"
+              class="absolute -top-1 -right-1 bg-red-600 text-white rounded-full w-4 h-4 flex items-center justify-center text-xs font-bold">
+              {{ favoriteIds.size }}
+            </span>
           </RouterLink>
 
-          <RouterLink to="/cart" class="relative group">
-            <button
-              class="flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-gray-700 hover:text-slate-900 hover:bg-slate-50 rounded-lg transition-all">
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-              </svg>
-              <span class="hidden xl:inline">Sepetim</span>
-              <span v-if="cart.length"
-                class="absolute -top-1 -right-1 bg-slate-900 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs font-bold shadow-md">
-                {{cart.reduce((acc, i) => acc + i.quantity, 0)}}
-              </span>
-            </button>
+          <!-- Cart -->
+          <RouterLink to="/cart"
+            class="relative p-2.5 text-gray-700 hover:text-slate-900 hover:bg-slate-50 rounded-lg transition-all"
+            title="Sepetim">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+            </svg>
+            <span v-if="cart.length"
+              class="absolute -top-1 -right-1 bg-slate-900 text-white rounded-full w-4 h-4 flex items-center justify-center text-xs font-bold">
+              {{cart.reduce((acc, i) => acc + i.quantity, 0)}}
+            </span>
           </RouterLink>
 
-          <div v-if="!user" class="flex items-center gap-2 pr-3 border-gray-200">
+          <!-- User Menu -->
+          <div v-if="!user" class="flex items-center gap-2 border-gray-200">
             <RouterLink to="/login">
-              <button
-                class="flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-gray-700 hover:text-slate-900 hover:bg-slate-50 rounded-lg transition-all">
-                <span>Giriş Yap</span>
+              <button class="px-4 py-2 text-sm font-medium text-gray-700 hover:text-slate-900 transition-colors">
+                Giriş
               </button>
             </RouterLink>
             <RouterLink to="/register">
               <button
-                class="flex items-center gap-2 px-5 py-2.5 text-sm font-medium text-white bg-slate-900 hover:bg-slate-800 rounded-lg transition-all shadow-sm hover:shadow-md">
-                <span>Kayıt Ol</span>
+                class="px-4 py-2 text-sm font-medium text-white bg-slate-900 hover:bg-slate-800 rounded-lg transition-all">
+                Kayıt Ol
               </button>
             </RouterLink>
           </div>
 
-          <div v-else class="relative border-gray-200">
+          <div v-else class="relative pl-1 border-gray-200">
             <button @click="isUserDropdownOpen = !isUserDropdownOpen"
-              class="flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-gray-700 hover:text-slate-900 hover:bg-slate-50 rounded-lg transition-all">
-              <span class="hidden xl:inline">{{ user?.name }}</span>
+              class="flex items-center gap-2 p-2 text-gray-700 hover:text-slate-900 hover:bg-slate-50 rounded-lg transition-all">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+              </svg>
               <svg class="w-4 h-4 transition-transform" :class="{ 'rotate-180': isUserDropdownOpen }" fill="none"
                 stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
@@ -292,29 +242,30 @@ function getFirstImage(imageUrl: string | null | undefined): string {
             <div v-if="isUserDropdownOpen" @click="isUserDropdownOpen = false"
               class="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-xl border border-gray-100 py-1">
               <div class="px-4 py-3 border-b border-gray-100">
-                <p class="text-sm font-medium text-gray-900">{{ user?.email || '' }}</p>
+                <p class="text-sm font-medium text-gray-900 truncate">{{ user?.name || user?.email }}</p>
               </div>
 
               <RouterLink to="/customer-panel"
-                class="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-slate-50 hover:text-slate-500 transition-colors">
+                class="block px-4 py-2.5 text-sm text-gray-700 hover:bg-slate-50 transition-colors">
                 Kullanıcı Paneli
               </RouterLink>
 
               <RouterLink v-if="user.role === 'admin'" to="/admin"
-                class="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-slate-50 hover:text-slate-500 transition-colors">
+                class="block px-4 py-2.5 text-sm text-gray-700 hover:bg-slate-50 transition-colors">
                 Admin Paneli
               </RouterLink>
 
               <button @click="logout"
-                class="w-full flex items-center px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors border-t border-gray-100 mt-1">
+                class="w-full text-left px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors border-t border-gray-100">
                 Çıkış Yap
               </button>
             </div>
           </div>
         </div>
 
+        <!-- Mobile Menu Button -->
         <button @click="toggleMobileMenu"
-          class="lg:hidden p-2 text-gray-700 hover:text-slate-500 hover:bg-slate-50 rounded-lg transition-all">
+          class="lg:hidden p-2 text-gray-700 hover:text-slate-900 hover:bg-slate-50 rounded-lg transition-all">
           <svg v-if="!isMobileMenuOpen" class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
           </svg>
@@ -325,24 +276,25 @@ function getFirstImage(imageUrl: string | null | undefined): string {
       </div>
     </div>
 
+    <!-- Mobile Menu -->
     <div v-if="isMobileMenuOpen" class="lg:hidden bg-white border-t border-gray-200">
       <div class="px-4 py-3 space-y-1">
+        <!-- Mobile Search -->
         <div class="mb-3 pb-3 border-b border-gray-200">
           <div class="relative">
-            <input 
-              v-model="searchQuery"
-              type="text"
-              placeholder="Ürün ara..."
-              class="w-full pl-10 pr-4 py-2.5 border-2 border-gray-200 rounded-lg focus:border-slate-900 focus:outline-none text-sm"
-            />
-            <svg class="absolute left-3 top-3 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            <input v-model="searchQuery" type="text" placeholder="Ürün ara..."
+              class="w-full pl-10 pr-4 py-2.5 border-2 border-gray-200 rounded-lg focus:border-slate-900 focus:outline-none text-sm" />
+            <svg class="absolute left-3 top-3 w-5 h-5 text-gray-400" fill="none" stroke="currentColor"
+              viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
           </div>
 
           <div v-if="showSearchResults && searchQuery" class="mt-2 max-h-64 overflow-y-auto bg-gray-50 rounded-lg">
             <div v-if="isSearching" class="p-4 text-center">
-              <div class="inline-block animate-spin rounded-full h-6 w-6 border-2 border-gray-300 border-t-gray-900"></div>
+              <div class="inline-block animate-spin rounded-full h-6 w-6 border-2 border-gray-300 border-t-gray-900">
+              </div>
             </div>
 
             <div v-else-if="searchResults.length === 0" class="p-4 text-center text-sm text-gray-500">
@@ -350,17 +302,11 @@ function getFirstImage(imageUrl: string | null | undefined): string {
             </div>
 
             <div v-else>
-              <button
-                v-for="product in searchResults"
-                :key="product.id"
+              <button v-for="product in searchResults" :key="product.id"
                 @click="selectProduct(product.id); toggleMobileMenu()"
-                class="w-full flex items-center gap-3 p-2 hover:bg-white transition"
-              >
-                <img 
-                  :src="getFirstImage(product.image_url)" 
-                  :alt="product.title"
-                  class="w-12 h-12 object-cover rounded"
-                />
+                class="w-full flex items-center gap-3 p-2 hover:bg-white transition">
+                <img :src="getFirstImage(product.image_url)" :alt="product.title"
+                  class="w-12 h-12 object-cover rounded" />
                 <div class="flex-1 text-left">
                   <p class="font-medium text-xs text-gray-900 line-clamp-1">{{ product.title }}</p>
                   <p class="font-bold text-xs text-gray-900">{{ product.price }} TL</p>
@@ -371,12 +317,12 @@ function getFirstImage(imageUrl: string | null | undefined): string {
         </div>
 
         <RouterLink to="/" @click="isMobileMenuOpen = false"
-          class="block px-4 py-2.5 text-sm font-medium text-gray-700 hover:text-slate-500 hover:bg-slate-50 rounded-lg transition-all">
+          class="block px-4 py-2.5 text-sm font-medium text-gray-700 hover:text-slate-900 hover:bg-slate-50 rounded-lg transition-all">
           Anasayfa
         </RouterLink>
 
         <button @click="toggleDropdownMobile"
-          class="w-full flex items-center justify-between px-4 py-2.5 text-sm font-medium text-gray-700 hover:text-slate-500 hover:bg-slate-50 rounded-lg transition-all">
+          class="w-full flex items-center justify-between px-4 py-2.5 text-sm font-medium text-gray-700 hover:text-slate-900 hover:bg-slate-50 rounded-lg transition-all">
           Kategoriler
           <svg class="w-4 h-4 transition-transform" :class="{ 'rotate-180': isDropdownOpenMobile }" fill="none"
             stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -386,59 +332,52 @@ function getFirstImage(imageUrl: string | null | undefined): string {
 
         <div v-if="isDropdownOpenMobile" class="pl-4 space-y-1">
           <RouterLink to="/kategori/erkek-giyim" @click="isMobileMenuOpen = false"
-            class="block px-4 py-2 text-sm text-gray-600 hover:text-slate-500 hover:bg-slate-50 rounded-lg transition-all">
+            class="block px-4 py-2 text-sm text-gray-600 hover:text-slate-900 hover:bg-slate-50 rounded-lg transition-all">
             Erkek Giyim
           </RouterLink>
           <RouterLink to="/kategori/kadin-giyim" @click="isMobileMenuOpen = false"
-            class="block px-4 py-2 text-sm text-gray-600 hover:text-slate-500 hover:bg-slate-50 rounded-lg transition-all">
+            class="block px-4 py-2 text-sm text-gray-600 hover:text-slate-900 hover:bg-slate-50 rounded-lg transition-all">
             Kadın Giyim
           </RouterLink>
           <RouterLink to="/kategori/ayakkabi" @click="isMobileMenuOpen = false"
-            class="block px-4 py-2 text-sm text-gray-600 hover:text-slate-500 hover:bg-slate-50 rounded-lg transition-all">
+            class="block px-4 py-2 text-sm text-gray-600 hover:text-slate-900 hover:bg-slate-50 rounded-lg transition-all">
             Ayakkabı
           </RouterLink>
           <RouterLink to="/kategori/cocuk-giyim" @click="isMobileMenuOpen = false"
-            class="block px-4 py-2 text-sm text-gray-600 hover:text-slate-500 hover:bg-slate-50 rounded-lg transition-all">
+            class="block px-4 py-2 text-sm text-gray-600 hover:text-slate-900 hover:bg-slate-50 rounded-lg transition-all">
             Çocuk Giyim
           </RouterLink>
         </div>
 
         <RouterLink to="/hakkimizda" @click="isMobileMenuOpen = false"
-          class="block px-4 py-2.5 text-sm font-medium text-gray-700 hover:text-slate-500 hover:bg-slate-50 rounded-lg transition-all">
+          class="block px-4 py-2.5 text-sm font-medium text-gray-700 hover:text-slate-900 hover:bg-slate-50 rounded-lg transition-all">
           Hakkımızda
         </RouterLink>
 
         <RouterLink to="/iletisim" @click="isMobileMenuOpen = false"
-          class="block px-4 py-2.5 text-sm font-medium text-gray-700 hover:text-slate-500 hover:bg-slate-50 rounded-lg transition-all">
+          class="block px-4 py-2.5 text-sm font-medium text-gray-700 hover:text-slate-900 hover:bg-slate-50 rounded-lg transition-all">
           İletişim
         </RouterLink>
 
-        <!-- Mobil Karşılaştırma -->
         <RouterLink to="/karsilastir" @click="isMobileMenuOpen = false"
-          class="flex items-center justify-between px-4 py-2.5 text-sm font-medium text-gray-700 hover:text-slate-500 hover:bg-slate-50 rounded-lg transition-all border-t border-gray-100 mt-2 pt-3">
-          <div class="flex items-center gap-2">
-            Karşılaştır
-          </div>
+          class="flex items-center justify-between px-4 py-2.5 text-sm font-medium text-gray-700 hover:text-slate-900 hover:bg-slate-50 rounded-lg transition-all border-t border-gray-100 mt-2 pt-3">
+          <span>Karşılaştır</span>
           <span v-if="compareList.length" class="bg-blue-600 text-white rounded-full px-2.5 py-0.5 text-xs font-bold">
-            {{compareList.length}}
+            {{ compareList.length }}
           </span>
         </RouterLink>
 
         <RouterLink to="/favorilerim" @click="isMobileMenuOpen = false"
-          class="flex items-center justify-between px-4 py-2.5 text-sm font-medium text-gray-700 hover:text-slate-500 hover:bg-slate-50 rounded-lg transition-all">
-          <div class="flex items-center gap-2">
-            Favorilerim
-          </div>
-          <span class="bg-slate-900 text-white rounded-full px-2.5 py-0.5 text-xs font-bold">
-            {{favoriteIds.size}}
+          class="flex items-center justify-between px-4 py-2.5 text-sm font-medium text-gray-700 hover:text-slate-900 hover:bg-slate-50 rounded-lg transition-all">
+          <span>Favorilerim</span>
+          <span v-if="favoriteIds.size" class="bg-red-600 text-white rounded-full px-2.5 py-0.5 text-xs font-bold">
+            {{ favoriteIds.size }}
           </span>
         </RouterLink>
 
         <RouterLink to="/cart" @click="isMobileMenuOpen = false"
-          class="flex items-center justify-between px-4 py-2.5 text-sm font-medium text-gray-700 hover:text-slate-500 hover:bg-slate-50 rounded-lg transition-all">
-          <div class="flex items-center gap-2">
-            Sepetim
-          </div>
+          class="flex items-center justify-between px-4 py-2.5 text-sm font-medium text-gray-700 hover:text-slate-900 hover:bg-slate-50 rounded-lg transition-all">
+          <span>Sepetim</span>
           <span v-if="cart.length" class="bg-slate-900 text-white rounded-full px-2.5 py-0.5 text-xs font-bold">
             {{cart.reduce((acc, i) => acc + i.quantity, 0)}}
           </span>
@@ -457,16 +396,16 @@ function getFirstImage(imageUrl: string | null | undefined): string {
 
         <div v-else class="pt-3 space-y-1 border-t border-gray-100">
           <div class="px-4 py-3 bg-slate-50 rounded-lg mb-2">
-            <p class="text-sm font-medium text-gray-900">{{ user?.email || '' }}</p>
+            <p class="text-sm font-medium text-gray-900 truncate">{{ user?.email || '' }}</p>
           </div>
 
           <RouterLink to="/customer-panel" @click="isMobileMenuOpen = false"
-            class="block px-4 py-2.5 text-sm font-medium text-gray-700 hover:text-slate-500 hover:bg-slate-50 rounded-lg transition-all">
+            class="block px-4 py-2.5 text-sm font-medium text-gray-700 hover:text-slate-900 hover:bg-slate-50 rounded-lg transition-all">
             Kullanıcı Paneli
           </RouterLink>
 
           <RouterLink v-if="user.role === 'admin'" to="/admin" @click="isMobileMenuOpen = false"
-            class="block px-4 py-2.5 text-sm font-medium text-gray-700 hover:text-slate-500 hover:bg-slate-50 rounded-lg transition-all">
+            class="block px-4 py-2.5 text-sm font-medium text-gray-700 hover:text-slate-900 hover:bg-slate-50 rounded-lg transition-all">
             Admin Paneli
           </RouterLink>
 
@@ -477,6 +416,62 @@ function getFirstImage(imageUrl: string | null | undefined): string {
         </div>
       </div>
     </div>
+
+    <!-- Search Modal -->
+    <Transition name="fade">
+      <div v-if="isSearchOpen" class="fixed inset-0 bg-black/50 z-[100] flex items-start justify-center pt-20 px-4"
+        @click="closeSearch">
+        <div @click.stop class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden">
+          <div class="p-6 border-b border-gray-200">
+            <div class="flex items-center gap-4">
+              <div class="relative flex-1">
+                <input v-model="searchQuery" type="text" placeholder="Ürün ara..."
+                  class="w-full pl-12 pr-4 py-3 border-2 border-gray-300 rounded-xl focus:border-slate-900 focus:outline-none text-base"
+                  autofocus />
+                <svg class="absolute left-4 top-3.5 w-6 h-6 text-gray-400" fill="none" stroke="currentColor"
+                  viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+              </div>
+              <button @click="closeSearch" class="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+                <svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <div v-if="showSearchResults" class="max-h-96 overflow-y-auto">
+            <div v-if="isSearching" class="p-12 text-center">
+              <div class="inline-block animate-spin rounded-full h-10 w-10 border-4 border-gray-300 border-t-gray-900">
+              </div>
+              <p class="text-gray-600 mt-4">Aranıyor...</p>
+            </div>
+
+            <div v-else-if="searchResults.length === 0" class="p-12 text-center">
+              <p class="text-gray-500 text-lg">Sonuç bulunamadı</p>
+            </div>
+
+            <div v-else class="divide-y divide-gray-100">
+              <button v-for="product in searchResults" :key="product.id" @click="selectProduct(product.id)"
+                class="w-full flex items-center gap-4 p-4 hover:bg-slate-50 transition-colors">
+                <img :src="getFirstImage(product.image_url)" :alt="product.title"
+                  class="w-20 h-20 object-cover rounded-lg flex-shrink-0" />
+                <div class="flex-1 text-left min-w-0">
+                  <p class="font-semibold text-gray-900 line-clamp-1">{{ product.title }}</p>
+                  <p class="text-sm text-gray-500 line-clamp-1 mt-0.5">{{ product.category_name }}</p>
+                  <p class="font-bold text-lg text-slate-900 mt-1">{{ product.price }} TL</p>
+                </div>
+                <svg class="w-5 h-5 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </Transition>
   </nav>
 </template>
 
