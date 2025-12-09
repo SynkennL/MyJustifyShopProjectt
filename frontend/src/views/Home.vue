@@ -59,7 +59,7 @@ function getFirstImage(imageUrl: string | null | undefined): string {
   return imageUrl;
 }
 
-// Karşılaştırma fonksiyonu - DÜZELTİLDİ
+// Karşılaştırma fonksiyonu
 const handleToggleCompare = (product: any) => {
   if (isInCompare(product.id)) {
     removeFromCompare(product.id);
