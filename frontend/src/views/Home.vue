@@ -246,21 +246,36 @@ const handleBuyNow = async (product: any) => {
           class="hs-carousel-body absolute top-0 bottom-0 start-0 flex flex-nowrap transition-transform duration-700 opacity-0">
           <div class="hs-carousel-slide">
             <div
-              class="h-96 md:h-[500px] flex flex-col bg-[url('./assets/herodiscountbanner1.png')] bg-cover bg-center bg-no-repeat">
-              <div class="mt-auto w-2/3 md:max-w-lg ps-6 pb-6 md:ps-12 md:pb-12">
-                <span class="block text-white text-sm font-medium mb-2">Yılbaşı İndirimleri</span>
-                <span class="block text-white text-2xl md:text-3xl font-bold">Şuanda mevcut olan yılbaşı indirimlerinden
-                  ürünlerimizden satın alarak yararlanabilirsiniz!</span>
+              class="h-96 md:h-[500px] flex flex-col bg-[url('./assets/herodiscountbanner1.png')] bg-cover bg-center bg-no-repeat relative">
+              <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent"></div>
+
+              <div class="mt-auto w-2/3 md:max-w-lg ps-6 pb-6 md:ps-12 md:pb-12 relative z-10">
+                <span
+                  class="block text-white text-sm font-bold mb-3 bg-red-600 px-4 py-2 rounded-lg inline-block shadow-lg">
+                  Yılbaşı İndirimleri
+                </span>
+                <span
+                  class="block text-white text-2xl md:text-3xl font-bold drop-shadow-[0_4px_8px_rgba(0,0,0,0.9)] leading-tight">
+                  Şuanda mevcut olan yılbaşı indirimlerinden ürünlerimizden satın alarak yararlanabilirsiniz!
+                </span>
               </div>
             </div>
           </div>
           <div class="hs-carousel-slide">
             <div
-              class="h-96 md:h-[500px] flex flex-col bg-[url('./assets/herobanner2.png')] bg-cover bg-center bg-no-repeat">
-              <div class="mt-auto w-2/3 md:max-w-lg ps-6 pb-6 md:ps-12 md:pb-12">
-                <span class="block text-white text-sm font-medium mb-2">Açılışa Özel İndirim</span>
-                <span class="block text-white text-2xl md:text-3xl font-bold">Açılışa özel uygun ve indirimli fiyatlı
-                  ürünler sizi bekliyor!</span>
+              class="h-96 md:h-[500px] flex flex-col bg-[url('./assets/herobanner2.png')] bg-cover bg-center bg-no-repeat relative">
+              <!-- Gradient overlay for better text readability -->
+              <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent"></div>
+
+              <div class="mt-auto w-2/3 md:max-w-lg ps-6 pb-6 md:ps-12 md:pb-12 relative z-10">
+                <span
+                  class="block text-white text-sm font-bold mb-3 bg-blue-600 px-4 py-2 rounded-lg inline-block shadow-lg">
+                  Açılışa Özel İndirim
+                </span>
+                <span
+                  class="block text-white text-2xl md:text-3xl font-bold drop-shadow-[0_4px_8px_rgba(0,0,0,0.9)] leading-tight">
+                  Açılışa özel uygun ve indirimli fiyatlı ürünler sizi bekliyor!
+                </span>
               </div>
             </div>
           </div>
@@ -334,8 +349,7 @@ const handleBuyNow = async (product: any) => {
 
 
           <RouterLink :to="`/urun/${product.id}`" class="relative overflow-hidden aspect-square">
-            <img :src="getFirstImage(product.image_url)" :alt="product.title"
-              class="w-full h-full object-cover" />
+            <img :src="getFirstImage(product.image_url)" :alt="product.title" class="w-full h-full object-cover" />
           </RouterLink>
 
           <div class="p-3 flex flex-col flex-1">
@@ -434,8 +448,7 @@ const handleBuyNow = async (product: any) => {
           class="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg transition-shadow relative group flex flex-col h-full">
 
           <RouterLink :to="`/urun/${product.id}`" class="relative overflow-hidden aspect-square">
-            <img :src="getFirstImage(product.image_url)" :alt="product.title"
-              class="w-full h-full object-cover" />
+            <img :src="getFirstImage(product.image_url)" :alt="product.title" class="w-full h-full object-cover" />
           </RouterLink>
 
           <button @click.prevent="handleToggleFavorite(product.id, product.title)"
@@ -449,7 +462,7 @@ const handleBuyNow = async (product: any) => {
           </button>
 
 
-            <!-- Karşılaştırma Butonu -->
+          <!-- Karşılaştırma Butonu -->
           <button @click.prevent="handleToggleCompare(product)"
             :title="isInCompare(product.id) ? 'Karşılaştırmadan çıkar' : 'Karşılaştırmaya ekle'" :class="[
               'absolute top-14 left-2 z-10 p-2 rounded-full shadow-lg transition-all',
