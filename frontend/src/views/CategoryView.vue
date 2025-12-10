@@ -215,7 +215,7 @@ const handleBuyNow = async (product: any) => {
         class="bg-white rounded-xl shadow hover:shadow-xl transition p-4 flex flex-col relative">
 
         <RouterLink :to="`/urun/${item.id}`" class="block">
-          <img :src="item.image_url || 'https://via.placeholder.com/300x300?text=No+Image'" alt="Ürün Resmi"
+          <img :src="getFirstImage(item.image_url) || 'https://via.placeholder.com/300x300?text=No+Image'" alt="Ürün Resmi"
             class="w-full h-80 object-cover rounded-lg mb-4 hover:opacity-90 transition" />
         </RouterLink>
         <RouterLink :to="`/urun/${item.id}`">
