@@ -264,7 +264,6 @@ const handleBuyNow = async (product: any) => {
           <div class="hs-carousel-slide">
             <div
               class="h-96 md:h-[500px] flex flex-col bg-[url('./assets/herobanner2.png')] bg-cover bg-center bg-no-repeat relative">
-              <!-- Gradient overlay for better text readability -->
               <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent"></div>
 
               <div class="mt-auto w-2/3 md:max-w-lg ps-6 pb-6 md:ps-12 md:pb-12 relative z-10">
