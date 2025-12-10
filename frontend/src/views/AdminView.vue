@@ -36,6 +36,19 @@ async function load() {
   allProducts.value = products;
 }
 
+function getFirstImage(imageUrl: string | null | undefined): string {
+  if (!imageUrl) return 'https://via.placeholder.com/300';
+  try {
+    const parsed = JSON.parse(imageUrl);
+    if (Array.isArray(parsed) && parsed.length > 0) {
+      return parsed[0];
+    }
+  } catch {
+    return imageUrl;
+  }
+  return imageUrl;
+}
+
 async function addCategory() {
   const res = await apiPost("/categories", { name: catName.value, slug: catSlug.value });
   if (res.error) { toast.error(res.error); return; }
@@ -129,7 +142,7 @@ onMounted(() => {
       <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         <div v-for="product in allProducts" :key="product.id" class="border rounded-lg p-4 hover:shadow-lg transition">
           <img 
-            :src="product.image_url || 'https://via.placeholder.com/300'" 
+            :src="getFirstImage(product.image_url)" 
             alt="Ürün" 
             class="w-full h-48 object-cover rounded-lg mb-3"
           />
