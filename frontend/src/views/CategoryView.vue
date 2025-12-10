@@ -183,8 +183,8 @@ const handleBuyNow = async (product: any) => {
   }
 
   const quantity = 1;
-  const selectedSize = selectedSizes[product.id]; // string değeri al
-  const hasRequiredSize = parseFeatures(product.features)?.sizes; // beden gerekli mi
+  const selectedSize = selectedSizes[product.id];
+  const hasRequiredSize = parseFeatures(product.features)?.sizes;
 
   if (hasRequiredSize && !selectedSize) {
     toast.error("Lütfen bir beden seçiniz!");
@@ -194,7 +194,7 @@ const handleBuyNow = async (product: any) => {
   const res = await apiPost("/orders", {
     product_id: product.id,
     quantity: quantity,
-    sizes: selectedSize ? [selectedSize] : undefined // string'i array'e çevir
+    sizes: selectedSize ? [selectedSize] : undefined
   });
 
   if (res.error) {
