@@ -64,3 +64,89 @@ export async function login(req: Request, res: Response) {
     client.release();
   }
 }
+
+export async function updateProfile(req: Request, res: Response) {
+  const { name, email, currentPassword, newPassword } = req.body;
+  const userId = (req as any).user?.id;
+
+  if (!userId) return res.status(401).json({ error: "Unauthorized" });
+
+  if (!name || !email) {
+    return res.status(400).json({ error: "Name and email are required" });
+  }
+
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email)) {
+    return res.status(400).json({ error: "Invalid email format" });
+  }
+
+  const client = await pool.connect();
+  try {
+    // Mevcut kullanıcıyı getir
+    const userQuery = await client.query(
+      "SELECT id, email, password_hash, name, role FROM users WHERE id=$1",
+      [userId]
+    );
+
+    if (userQuery.rows.length === 0) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    const currentUser = userQuery.rows[0];
+
+    if (email !== currentUser.email) {
+      const emailCheck = await client.query(
+        "SELECT id FROM users WHERE email=$1 AND id!=$2",
+        [email, userId]
+      );
+
+      if (emailCheck.rows.length > 0) {
+        return res.status(400).json({ error: "Email already in use" });
+      }
+    }
+
+    let newPasswordHash = currentUser.password_hash;
+    
+    if (currentPassword || newPassword) {
+      if (!currentPassword) {
+        return res.status(400).json({ error: "Mevcut şifrenizi girmelisiniz" });
+      }
+      
+      if (!newPassword) {
+        return res.status(400).json({ error: "Yeni şifrenizi girmelisiniz" });
+      }
+
+      const passwordMatch = await bcrypt.compare(currentPassword, currentUser.password_hash);
+      if (!passwordMatch) {
+        return res.status(400).json({ error: "Mevcut şifre yanlış!" });
+      }
+
+      if (newPassword.length < 6) {
+        return res.status(400).json({ error: "Yeni şifre en az 6 karakter olmalıdır" });
+      }
+
+      newPasswordHash = await bcrypt.hash(newPassword, 10);
+    }
+
+    const updateQuery = await client.query(
+      "UPDATE users SET name=$1, email=$2, password_hash=$3 WHERE id=$4 RETURNING id, email, name, role",
+      [name, email, newPasswordHash, userId]
+    );
+
+    const updatedUser = updateQuery.rows[0];
+
+    res.json({
+      message: "Profile updated successfully",
+      user: updatedUser
+    });
+
+  } catch (err: any) {
+    console.error("Profile update error:", err);
+    if (err.code === "23505") {
+      return res.status(400).json({ error: "Email already in use" });
+    }
+    res.status(500).json({ error: "Server error" });
+  } finally {
+    client.release();
+  }
+}

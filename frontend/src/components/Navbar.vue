@@ -245,6 +245,11 @@ function getFirstImage(imageUrl: string | null | undefined): string {
                 <p class="text-sm font-medium text-gray-900 truncate">{{ user?.name || user?.email }}</p>
               </div>
 
+              <RouterLink to="/profil"
+                class="block px-4 py-2.5 text-sm text-gray-700 hover:bg-slate-50 transition-colors">
+                Profilim
+              </RouterLink>
+
               <RouterLink to="/customer-panel"
                 class="block px-4 py-2.5 text-sm text-gray-700 hover:bg-slate-50 transition-colors">
                 Kullanıcı Paneli
@@ -398,6 +403,11 @@ function getFirstImage(imageUrl: string | null | undefined): string {
           <div class="px-4 py-3 bg-slate-50 rounded-lg mb-2">
             <p class="text-sm font-medium text-gray-900 truncate">{{ user?.email || '' }}</p>
           </div>
+
+          <RouterLink to="/profil" @click="isMobileMenuOpen = false"
+            class="block px-4 py-2.5 text-sm font-medium text-gray-700 hover:text-slate-900 hover:bg-slate-50 rounded-lg transition-all">
+            Profilim
+          </RouterLink>
 
           <RouterLink to="/customer-panel" @click="isMobileMenuOpen = false"
             class="block px-4 py-2.5 text-sm font-medium text-gray-700 hover:text-slate-900 hover:bg-slate-50 rounded-lg transition-all">

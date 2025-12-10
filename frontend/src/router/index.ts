@@ -12,6 +12,7 @@ import CartView from '../views/CartView.vue'
 import ProductDetailView from '../views/ProductDetailView.vue'
 import FavoritesView from '../views/FavoritesView.vue'
 import CompareView from '../views/CompareView.vue'
+import ProfileView from '../views/ProfileView.vue'
 const routes = [
   { path: '/', component: HomeView },
   { path: '/hakkimizda', component: AboutView },
@@ -24,7 +25,8 @@ const routes = [
   { path: "/kategori/:name", name: "category", component: CategoryView },
   { path: "/urun/:id", name: "ProductDetail", component: ProductDetailView },
   { path: '/favorilerim', component: FavoritesView },
-  { path: '/karsilastir', name: 'Compare', component: CompareView }
+  { path: '/karsilastir', name: 'Compare', component: CompareView },
+  { path: '/profil', name: 'Profile', component: ProfileView }
 
 ]
 
