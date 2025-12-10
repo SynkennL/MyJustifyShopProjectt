@@ -334,7 +334,7 @@ const handleBuyNow = async (product: any) => {
 
 
           <RouterLink :to="`/urun/${product.id}`" class="relative overflow-hidden aspect-square">
-            <img :src="getFirstImage(product.image_url) || 'https://via.placeholder.com/300x300?text=No+Image'" :alt="product.title"
+            <img :src="getFirstImage(product.image_url)" :alt="product.title"
               class="w-full h-full object-cover" />
           </RouterLink>
 
@@ -434,7 +434,7 @@ const handleBuyNow = async (product: any) => {
           class="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg transition-shadow relative group flex flex-col h-full">
 
           <RouterLink :to="`/urun/${product.id}`" class="relative overflow-hidden aspect-square">
-            <img :src="getFirstImage(product.image_url) || 'https://via.placeholder.com/300x300?text=No+Image'" :alt="product.title"
+            <img :src="getFirstImage(product.image_url)" :alt="product.title"
               class="w-full h-full object-cover" />
           </RouterLink>
 

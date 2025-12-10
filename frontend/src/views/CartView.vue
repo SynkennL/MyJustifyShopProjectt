@@ -22,6 +22,20 @@ const updateQuantity = (productId: number, delta: number, sizes?: string[] | nul
   }
 };
 
+function getFirstImage(imageUrl: string | null | undefined): string {
+  if (!imageUrl) return 'https://via.placeholder.com/300';
+  try {
+    const parsed = JSON.parse(imageUrl);
+    if (Array.isArray(parsed) && parsed.length > 0) {
+      return parsed[0];
+    }
+  } catch {
+    return imageUrl;
+  }
+  return imageUrl;
+}
+
+
 const removeFromCart = (productId: number, sizes?: string[] | null) => {
   const sizesKey = (sizes || []).sort().join('|');
   const index = cart.value.findIndex(i => {
@@ -154,7 +168,7 @@ const buyAll = async () => {
       <div v-for="item in cart" :key="item.id + '-' + (item.sizes || []).join('|')" class="border border-gray-200 rounded p-4">
         <div class="flex gap-4">
           <img 
-            :src="item.image || 'https://via.placeholder.com/150'" 
+            :src="getFirstImage(item.image)" 
             :alt="item.title"
             class="w-24 h-24 object-cover rounded"
           />
