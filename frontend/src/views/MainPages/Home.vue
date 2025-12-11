@@ -21,11 +21,18 @@ const categories = [
   { name: "Çocuk Giyim", slug: "cocuk-giyim" }
 ];
 
+
+// Resimleri import edelim
+import erkekGiyimImg from "../../assets/erkek-giyim.jpeg";
+import kadinGiyimImg from "../../assets/kadın-giyim.jpg";
+import ayakkabiImg from "../../assets/ayakkabi3.jpg";
+import cocukGiyimImg from "../../assets/cocuk-giyim.jpg";
+
 const categoryImages: Record<string, string> = {
-  "erkek-giyim": "../../assets/erkek-giyim.jpeg",
-  "kadin-giyim": "../../assets/kadın-giyim.jpg",
-  "ayakkabi": "../../assets/ayakkabi3.jpg",
-  "cocuk-giyim": "../../assets/cocuk-giyim.jpg"
+  "erkek-giyim": erkekGiyimImg,
+  "kadin-giyim": kadinGiyimImg,
+  "ayakkabi": ayakkabiImg,
+  "cocuk-giyim": cocukGiyimImg
 };
 
 onMounted(async () => {
