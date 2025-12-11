@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
+import { apiPatch } from "../../services/api";
 import { toast } from "vue3-toastify";
 import Button from "../../components/Button.vue";
 import Input from "../../components/Input.vue";
@@ -19,8 +20,6 @@ const editForm = ref({
   newPassword: "",
   confirmPassword: ""
 });
-
-const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:4000/api";
 
 const quickLinks = [
   { to: "/customer-panel", label: "Kullanıcı Paneli", icon: "panel" },
@@ -121,20 +120,7 @@ async function saveProfile() {
       updateData.newPassword = editForm.value.newPassword;
     }
 
-    const response = await fetch(`${API_BASE}/auth/update-profile`, {
-      method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`
-      },
-      body: JSON.stringify(updateData)
-    });
-
-    const data = await response.json();
-
-    if (!response.ok) {
-      throw new Error(data.error || "Profil güncellenirken bir hata oluştu!");
-    }
+    const data = await apiPatch<{ user: any; message: string }>("/auth/update-profile", updateData);
 
     const updatedUser = {
       ...user.value,
@@ -150,7 +136,7 @@ async function saveProfile() {
     resetForm();
   } catch (error: any) {
     console.error("Profil güncelleme hatası:", error);
-    toast.error(error.message || "Profil güncellenirken bir hata oluştu!");
+    toast.error(error.error || "Profil güncellenirken bir hata oluştu!");
   } finally {
     isLoading.value = false;
   }

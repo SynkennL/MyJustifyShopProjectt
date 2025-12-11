@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
-import { apiGet, apiPost } from "../../services/api";
+import { apiGet, apiPost, apiDelete, apiPatch } from "../../services/api";
 import { useRouter } from "vue-router";
 import { toast } from "vue3-toastify";
 import Button from "../../components/Button.vue";
@@ -18,8 +18,6 @@ const categories = ref<any[]>([]);
 const userId = ref<number | null>(null);
 const userRole = ref<string>("");
 
-const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:4000/api";
-
 onMounted(() => {
   const user = JSON.parse(localStorage.getItem("user") || "{}");
   if (user.role !== 'customer' && user.role !== 'admin') {
@@ -35,9 +33,9 @@ onMounted(() => {
 async function loadData() {
   try {
     const [allProducts, allOrders, cats] = await Promise.all([
-      apiGet("/products"),
-      apiGet("/orders/my-orders"),
-      apiGet("/categories")
+      apiGet<any[]>("/products"),
+      apiGet<any[]>("/orders/my-orders"),
+      apiGet<any[]>("/categories")
     ]);
 
     myProducts.value = allProducts.filter((p: any) => p.seller_id === userId.value);
@@ -46,6 +44,7 @@ async function loadData() {
     categories.value = cats;
   } catch (error) {
     console.error("Veri yükleme hatası:", error);
+    toast.error("Veriler yüklenirken bir hata oluştu!");
   }
 }
 
@@ -76,69 +75,36 @@ async function handleProductSubmit(productData: any, sizes: string[]) {
       sizes: sizes.length > 0 ? sizes : undefined
     };
 
-    const res = await apiPost("/products", data);
-    if (res.error) {
-      toast.error(res.error);
-      return;
-    }
-
+    await apiPost("/products", data);
     toast.success("Ürün başarıyla eklendi!");
     await loadData();
-  } catch (error) {
+  } catch (error: any) {
     console.error("Ürün ekleme hatası:", error);
-    toast.error("Ürün eklenirken bir hata oluştu!");
+    toast.error(error.error || "Ürün eklenirken bir hata oluştu!");
   }
 }
 
 async function deleteProduct(productId: number) {
   if (!confirm("Bu ürünü silmek istediğinize emin misiniz?")) return;
 
-  const token = localStorage.getItem("token");
   try {
-    const res = await fetch(`${API_BASE}/products/${productId}`, {
-      method: "DELETE",
-      headers: {
-        "Authorization": `Bearer ${token}`,
-        "Content-Type": "application/json"
-      }
-    });
-
-    const data = await res.json();
-
-    if (res.ok) {
-      toast.success("Ürün başarıyla silindi!");
-      await loadData();
-    } else {
-      toast.error(data.error || "Ürün silinemedi!");
-    }
-  } catch (error) {
+    await apiDelete(`/products/${productId}`);
+    toast.success("Ürün başarıyla silindi!");
+    await loadData();
+  } catch (error: any) {
     console.error("Silme hatası:", error);
-    toast.error("Ürün silinirken bir hata oluştu!");
+    toast.error(error.error || "Ürün silinemedi!");
   }
 }
 
 async function updateOrderStatus(orderId: number, newStatus: string) {
-  const token = localStorage.getItem("token");
   try {
-    const res = await fetch(`${API_BASE}/orders/${orderId}/status`, {
-      method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`
-      },
-      body: JSON.stringify({ status: newStatus })
-    });
-    
-    if (res.ok) {
-      toast.success("Sipariş durumu güncellendi!");
-      await loadData();
-    } else {
-      const data = await res.json();
-      toast.error(data.error || "Durum güncellenemedi!");
-    }
-  } catch (error) {
+    await apiPatch(`/orders/${orderId}/status`, { status: newStatus });
+    toast.success("Sipariş durumu güncellendi!");
+    await loadData();
+  } catch (error: any) {
     console.error("Durum güncelleme hatası:", error);
-    toast.error("Durum güncellenirken bir hata oluştu!");
+    toast.error(error.error || "Durum güncellenirken bir hata oluştu!");
   }
 }
 

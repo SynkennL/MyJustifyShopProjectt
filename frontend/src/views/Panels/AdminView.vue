@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
-import { apiGet, apiPost } from "../../services/api";
+import { apiGet, apiPost, apiDelete } from "../../services/api";
 import { useRouter } from "vue-router";
 import { toast } from "vue3-toastify";
 import Button from "../../components/Button.vue";
@@ -34,11 +34,16 @@ const catName = ref("");
 const catSlug = ref("");
 
 async function load() {
-  const cats = await apiGet("/categories");
-  categories.value = cats;
-  
-  const products = await apiGet("/products");
-  allProducts.value = products;
+  try {
+    const cats = await apiGet<Category[]>("/categories");
+    categories.value = cats;
+    
+    const products = await apiGet<Product[]>("/products");
+    allProducts.value = products;
+  } catch (error) {
+    console.error("Veri yükleme hatası:", error);
+    toast.error("Veriler yüklenirken bir hata oluştu!");
+  }
 }
 
 function getFirstImage(imageUrl: string | null | undefined): string {
@@ -57,38 +62,30 @@ async function addCategory() {
     return;
   }
 
-  const res = await apiPost("/categories", { 
-    name: catName.value, 
-    slug: catSlug.value 
-  });
-  
-  if (res.error) {
-    toast.error(res.error);
-    return;
+  try {
+    await apiPost("/categories", { 
+      name: catName.value, 
+      slug: catSlug.value 
+    });
+    
+    toast.success("Kategori eklendi!");
+    catName.value = "";
+    catSlug.value = "";
+    await load();
+  } catch (error: any) {
+    toast.error(error.error || "Kategori eklenirken bir hata oluştu!");
   }
-  
-  toast.success("Kategori eklendi!");
-  catName.value = "";
-  catSlug.value = "";
-  await load();
 }
 
 async function deleteProduct(productId: number) {
   if (!confirm("Bu ürünü silmek istediğinize emin misiniz?")) return;
 
-  const token = localStorage.getItem("token");
-  const res = await fetch(`${import.meta.env.VITE_API_BASE || "http://localhost:4000/api"}/products/${productId}`, {
-    method: "DELETE",
-    headers: {
-      "Authorization": `Bearer ${token}`
-    }
-  });
-
-  if (res.ok) {
+  try {
+    await apiDelete(`/products/${productId}`);
     toast.success("Ürün silindi!");
     await load();
-  } else {
-    toast.error("Ürün silinemedi!");
+  } catch (error: any) {
+    toast.error(error.error || "Ürün silinemedi!");
   }
 }
 

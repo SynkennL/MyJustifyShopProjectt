@@ -1,5 +1,5 @@
 import { ref } from "vue";
-import { apiGet, apiPost } from "./api";
+import { apiGet, apiPost, apiDelete } from "./api";
 
 const favoriteIds = ref<Set<number>>(new Set());
 
@@ -11,7 +11,7 @@ const loadFavoriteIds = async () => {
       return;
     }
 
-    const data = await apiGet("/favorites/ids");
+    const data = await apiGet<{ favoriteIds: number[] }>("/favorites/ids");
     favoriteIds.value = new Set(data.favoriteIds || []);
   } catch (err) {
     console.error("Favoriler yüklenemedi:", err);
@@ -42,20 +42,7 @@ const removeFromFavorites = async (productId: number) => {
       throw new Error("Giriş yapmalısınız");
     }
 
-    const res = await fetch(
-      `${import.meta.env.VITE_API_BASE || "http://localhost:4000/api"}/favorites/${productId}`,
-      {
-        method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-
-    if (!res.ok) {
-      throw new Error("Favoriden çıkarılamadı");
-    }
-
+    await apiDelete(`/favorites/${productId}`);
     favoriteIds.value.delete(productId);
     return true;
   } catch (err) {
