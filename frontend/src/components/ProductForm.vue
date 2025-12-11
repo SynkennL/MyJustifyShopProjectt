@@ -102,7 +102,7 @@ defineExpose({ resetForm });
     </select>
 
     <!-- Resim URL'leri -->
-    <Card padding="md" border>
+    <Card padding="md">
       <h4 class="font-semibold mb-3 text-gray-700">📷 Ürün Resimleri</h4>
       <div class="flex gap-2 mb-3">
         <Input 
@@ -127,7 +127,7 @@ defineExpose({ resetForm });
     </Card>
 
     <!-- Özellikler -->
-    <Card padding="md" border>
+    <Card padding="md">
       <h4 class="font-semibold mb-3 text-gray-700">Ürün Özellikleri</h4>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
         <div>
