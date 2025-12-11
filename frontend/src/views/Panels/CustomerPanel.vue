@@ -3,6 +3,7 @@ import { ref, onMounted } from "vue";
 import { apiGet, apiPost } from "../../services/api";
 import { useRouter } from "vue-router";
 import { toast } from "vue3-toastify";
+import Button from "../../components/Button.vue";
 
 interface Product {
   id: number;
@@ -293,13 +294,11 @@ onMounted(() => {
       <h2 class="text-2xl font-bold">
         {{'👤 Kullanıcı Paneli' }}
       </h2>
-      <button 
+      <Button 
         v-if="userRole === 'admin'" 
-        @click="router.push('/admin')"
-        class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition"
-      >
+        @click="router.push('/admin')">
         🛠️ Admin Yönetim Paneli
-      </button>
+      </Button>
     </div>
 
     <div v-if="userRole === 'admin'" class="mb-6 p-4 bg-indigo-50 border border-indigo-200 rounded-lg">
@@ -335,9 +334,9 @@ onMounted(() => {
             class="input flex-1"
             @keyup.enter="addImageUrl"
           />
-          <button @click="addImageUrl" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+          <Button @click="addImageUrl" >
             Ekle
-          </button>
+          </Button>
         </div>
         
         <div v-if="newProduct.image_urls.length > 0" class="grid grid-cols-3 gap-3">
@@ -399,7 +398,7 @@ onMounted(() => {
         </div>
       </div>
 
-      <button @click="addProduct" class="btn mt-4 w-full">Ürün Ekle</button>
+      <Button variant="primary" full-width size="md" class="mt-2" @click="addProduct">Ürün Ekle</Button>
     </section>
 
     <section class="mb-8 p-4 border rounded-lg">
@@ -434,9 +433,9 @@ onMounted(() => {
           </div>
           
           <p class="font-bold text-lg mb-3 text-gray-900">{{ product.price }} TL</p>
-          <button @click="deleteProduct(product.id)" class="w-full bg-red-600 text-white py-2 rounded hover:bg-red-700 transition">
+          <Button variant="danger" full-width @click="deleteProduct(product.id)">
             Sil
-          </button>
+          </Button>
         </div>
       </div>
     </section>
@@ -534,15 +533,5 @@ onMounted(() => {
   padding: 0.5rem;
   border: 1px solid #d1d5db;
   border-radius: 0.375rem;
-}
-.btn {
-  padding: 0.5rem 1rem;
-  background-color: #1f2937;
-  color: white;
-  border-radius: 0.375rem;
-  cursor: pointer;
-}
-.btn:hover {
-  background-color: #111827;
 }
 </style>

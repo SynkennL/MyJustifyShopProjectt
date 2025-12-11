@@ -3,6 +3,7 @@ import { ref } from "vue";
 import { useRouter } from "vue-router";
 import { apiPost } from "../../services/api";
 import { clearGuestCart } from "../../services/cart";
+import Button from "../../components/Button.vue";
 
 const router = useRouter();
 const name = ref("");
@@ -141,10 +142,9 @@ async function submit() {
       </div>
 
       <!-- Submit Button -->
-      <button type="submit"
-        class="w-full bg-slate-900 text-white py-3.5 rounded-lg font-semibold hover:bg-slate-800 transition-all duration-300 hover:scale-[1.02] shadow-lg hover:shadow-xl">
+      <Button variant="primary" size="lg" full-width type="submit">
         Hesap Oluştur
-      </button>
+    </Button>
 
       <p v-if="error" class="text-red-500 text-center text-sm bg-red-50 py-2 px-4 rounded-lg border border-red-200">
         {{ error }}

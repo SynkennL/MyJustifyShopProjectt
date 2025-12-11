@@ -411,14 +411,9 @@ const handleBuyNow = async (product: any) => {
       </div>
 
       <div class="flex flex-wrap gap-3 mb-8">
-        <button v-for="category in categories" :key="category.slug" @click="selectCategory(category.slug)" :class="[
-          'px-5 py-2.5 rounded-lg font-medium text-sm transition-all',
-          selectedCategory === category.slug
-            ? 'bg-gray-900 text-white'
-            : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-100'
-        ]">
+        <Button variant="primary" v-for="category in categories" :key="category.slug" @click="selectCategory(category.slug)"> 
           {{ category.name }}
-        </button>
+        </Button>
       </div>
 
       <div v-if="isLoadingCategory" class="text-center py-16">

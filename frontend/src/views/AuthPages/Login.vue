@@ -4,7 +4,7 @@ import { useRouter } from "vue-router";
 import { apiPost } from "../../services/api";
 import { toast } from "vue3-toastify";
 import { removeOwnedProductsFromCart } from "../../services/cart";
-
+import Button from "../../components/Button.vue";
 
 const router = useRouter();
 const email = ref("");
@@ -39,9 +39,8 @@ async function submit() {
     <input v-model="password" type="password" placeholder="Şifre"
       class="w-full py-3 px-4 bg-gray-50 border-2 border-gray-200 focus:border-slate-900 focus:bg-white  mt-4  mb-5 text-sm outline-0 rounded-lg transition-all">
 
-    <button @click="submit"
-      class="w-full bg-slate-900 text-white py-2.5 rounded-md hover:bg-slate-800 transition-transform duration-300 hover:scale-105">Giriş
-      Yap</button>
+    <Button variant="primary" full-width size="lg" @click="submit">
+      Giriş Yap</Button>
   </div>
 </template>
 

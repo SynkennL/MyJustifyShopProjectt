@@ -3,6 +3,7 @@ import { ref, onMounted } from "vue";
 import { apiGet, apiPost } from "../../services/api";
 import { useRouter } from "vue-router";
 import { toast } from "vue3-toastify";
+import Button from "../../components/Button.vue";
 
 const router = useRouter();
 
@@ -91,12 +92,10 @@ onMounted(() => {
   <div class="p-6 max-w-7xl mx-auto bg-white rounded-xl shadow-md">
     <div class="flex justify-between items-center mb-6">
       <h2 class="text-2xl font-bold">🛠️ Admin Yönetim Paneli</h2>
-      <button 
-        @click="router.push('/customer-panel')"
-        class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition"
-      >
+      <Button 
+        @click="router.push('/customer-panel')">
         ← Kişisel Panelime Dön
-      </button>
+      </Button>
     </div>
 
     <div class="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
@@ -116,7 +115,7 @@ onMounted(() => {
       <div class="flex gap-2">
         <input v-model="catName" placeholder="Kategori adı" class="input flex-1" />
         <input v-model="catSlug" placeholder="Slug (örn: erkek-giyim)" class="input flex-1" />
-        <button @click="addCategory" class="btn">Ekle</button>
+        <Button variant="success" @click="addCategory">Ekle</Button>
       </div>
     </section>
 
@@ -153,9 +152,9 @@ onMounted(() => {
             Satıcı: {{ product.seller_name || product.seller_email }}
           </p>
           <p class="font-bold text-lg mb-3">{{ product.price }} TL</p>
-          <button @click="deleteProduct(product.id)" class="w-full bg-red-600 text-white py-2 rounded hover:bg-red-700">
+          <Button variant="danger" full-width @click="deleteProduct(product.id)">
             Sil
-          </button>
+          </Button>
         </div>
       </div>
     </section>
@@ -168,16 +167,5 @@ onMounted(() => {
   padding: 0.5rem;
   border: 1px solid #d1d5db;
   border-radius: 0.375rem;
-}
-.btn {
-  padding: 0.5rem 1rem;
-  background-color: #1f2937;
-  color: white;
-  border-radius: 0.375rem;
-  cursor: pointer;
-  white-space: nowrap;
-}
-.btn:hover {
-  background-color: #111827;
 }
 </style>

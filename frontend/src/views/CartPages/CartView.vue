@@ -3,7 +3,7 @@ import { useRouter } from "vue-router";
 import { cart, clearCart } from "../../services/cart";
 import { apiPost } from "../../services/api";
 import { toast } from "vue3-toastify";
-
+import Button from "../../components/Button.vue";
 const router = useRouter();
 
 const updateQuantity = (productId: number, delta: number, sizes?: string[] | null) => {
@@ -142,24 +142,20 @@ const buyAll = async () => {
   <div class="p-4 mx-auto max-w-4xl bg-white">
     <div class="flex justify-between items-center mb-6">
       <h2 class="text-3xl text-slate-900 font-bold">Alışveriş Sepetim</h2>
-      <button 
-        v-if="cart.length > 0"
-        @click="clearCart" 
-        class="text-sm text-red-600 hover:underline font-medium"
-      >
+      <Button variant="danger" size="md"
+        v-if="cart.length> 0"
+        @click="clearCart">
         Sepeti Temizle
-      </button>
+      </Button>
     </div>
 
     <!-- Boş Sepet -->
     <div v-if="cart.length === 0" class="text-center py-16">
       <p class="text-gray-500 text-lg mb-4">Sepetiniz boş</p>
-      <button 
-        @click="router.push('/')" 
-        class="text-white bg-slate-900 font-medium hover:bg-slate-800 text-sm px-6 py-3 rounded transition-all"
-      >
+      <Button variant="primary" size="lg"
+        @click="router.push('/')" >
         Alışverişe Başla
-      </button>
+      </Button>
     </div>
 
     <!-- Sepet Ürünleri -->
@@ -181,34 +177,31 @@ const buyAll = async () => {
             
             <div class="flex items-center gap-4">
               <div class="flex items-center gap-2">
-                <button 
-                  @click="updateQuantity(item.id, -1, item.sizes)"
-                  class="w-8 h-8 border border-gray-300 rounded hover:bg-gray-100"
+                <Button variant="outline"
+                  @click="updateQuantity(item.id, -1, item.sizes)"   
                 >
                   -
-                </button>
+                </Button>
                 <span class="w-12 text-center font-medium">{{ item.quantity }}</span>
-                <button 
+                <Button variant="outline"
                   @click="updateQuantity(item.id, 1, item.sizes)"
-                  class="w-8 h-8 border border-gray-300 rounded hover:bg-gray-100"
                 >
                   +
-                </button>
+                </Button>
               </div>
               
-              <button 
+              <Button 
                 @click="buyProduct(item)"
-                class="text-white bg-green-600 hover:bg-green-700 text-sm px-4 py-2 rounded font-medium"
+               variant="primary"
               >
                 Satın Al
-              </button>
+              </Button>
               
-              <button 
+              <Button variant="danger"
                 @click="removeFromCart(item.id, item.sizes)"
-                class="text-red-600 hover:underline text-sm font-medium"
               >
                 Kaldır
-              </button>
+              </Button>
             </div>
             
             <p class="text-sm text-gray-600 mt-3">
@@ -231,19 +224,15 @@ const buyAll = async () => {
           </div>
         </div>
 
-        <button 
-          @click="buyAll"
-          class="w-full text-white bg-slate-900 font-medium hover:bg-slate-800 text-sm px-4 py-3 rounded transition-all mb-3"
-        >
+        <Button class="mr-3"
+          @click="buyAll">
           Tümünü Satın Al ({{ cart.length }} Ürün)
-        </button>
+        </Button>
 
-        <button 
-          @click="router.push('/')"
-          class="w-full bg-gray-100 text-slate-900 font-medium hover:bg-gray-200 text-sm px-4 py-3 rounded transition-all"
-        >
+        <Button
+          @click="router.push('/')">
           Alışverişe Devam Et
-        </button>
+        </Button>
       </div>
     </div>
   </div>
