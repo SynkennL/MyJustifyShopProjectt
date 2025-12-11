@@ -22,6 +22,11 @@ const editForm = ref({
 
 const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:4000/api";
 
+const quickLinks = [
+  { to: "/customer-panel", label: "Kullanıcı Paneli", icon: "panel" },
+  { to: "/favorilerim", label: "Favorilerim", icon: "heart" }
+];
+
 onMounted(() => {
   const userStr = localStorage.getItem("user");
   if (!userStr) {
@@ -31,36 +36,37 @@ onMounted(() => {
   }
 
   user.value = JSON.parse(userStr);
-  editForm.value.name = user.value.name || "";
-  editForm.value.email = user.value.email || "";
+  resetForm();
 });
 
-function startEditing() {
-  isEditing.value = true;
-  editForm.value.name = user.value.name || "";
-  editForm.value.email = user.value.email || "";
+function resetForm() {
+  editForm.value.name = user.value?.name || "";
+  editForm.value.email = user.value?.email || "";
   editForm.value.currentPassword = "";
   editForm.value.newPassword = "";
   editForm.value.confirmPassword = "";
+}
+
+function startEditing() {
+  isEditing.value = true;
+  resetForm();
 }
 
 function cancelEditing() {
   isEditing.value = false;
-  editForm.value.currentPassword = "";
-  editForm.value.newPassword = "";
-  editForm.value.confirmPassword = "";
+  resetForm();
 }
 
-async function saveProfile() {
-  if (!editForm.value.name || !editForm.value.email) {
+function validateForm(): boolean {
+  if (!editForm.value.name?.trim() || !editForm.value.email?.trim()) {
     toast.error("İsim ve email alanları zorunludur!");
-    return;
+    return false;
   }
 
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!emailRegex.test(editForm.value.email)) {
     toast.error("Geçerli bir email adresi giriniz!");
-    return;
+    return false;
   }
 
   const isPasswordChange = editForm.value.currentPassword || editForm.value.newPassword || editForm.value.confirmPassword;
@@ -68,24 +74,30 @@ async function saveProfile() {
   if (isPasswordChange) {
     if (!editForm.value.currentPassword || !editForm.value.newPassword || !editForm.value.confirmPassword) {
       toast.error("Şifre değiştirmek için tüm şifre alanlarını doldurun!");
-      return;
+      return false;
     }
 
     if (editForm.value.newPassword !== editForm.value.confirmPassword) {
       toast.error("Yeni şifreler eşleşmiyor!");
-      return;
+      return false;
     }
 
     if (editForm.value.newPassword.length < 6) {
       toast.error("Yeni şifre en az 6 karakter olmalıdır!");
-      return;
+      return false;
     }
 
     if (editForm.value.currentPassword === editForm.value.newPassword) {
       toast.error("Yeni şifre mevcut şifrenizle aynı olamaz!");
-      return;
+      return false;
     }
   }
+
+  return true;
+}
+
+async function saveProfile() {
+  if (!validateForm()) return;
 
   isLoading.value = true;
 
@@ -96,6 +108,8 @@ async function saveProfile() {
       router.push("/login");
       return;
     }
+
+    const isPasswordChange = editForm.value.currentPassword || editForm.value.newPassword;
 
     const updateData: any = {
       name: editForm.value.name,
@@ -133,9 +147,7 @@ async function saveProfile() {
 
     toast.success(isPasswordChange ? "Profil ve şifre başarıyla güncellendi!" : "Profil başarıyla güncellendi!");
     isEditing.value = false;
-    editForm.value.currentPassword = "";
-    editForm.value.newPassword = "";
-    editForm.value.confirmPassword = "";
+    resetForm();
   } catch (error: any) {
     console.error("Profil güncelleme hatası:", error);
     toast.error(error.message || "Profil güncellenirken bir hata oluştu!");
@@ -157,24 +169,18 @@ function getRoleText(role: string) {
     <Card padding="lg" class="mb-4">
       <div class="flex items-center justify-between mb-6">
         <h2 class="text-xl font-semibold text-slate-900">Hesap Bilgileri</h2>
-        <Button v-if="!isEditing" @click="startEditing">
-          Düzenle
-        </Button>
+        <Button v-if="!isEditing" @click="startEditing">Düzenle</Button>
       </div>
 
       <!-- Görüntüleme Modu -->
       <div v-if="!isEditing" class="space-y-4">
-        <div>
-          <label class="block text-sm font-medium text-gray-600 mb-1">İsim Soyisim</label>
-          <p class="text-gray-900">{{ user?.name || '-' }}</p>
-        </div>
-        <div>
-          <label class="block text-sm font-medium text-gray-600 mb-1">E-posta Adresi</label>
-          <p class="text-gray-900">{{ user?.email }}</p>
-        </div>
-        <div>
-          <label class="block text-sm font-medium text-gray-600 mb-1">Hesap Türü</label>
-          <p class="text-gray-900">{{ getRoleText(user?.role) }}</p>
+        <div v-for="field in [
+          { label: 'İsim Soyisim', value: user?.name || '-' },
+          { label: 'E-posta Adresi', value: user?.email },
+          { label: 'Hesap Türü', value: getRoleText(user?.role) }
+        ]" :key="field.label">
+          <label class="block text-sm font-medium text-gray-600 mb-1">{{ field.label }}</label>
+          <p class="text-gray-900">{{ field.value }}</p>
         </div>
       </div>
 
@@ -186,19 +192,24 @@ function getRoleText(role: string) {
         <div class="pt-4 border-t border-gray-200">
           <h3 class="text-sm font-semibold text-gray-900 mb-3">Şifre Değiştir (İsteğe Bağlı)</h3>
           <div class="space-y-3">
-            <Input v-model="editForm.currentPassword" type="password" label="Mevcut Şifre" placeholder="Mevcut şifreniz" />
-            <Input v-model="editForm.newPassword" type="password" label="Yeni Şifre" placeholder="En az 6 karakter" />
-            <Input v-model="editForm.confirmPassword" type="password" label="Yeni Şifre (Tekrar)" placeholder="Yeni şifrenizi tekrar girin" />
+            <Input 
+              v-for="field in [
+                { model: 'currentPassword', label: 'Mevcut Şifre', placeholder: 'Mevcut şifreniz' },
+                { model: 'newPassword', label: 'Yeni Şifre', placeholder: 'En az 6 karakter' },
+                { model: 'confirmPassword', label: 'Yeni Şifre (Tekrar)', placeholder: 'Yeni şifrenizi tekrar girin' }
+              ]"
+              :key="field.model"
+              v-model="editForm[field.model as keyof typeof editForm]" 
+              type="password" 
+              :label="field.label" 
+              :placeholder="field.placeholder" 
+            />
           </div>
         </div>
 
         <div class="flex gap-2 pt-4">
-          <Button type="submit" variant="primary" size="lg" flex :loading="isLoading">
-            Kaydet
-          </Button>
-          <Button type="button" variant="secondary" @click="cancelEditing" :disabled="isLoading">
-            İptal
-          </Button>
+          <Button type="submit" variant="primary" size="lg" flex :loading="isLoading">Kaydet</Button>
+          <Button type="button" variant="secondary" @click="cancelEditing" :disabled="isLoading">İptal</Button>
         </div>
       </form>
     </Card>
@@ -207,14 +218,13 @@ function getRoleText(role: string) {
     <Card padding="lg">
       <h2 class="text-lg font-semibold text-slate-900 mb-4">Hızlı Erişim</h2>
       <div class="space-y-2">
-        <RouterLink to="/customer-panel" class="flex items-center gap-2 p-3 rounded hover:bg-gray-50 transition text-gray-700">
-          <span class="text-sm font-medium">Kullanıcı Paneli</span>
-        </RouterLink>
-        <RouterLink v-if="user?.role === 'admin'" to="/admin" class="flex items-center gap-2 p-3 rounded hover:bg-gray-50 transition text-gray-700">
-          <span class="text-sm font-medium">Admin Paneli</span>
-        </RouterLink>
-        <RouterLink to="/favorilerim" class="flex items-center gap-2 p-3 rounded hover:bg-gray-50 transition text-gray-700">
-          <span class="text-sm font-medium">Favorilerim</span>
+        <RouterLink 
+          v-for="link in [...quickLinks, ...(user?.role === 'admin' ? [{ to: '/admin', label: 'Admin Paneli', icon: 'admin' }] : [])]"
+          :key="link.to"
+          :to="link.to" 
+          class="flex items-center gap-2 p-3 rounded hover:bg-gray-50 transition text-gray-700"
+        >
+          <span class="text-sm font-medium">{{ link.label }}</span>
         </RouterLink>
       </div>
     </Card>
