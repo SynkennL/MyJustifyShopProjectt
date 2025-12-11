@@ -4,7 +4,7 @@ import { useRoute, useRouter } from "vue-router";
 import { apiGet, apiPost } from "../../services/api";
 import { addToCart } from "../../services/cart";
 import { toast } from "vue3-toastify";
-
+import Button from "../../components/Button.vue";
 const route = useRoute();
 const router = useRouter();
 const product = ref<any>(null);
@@ -255,22 +255,20 @@ function prevImage() {
         </div>
 
         <div class="flex gap-2">
-          <button @click="handleAddToCart" :disabled:="isOwnProduct()" :class="[
-            'flex-1 py-2.5 rounded font-medium',
+          <Button @click="handleAddToCart" flex-1 variant="primary"  :disabled:="isOwnProduct()" :class="[
             isOwnProduct()
               ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
               : 'bg-gray-900 text-white hover:bg-gray-800'
           ]">
             Sepete Ekle
-          </button>
-          <button @click="handleBuyNow" :disabled:="isOwnProduct()" :class="[
-            'flex-1 py-2.5 rounded font-medium',
+          </Button>
+          <Button @click="handleBuyNow" flex-1 variant="success" :disabled:="isOwnProduct()" :class="[
             isOwnProduct()
               ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
               : 'bg-green-600 text-white hover:bg-green-700'
           ]">
             Satın Al
-          </button>
+          </Button>
         </div>
 
         <div class="mt-1 pt-3">

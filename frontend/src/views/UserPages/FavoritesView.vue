@@ -6,7 +6,7 @@ import { addToCart } from "../../services/cart";
 import { removeFromFavorites } from "../../services/favorites";
 import { toast } from "vue3-toastify";
 import { addToCompare, removeFromCompare, isInCompare, MAX_COMPARE, compareList } from "../../services/compare";
-
+import Button from "../../components/Button.vue";
 const router = useRouter();
 const favorites = ref<any[]>([]);
 const loading = ref(true);
@@ -214,7 +214,7 @@ const handleBuyNow = async (product: any) => {
     <div v-else>
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         <div v-for="product in favorites" :key="product.id"
-          class="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg transition relative group">
+          class="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg transition relative group flex flex-col">
           <button @click="handleRemoveFavorite(product.id)"
             class="absolute top-3 right-3 z-10 bg-white/90 hover:bg-white p-2 rounded-full shadow-lg transition"
             title="Favorilerden çıkar">
@@ -244,7 +244,7 @@ const handleBuyNow = async (product: any) => {
               class="w-full h-full object-cover hover:opacity-90 transition" />
           </RouterLink>
 
-          <div class="p-4">
+          <div class="p-4 flex flex-col flex-1">
             <RouterLink :to="`/urun/${product.id}`">
               <h3 class="font-semibold text-lg text-gray-900 mb-1 line-clamp-2 hover:text-blue-600 transition">
                 {{ product.title }}
@@ -263,9 +263,10 @@ const handleBuyNow = async (product: any) => {
 
             <div v-if="parseFeatures(product.features)?.sizes" class="mb-3">
               <label class="text-xs text-gray-600 block mb-2">Beden:</label>
-              <div class="flex flex-wrap gap-1.5">
+              <div class="flex flex-wrap gap-2">
                 <label v-for="size in parseFeatures(product.features).sizes" :key="size">
-                  <input type="radio" :value="size" v-model="selectedSizes" name="sizeGroup" class="w-3 h-3" />
+                  <input type="radio" :value="size" v-model="selectedSizes[product.id]"
+                    :name="`sizeGroup-${product.id}`" class="w-4 h-4" />
                   {{ size }}
                 </label>
               </div>
@@ -276,19 +277,13 @@ const handleBuyNow = async (product: any) => {
               <span class="text-xs text-gray-500">{{ product.category_name }}</span>
             </div>
 
-            <div v-if="!isOwnProduct(product)" class="flex gap-2">
-              <button @click="handleAddToCart(product)"
-                class="flex-1 bg-gray-900 text-white py-2.5 rounded-lg hover:bg-gray-800 transition font-medium text-sm">
+            <div v-if="!isOwnProduct(product)" class="flex gap-2 mt-auto pt-3">
+              <Button flex variant="primary" @click="handleAddToCart(product)">
                 Sepete Ekle
-              </button>
-              <button @click="handleBuyNow(product)"
-                class="flex-1 bg-green-600 text-white py-2.5 rounded-lg hover:bg-green-700 transition font-medium text-sm">
+              </Button>
+              <Button flex variant="success" @click="handleBuyNow(product)">
                 Satın Al
-              </button>
-            </div>
-
-            <div v-else class="bg-blue-50 border border-blue-200 rounded-lg p-2 text-center">
-              <p class="text-xs text-blue-800">Sizin ürününüz</p>
+              </Button>
             </div>
           </div>
         </div>

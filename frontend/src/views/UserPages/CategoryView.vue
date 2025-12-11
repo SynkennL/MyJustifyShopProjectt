@@ -7,7 +7,7 @@ import { addToCart } from "../../services/cart";
 import { toast } from "vue3-toastify";
 import { isFavorite, toggleFavorite, loadFavoriteIds } from "../../services/favorites";
 import { addToCompare, removeFromCompare, isInCompare, MAX_COMPARE, compareList } from "../../services/compare";
-
+import Button from "../../components/Button.vue";
 
 const route = useRoute();
 const router = useRouter();
@@ -276,14 +276,12 @@ const handleBuyNow = async (product: any) => {
         <p class="text-gray-900 font-bold text-lg mt-auto mb-3">{{ item.price }} TL</p>
 
         <div class="flex gap-2">
-          <button @click="handleAddToCart(item)"
-            class="flex-1 bg-gray-900 text-white font-medium py-2 rounded hover:bg-gray-800 transition">
+          <Button flex variant="primary" @click="handleAddToCart(item)">
             Sepete Ekle
-          </button>
-          <button @click="handleBuyNow(item)"
-            class="flex-1 bg-green-600 text-white font-medium py-2 rounded hover:bg-green-700 transition">
+          </Button>
+          <Button flex variant="success" @click="handleBuyNow(item)">
             Satın Al
-          </button>
+          </Button>
         </div>
       </div>
     </div>

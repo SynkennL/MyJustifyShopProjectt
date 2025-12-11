@@ -17,12 +17,9 @@
 
                         </p>
                     </div>
-                    <button
-                        class="sm:w-fit w-full px-3.5 py-2 bg-indigo-600 hover:bg-indigo-800 transition-all duration-700 ease-in-out rounded-lg shadow-[0px_1px_2px_0px_rgba(16,_24,_40,_0.05)] justify-center items-center flex">
-                        <span class="px-1.5 text-white text-sm font-medium leading-6">
-                            <RouterLink to="/">Anasayfaya Git</RouterLink>
-                        </span>
-                    </button>
+                    <Button variant="primary" size="lg"> 
+                     <RouterLink to="/">Anasayfaya Git</RouterLink>
+                    </Button>
                 </div>
                 <img class="lg:mx-0 mx-auto h-full rounded-3xl object-cover"
                     src="https://cms.ikas.com/wp-content/uploads/2024/10/hakkimizda-sayfasi-nedir-nasil-olusturulur.webp"
@@ -34,5 +31,5 @@
 
 <script setup lang="ts">
 import { RouterLink } from 'vue-router';
-
+import Button from '../../components/Button.vue';
 </script>

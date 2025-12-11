@@ -6,7 +6,7 @@ import { addToCart } from "../../services/cart";
 import { toast } from "vue3-toastify";
 import { isFavorite, toggleFavorite, loadFavoriteIds } from "../../services/favorites";
 import { addToCompare, removeFromCompare, isInCompare, MAX_COMPARE, compareList } from "../../services/compare";
-
+import Button from "../../components/Button.vue";
 const router = useRouter();
 const popularProducts = ref<any[]>([]);
 const currentUserId = ref<number | null>(null);
@@ -385,27 +385,12 @@ const handleBuyNow = async (product: any) => {
             </div>
 
             <div v-if="!isOwnProduct(product)" class="flex gap-2">
-              <button @click="handleAddToCart(product)"
-                class="flex-1 bg-gray-900 text-white text-xs font-medium py-2 rounded hover:bg-gray-800 transition">
+              <Button flex variant="primary" size="md" @click="handleAddToCart(product)">
                 Sepete Ekle
-              </button>
-              <button @click="handleBuyNow(product)"
-                class="flex-1 bg-green-600 text-white text-xs font-medium py-2 rounded hover:bg-green-700 transition">
+              </Button>
+              <Button flex variant="success" size="sm" @click="handleBuyNow(product)">
                 Satın Al
-              </button>
-            </div>
-
-            <div v-else class="flex gap-2">
-              <button disabled
-                class="flex-1 bg-gray-300 text-gray-500 text-xs font-medium py-2 rounded cursor-not-allowed"
-                title="Kendi ürününüzü satın alamazsınız">
-                Sepete Ekle
-              </button>
-              <button disabled
-                class="flex-1 bg-gray-300 text-gray-500 text-xs font-medium py-2 rounded cursor-not-allowed"
-                title="Kendi ürününüzü satın alamazsınız">
-                Satın Al
-              </button>
+              </Button>
             </div>
           </div>
         </div>
@@ -507,14 +492,12 @@ const handleBuyNow = async (product: any) => {
             </div>
 
             <div v-if="!isOwnProduct(product)" class="flex gap-2">
-              <button @click="handleAddToCart(product)"
-                class="flex-1 bg-gray-900 text-white text-xs font-medium py-2 rounded hover:bg-gray-800 transition">
+              <Button flex variant="primary" size="md" @click="handleAddToCart(product)">
                 Sepete Ekle
-              </button>
-              <button @click="handleBuyNow(product)"
-                class="flex-1 bg-green-600 text-white text-xs font-medium py-2 rounded hover:bg-green-700 transition">
+              </Button>
+              <Button flex variant="success" size="md" @click="handleBuyNow(product)">
                 Satın Al
-              </button>
+              </Button>
             </div>
           </div>
         </div>
@@ -525,12 +508,13 @@ const handleBuyNow = async (product: any) => {
       </div>
 
       <div v-if="categoryProducts.length > 0" class="text-center mt-8">
-        <RouterLink :to="`/kategori/${selectedCategory}`"
-          class="inline-flex items-center gap-2 px-6 py-3 bg-gray-900 text-white font-medium rounded-lg hover:bg-gray-800 transition">
-          Tümünü Gör
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
-          </svg>
+        <RouterLink :to="`/kategori/${selectedCategory}`">
+          <Button variant="primary" size="lg">
+            Tümünü Gör
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+            </svg>
+          </Button>
         </RouterLink>
       </div>
     </div>

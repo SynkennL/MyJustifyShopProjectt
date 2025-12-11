@@ -31,8 +31,7 @@
         <textarea placeholder='Mesajınız' name="Mesaj" rows="6" required
           class="w-full px-4 text-slate-800 bg-gray-100 border border-gray-200 focus:border-slate-900 focus:bg-transparent text-sm pt-3 outline-0 transition-all"></textarea>
       </div>
-      <button type="submit"
-        class="text-white bg-slate-900 font-medium hover:bg-slate-800 tracking-wide text-sm px-4 py-2.5 w-full border-0 outline-0 cursor-pointer hover:scale-105 transition-transform duration-300 ease-in-out">Gönder</button>
+      <Button full-width  variant="primary" size="lg" type="submit">Gönder</Button>
     </form>
     <div
       class="flex items-start sm:items-center p-4 mb-4 mt-3 text-sm rounded-xl bg-blue-700 hover:scale-105 transition duration-500 ease-in-out"
@@ -50,4 +49,5 @@
 </template>
 
 <script setup lang="ts">
+import Button from '../../components/Button.vue';
 </script>
