@@ -4,6 +4,10 @@ import { apiGet, apiPost } from "../../services/api";
 import { useRouter } from "vue-router";
 import { toast } from "vue3-toastify";
 import Button from "../../components/Button.vue";
+import Input from "../../components/Input.vue";
+import Card from "../../components/Card.vue";
+import PageHeader from "../../components/PageHeader.vue";
+import EmptyState from "../../components/EmptyState.vue";
 
 const router = useRouter();
 
@@ -41,19 +45,31 @@ function getFirstImage(imageUrl: string | null | undefined): string {
   if (!imageUrl) return 'https://via.placeholder.com/300';
   try {
     const parsed = JSON.parse(imageUrl);
-    if (Array.isArray(parsed) && parsed.length > 0) {
-      return parsed[0];
-    }
+    return Array.isArray(parsed) && parsed.length > 0 ? parsed[0] : imageUrl;
   } catch {
     return imageUrl;
   }
-  return imageUrl;
 }
 
 async function addCategory() {
-  const res = await apiPost("/categories", { name: catName.value, slug: catSlug.value });
-  if (res.error) { toast.error(res.error); return; }
-  catName.value = ""; catSlug.value = "";
+  if (!catName.value || !catSlug.value) {
+    toast.error("Kategori adı ve slug gereklidir!");
+    return;
+  }
+
+  const res = await apiPost("/categories", { 
+    name: catName.value, 
+    slug: catSlug.value 
+  });
+  
+  if (res.error) {
+    toast.error(res.error);
+    return;
+  }
+  
+  toast.success("Kategori eklendi!");
+  catName.value = "";
+  catSlug.value = "";
   await load();
 }
 
@@ -76,7 +92,6 @@ async function deleteProduct(productId: number) {
   }
 }
 
-// Sadece adminlerin erişebilmesi için kontrol
 onMounted(() => {
   const user = JSON.parse(localStorage.getItem("user") || "{}");
   if (user.role !== 'admin') {
@@ -89,14 +104,16 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="p-6 max-w-7xl mx-auto bg-white rounded-xl shadow-md">
-    <div class="flex justify-between items-center mb-6">
-      <h2 class="text-2xl font-bold">🛠️ Admin Yönetim Paneli</h2>
-      <Button 
-        @click="router.push('/customer-panel')">
-        ← Kişisel Panelime Dön
-      </Button>
-    </div>
+  <div class="max-w-7xl mx-auto p-6">
+    <PageHeader title="🛠️ Admin Yönetim Paneli">
+      <template #actions>
+        <div class="flex justify-end mt-4">
+          <Button @click="router.push('/customer-panel')">
+            ← Kişisel Panelime Dön
+          </Button>
+        </div>
+      </template>
+    </PageHeader>
 
     <div class="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
       <div class="flex items-start gap-3">
@@ -110,36 +127,42 @@ onMounted(() => {
     </div>
 
     <!-- Kategori Ekle -->
-    <section class="mb-8 p-4 border rounded-lg">
-      <h3 class="font-semibold mb-3 text-lg">➕ Kategori Ekle</h3>
+    <Card title="➕ Kategori Ekle" padding="md" class="mb-8">
       <div class="flex gap-2">
-        <input v-model="catName" placeholder="Kategori adı" class="input flex-1" />
-        <input v-model="catSlug" placeholder="Slug (örn: erkek-giyim)" class="input flex-1" />
+        <Input v-model="catName" placeholder="Kategori adı" />
+        <Input v-model="catSlug" placeholder="Slug (örn: erkek-giyim)" />
         <Button variant="success" @click="addCategory">Ekle</Button>
       </div>
-    </section>
+    </Card>
 
     <!-- Mevcut Kategoriler -->
-    <section class="mb-8 p-4 border rounded-lg">
-      <h3 class="font-semibold mb-3 text-lg">📂 Mevcut Kategoriler</h3>
-      <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
-        <div v-for="cat in categories" :key="cat.id" class="bg-gray-100 p-2 rounded text-center">
+    <Card title="📂 Mevcut Kategoriler" padding="md" class="mb-8">
+      <EmptyState 
+        v-if="categories.length === 0"
+        title="Henüz kategori bulunmuyor"
+        icon="product"
+      />
+
+      <div v-else class="grid grid-cols-2 md:grid-cols-4 gap-2">
+        <div v-for="cat in categories" :key="cat.id" class="bg-gray-100 p-3 rounded text-center">
           <p class="font-medium">{{ cat.name }}</p>
           <p class="text-xs text-gray-500">{{ cat.slug }}</p>
         </div>
       </div>
-    </section>
+    </Card>
 
     <!-- Tüm Ürünler -->
-    <section class="p-4 border rounded-lg">
-      <h3 class="font-semibold mb-4 text-lg">🏪 Tüm Kullanıcı Ürünleri ({{ allProducts.length }})</h3>
+    <Card title="🏪 Tüm Kullanıcı Ürünleri" padding="md">
+      <p class="text-sm text-gray-600 mb-4">Toplam {{ allProducts.length }} ürün</p>
       
-      <div v-if="allProducts.length === 0" class="text-center py-10 text-gray-500">
-        Henüz ürün bulunmuyor.
-      </div>
+      <EmptyState 
+        v-if="allProducts.length === 0"
+        title="Henüz ürün bulunmuyor"
+        icon="product"
+      />
 
       <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        <div v-for="product in allProducts" :key="product.id" class="border rounded-lg p-4 hover:shadow-lg transition">
+        <Card v-for="product in allProducts" :key="product.id" padding="md" hover>
           <img 
             :src="getFirstImage(product.image_url)" 
             alt="Ürün" 
@@ -155,17 +178,8 @@ onMounted(() => {
           <Button variant="danger" full-width @click="deleteProduct(product.id)">
             Sil
           </Button>
-        </div>
+        </Card>
       </div>
-    </section>
+    </Card>
   </div>
 </template>
-
-<style scoped>
-.input {
-  width: 100%;
-  padding: 0.5rem;
-  border: 1px solid #d1d5db;
-  border-radius: 0.375rem;
-}
-</style>

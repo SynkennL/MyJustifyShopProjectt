@@ -5,43 +5,92 @@ import { apiPost } from "../../services/api";
 import { toast } from "vue3-toastify";
 import { removeOwnedProductsFromCart } from "../../services/cart";
 import Button from "../../components/Button.vue";
+import Input from "../../components/Input.vue";
+import Card from "../../components/Card.vue";
 
 const router = useRouter();
 const email = ref("");
 const password = ref("");
 const error = ref("");
+const loading = ref(false);
 
 async function submit() {
+  loading.value = true;
+  error.value = "";
+  
   try {
-    const res = await apiPost("/auth/login", { email: email.value, password: password.value });
-    if (res.error) { error.value = res.error; return; }
+    const res = await apiPost("/auth/login", { 
+      email: email.value, 
+      password: password.value 
+    });
+    
+    if (res.error) {
+      error.value = res.error;
+      return;
+    }
+    
     localStorage.setItem("token", res.token);
     localStorage.setItem("user", JSON.stringify(res.user));
     await removeOwnedProductsFromCart(res.user.id);
+    
     await router.push("/");
-  setTimeout(() => {
-    location.reload();
-  }, 100);
+    setTimeout(() => location.reload(), 100);
   } catch (e) {
     toast.error("Giriş yapılırken bir hata oluştu.");
+  } finally {
+    loading.value = false;
   }
 }
 </script>
 
 <template>
-  <div class="p-8 mx-auto max-w-lg bg-white rounded-2xl shadow-2xl mt-10 border border-gray-100">
-    <div class="text-center mb-8">
-      <h1 class="text-3xl font-bold text-slate-900 mb-6">Giriş Yap</h1>
-    </div>
+  <div class="flex items-center justify-center min-h-[80vh] px-4">
+    <Card class="w-full max-w-lg" padding="lg">
+      <div class="text-center mb-8">
+        <h1 class="text-3xl font-bold text-slate-900 mb-2">Giriş Yap</h1>
+        <p class="text-gray-600">Hesabınıza erişmek için giriş yapın</p>
+      </div>
 
-    <input v-model="email" placeholder="Email"
-      class="w-full py-3 px-4 bg-gray-50 border-2 border-gray-200 focus:border-slate-900 focus:bg-white text-sm outline-0 rounded-lg transition-all">
-    <input v-model="password" type="password" placeholder="Şifre"
-      class="w-full py-3 px-4 bg-gray-50 border-2 border-gray-200 focus:border-slate-900 focus:bg-white  mt-4  mb-5 text-sm outline-0 rounded-lg transition-all">
+      <form @submit.prevent="submit" class="space-y-4">
+        <Input
+          v-model="email"
+          type="email"
+          label="E-posta"
+          placeholder="ornek@email.com"
+          required
+          autocomplete="email"
+        />
 
-    <Button variant="primary" full-width size="lg" @click="submit">
-      Giriş Yap</Button>
+        <Input
+          v-model="password"
+          type="password"
+          label="Şifre"
+          placeholder="Şifrenizi girin"
+          required
+          autocomplete="current-password"
+        />
+
+        <p v-if="error" class="text-red-500 text-sm bg-red-50 py-2 px-4 rounded-lg border border-red-200">
+          {{ error }}
+        </p>
+
+        <Button 
+          type="submit" 
+          variant="primary" 
+          size="lg" 
+          full-width
+          :loading="loading"
+        >
+          Giriş Yap
+        </Button>
+
+        <p class="text-center text-sm text-gray-600 mt-4">
+          Hesabınız yok mu?
+          <RouterLink to="/register" class="font-semibold text-slate-900 hover:underline ml-1">
+            Kayıt Olun
+          </RouterLink>
+        </p>
+      </form>
+    </Card>
   </div>
 </template>
-
-<style scoped></style>

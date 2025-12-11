@@ -1,26 +1,23 @@
 <script setup lang="ts">
+import { computed } from "vue";
 import { useRouter } from "vue-router";
 import { cart, clearCart } from "../../services/cart";
 import { apiPost } from "../../services/api";
 import { toast } from "vue3-toastify";
 import Button from "../../components/Button.vue";
+import EmptyState from "../../components/EmptyState.vue";
+import Card from "../../components/Card.vue";
+import PageHeader from "../../components/PageHeader.vue";
+
 const router = useRouter();
 
-const updateQuantity = (productId: number, delta: number, sizes?: string[] | null) => {
-  const sizesKey = (sizes || []).sort().join('|');
-  const item = cart.value.find(i => {
-    const existingSizesKey = (i.sizes || []).sort().join('|');
-    return i.id === productId && existingSizesKey === sizesKey;
-  });
-  if (item) {
-    item.quantity += delta;
-    if (item.quantity <= 0) {
-      removeFromCart(productId, sizes);
-    } else {
-      saveCart();
-    }
-  }
-};
+const totalPrice = computed(() => {
+  return cart.value.reduce((acc, i) => acc + i.price * i.quantity, 0);
+});
+
+const totalItems = computed(() => {
+  return cart.value.reduce((acc, i) => acc + i.quantity, 0);
+});
 
 function getFirstImage(imageUrl: string | null | undefined): string {
   if (!imageUrl) return 'https://via.placeholder.com/300';
@@ -35,6 +32,22 @@ function getFirstImage(imageUrl: string | null | undefined): string {
   return imageUrl;
 }
 
+const updateQuantity = (productId: number, delta: number, sizes?: string[] | null) => {
+  const sizesKey = (sizes || []).sort().join('|');
+  const item = cart.value.find(i => {
+    const existingSizesKey = (i.sizes || []).sort().join('|');
+    return i.id === productId && existingSizesKey === sizesKey;
+  });
+  
+  if (item) {
+    item.quantity += delta;
+    if (item.quantity <= 0) {
+      removeFromCart(productId, sizes);
+    } else {
+      saveCart();
+    }
+  }
+};
 
 const removeFromCart = (productId: number, sizes?: string[] | null) => {
   const sizesKey = (sizes || []).sort().join('|');
@@ -42,6 +55,7 @@ const removeFromCart = (productId: number, sizes?: string[] | null) => {
     const existingSizesKey = (i.sizes || []).sort().join('|');
     return i.id === productId && existingSizesKey === sizesKey;
   });
+  
   if (index > -1) {
     cart.value.splice(index, 1);
     saveCart();
@@ -50,10 +64,6 @@ const removeFromCart = (productId: number, sizes?: string[] | null) => {
 
 const saveCart = () => {
   localStorage.setItem("cart", JSON.stringify(cart.value));
-};
-
-const totalPrice = () => {
-  return cart.value.reduce((acc, i) => acc + i.price * i.quantity, 0);
 };
 
 const buyProduct = async (product: any) => {
@@ -97,7 +107,7 @@ const buyAll = async () => {
     return;
   }
 
-  if (!confirm(`"${cart.value.length}" ürünü toplam ${totalPrice()} TL'ye satın almak istediğinize emin misiniz?`)) {
+  if (!confirm(`"${cart.value.length}" ürünü toplam ${totalPrice.value} TL'ye satın almak istediğinize emin misiniz?`)) {
     return;
   }
 
@@ -139,29 +149,33 @@ const buyAll = async () => {
 </script>
 
 <template>
-  <div class="p-4 mx-auto max-w-4xl bg-white">
-    <div class="flex justify-between items-center mb-6">
-      <h2 class="text-3xl text-slate-900 font-bold">Alışveriş Sepetim</h2>
-      <Button variant="danger" size="md"
-        v-if="cart.length> 0"
-        @click="clearCart">
-        Sepeti Temizle
-      </Button>
-    </div>
+  <div class="max-w-4xl mx-auto p-4">
+    <PageHeader title="Alışveriş Sepetim">
+      <template #actions>
+        <div class="flex justify-end mt-4">
+          <Button 
+            v-if="cart.length > 0"
+            variant="danger"
+            @click="clearCart"
+          >
+            Sepeti Temizle
+          </Button>
+        </div>
+      </template>
+    </PageHeader>
 
-    <!-- Boş Sepet -->
-    <div v-if="cart.length === 0" class="text-center py-16">
-      <p class="text-gray-500 text-lg mb-4">Sepetiniz boş</p>
-      <Button variant="primary" size="lg"
-        @click="router.push('/')" >
-        Alışverişe Başla
-      </Button>
-    </div>
+    <EmptyState
+      v-if="cart.length === 0"
+      title="Sepetiniz boş"
+      description="Alışverişe başlamak için ürünleri keşfedin"
+      icon="cart"
+      action-text="Alışverişe Başla"
+      action-to="/"
+    />
 
-    <!-- Sepet Ürünleri -->
     <div v-else class="space-y-4">
       <!-- Ürün Listesi -->
-      <div v-for="item in cart" :key="item.id + '-' + (item.sizes || []).join('|')" class="border border-gray-200 rounded p-4">
+      <Card v-for="item in cart" :key="item.id + '-' + (item.sizes || []).join('|')" padding="md">
         <div class="flex gap-4">
           <img 
             :src="getFirstImage(item.image)" 
@@ -169,21 +183,27 @@ const buyAll = async () => {
             class="w-24 h-24 object-cover rounded"
           />
           
-            <div class="flex-1">
+          <div class="flex-1">
             <h3 class="font-semibold text-lg text-slate-900 mb-1">{{ item.title }}</h3>
             <p class="text-slate-900 font-bold text-xl mb-3">{{ item.price }} TL</p>
 
-            <p v-if="item.sizes && item.sizes.length" class="text-sm text-gray-600 mb-2">Seçilen Bedenler: <span class="font-semibold">{{ item.sizes.join(", ") }}</span></p>
+            <p v-if="item.sizes && item.sizes.length" class="text-sm text-gray-600 mb-2">
+              Seçilen Bedenler: <span class="font-semibold">{{ item.sizes.join(", ") }}</span>
+            </p>
             
             <div class="flex items-center gap-4">
               <div class="flex items-center gap-2">
-                <Button variant="outline"
-                  @click="updateQuantity(item.id, -1, item.sizes)"   
+                <Button 
+                  variant="outline"
+                  size="sm"
+                  @click="updateQuantity(item.id, -1, item.sizes)"
                 >
                   -
                 </Button>
                 <span class="w-12 text-center font-medium">{{ item.quantity }}</span>
-                <Button variant="outline"
+                <Button 
+                  variant="outline"
+                  size="sm"
                   @click="updateQuantity(item.id, 1, item.sizes)"
                 >
                   +
@@ -191,13 +211,16 @@ const buyAll = async () => {
               </div>
               
               <Button 
+                variant="primary"
+                size="sm"
                 @click="buyProduct(item)"
-               variant="primary"
               >
                 Satın Al
               </Button>
               
-              <Button variant="danger"
+              <Button 
+                variant="danger"
+                size="sm"
                 @click="removeFromCart(item.id, item.sizes)"
               >
                 Kaldır
@@ -209,31 +232,39 @@ const buyAll = async () => {
             </p>
           </div>
         </div>
-      </div>
+      </Card>
 
       <!-- Sepet Özeti -->
-      <div class="border-t-2 border-gray-300 pt-6 mt-6">
+      <Card padding="lg">
         <div class="space-y-2 mb-4">
           <div class="flex justify-between text-gray-700">
             <span>Toplam Ürün:</span>
-            <span class="font-semibold">{{ cart.reduce((acc, i) => acc + i.quantity, 0) }} adet</span>
+            <span class="font-semibold">{{ totalItems }} adet</span>
           </div>
           <div class="flex justify-between text-slate-900 text-2xl font-bold pt-2 border-t border-gray-300">
             <span>Toplam:</span>
-            <span>{{ totalPrice().toFixed(2) }} TL</span>
+            <span>{{ totalPrice.toFixed(2) }} TL</span>
           </div>
         </div>
 
-        <Button class="mr-3"
-          @click="buyAll">
-          Tümünü Satın Al ({{ cart.length }} Ürün)
-        </Button>
+        <div class="flex gap-3">
+          <Button 
+            variant="primary"
+            size="lg"
+            @click="buyAll"
+          >
+            Tümünü Satın Al ({{ cart.length }} Ürün)
+          </Button>
 
-        <Button
-          @click="router.push('/')">
-          Alışverişe Devam Et
-        </Button>
-      </div>
+          <Button
+            variant="secondary"
+            size="lg"
+            @click="router.push('/')"
+          >
+            Alışverişe Devam Et
+          </Button>
+        </div>
+      </Card>
     </div>
   </div>
 </template>

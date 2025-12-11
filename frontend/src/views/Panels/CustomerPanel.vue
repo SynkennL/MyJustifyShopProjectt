@@ -4,62 +4,26 @@ import { apiGet, apiPost } from "../../services/api";
 import { useRouter } from "vue-router";
 import { toast } from "vue3-toastify";
 import Button from "../../components/Button.vue";
-
-interface Product {
-  id: number;
-  title: string;
-  description: string;
-  price: number;
-  category_name: string;
-  image_url?: string;
-  features?: any;
-}
-
-interface SoldOrder {
-  id: number;
-  product_title: string;
-  quantity: number;
-  total_price: number;
-  status: string;
-  buyer_email: string;
-  image_url?: string;
-  created_at: string;
-  sizes?: string[] | null;
-}
-
-interface PurchasedOrder {
-  id: number;
-  product_title: string;
-  quantity: number;
-  total_price: number;
-  status: string;
-  seller_email: string;
-  image_url?: string;
-  created_at: string;
-  sizes?: string[] | null;
-}
+import Input from "../../components/Input.vue";
+import Card from "../../components/Card.vue";
+import PageHeader from "../../components/PageHeader.vue";
+import EmptyState from "../../components/EmptyState.vue";
 
 const router = useRouter();
-const myProducts = ref<Product[]>([]);
-const soldOrders = ref<SoldOrder[]>([]);
-const purchasedOrders = ref<PurchasedOrder[]>([]);
+const myProducts = ref<any[]>([]);
+const soldOrders = ref<any[]>([]);
+const purchasedOrders = ref<any[]>([]);
 const categories = ref<any[]>([]);
 const userId = ref<number | null>(null);
 const userRole = ref<string>("");
 
-// Yeni ürün formu
 const newProduct = ref({
   title: "",
   description: "",
   price: 0,
   category_id: null as number | null,
   image_urls: [] as string[],
-  features: {
-    beden: "",
-    renk: "",
-    malzeme: "",
-    marka: ""
-  }
+  features: { renk: "", malzeme: "", marka: "" }
 });
 
 const newImageUrl = ref("");
@@ -87,14 +51,8 @@ async function loadData() {
     myProducts.value = allProducts.filter((p: any) => p.seller_id === user.id);
     
     const allOrders = await apiGet("/orders/my-orders");
-    
-    soldOrders.value = allOrders.filter((order: any) => 
-      order.seller_id === user.id
-    );
-    
-    purchasedOrders.value = allOrders.filter((order: any) => 
-      order.buyer_id === user.id
-    );
+    soldOrders.value = allOrders.filter((order: any) => order.seller_id === user.id);
+    purchasedOrders.value = allOrders.filter((order: any) => order.buyer_id === user.id);
 
     const cats = await apiGet("/categories");
     categories.value = cats;
@@ -116,7 +74,6 @@ async function addProduct() {
 
   try {
     const cleanedFeatures: any = {};
-    
     if (newProduct.value.features.renk) cleanedFeatures.Renk = newProduct.value.features.renk;
     if (newProduct.value.features.malzeme) cleanedFeatures.Malzeme = newProduct.value.features.malzeme;
     if (newProduct.value.features.marka) cleanedFeatures.Marka = newProduct.value.features.marka;
@@ -145,12 +102,7 @@ async function addProduct() {
       price: 0,
       category_id: null,
       image_urls: [],
-      features: {
-        beden: "",
-        renk: "",
-        malzeme: "",
-        marka: ""
-      }
+      features: { renk: "", malzeme: "", marka: "" }
     };
     selectedProductSizes.value = [];
     
@@ -215,27 +167,17 @@ async function updateOrderStatus(orderId: number, newStatus: string) {
 
 function parseFeatures(features: any) {
   if (!features) return null;
-  if (typeof features === 'string') {
-    try {
-      return JSON.parse(features);
-    } catch {
-      return null;
-    }
-  }
-  return features;
+  return typeof features === 'string' ? JSON.parse(features) : features;
 }
 
 function getFirstImage(imageUrl: string | null | undefined): string {
   if (!imageUrl) return 'https://via.placeholder.com/300';
   try {
     const parsed = JSON.parse(imageUrl);
-    if (Array.isArray(parsed) && parsed.length > 0) {
-      return parsed[0];
-    }
+    return Array.isArray(parsed) && parsed.length > 0 ? parsed[0] : imageUrl;
   } catch {
     return imageUrl;
   }
-  return imageUrl;
 }
 
 function featureEntries(features: any) {
@@ -244,13 +186,9 @@ function featureEntries(features: any) {
   const hasSizes = Array.isArray(f.sizes) && f.sizes.length > 0;
   return Object.entries(f).filter(([k]) => {
     const lk = String(k).toLowerCase();
-    if (lk === 'sizes') return false;
-    if (hasSizes && (lk === 'beden' || lk === 'bede' || lk === 'size')) return false;
-    return true;
+    return lk !== 'sizes' && !(hasSizes && ['beden', 'bede', 'size'].includes(lk));
   });
 }
-
-onMounted(loadData);
 
 function formatDate(dateString: string) {
   return new Date(dateString).toLocaleDateString('tr-TR');
@@ -285,21 +223,21 @@ onMounted(() => {
     router.push("/");
     return;
   }
+  loadData();
 });
 </script>
 
 <template>
-  <div v-if="userRole === 'admin' || userRole==='customer'" class="p-6 max-w-7xl mx-auto bg-white rounded-xl shadow-md">
-    <div class="flex justify-between items-center mb-6">
-      <h2 class="text-2xl font-bold">
-        {{'👤 Kullanıcı Paneli' }}
-      </h2>
-      <Button 
-        v-if="userRole === 'admin'" 
-        @click="router.push('/admin')">
-        🛠️ Admin Yönetim Paneli
-      </Button>
-    </div>
+  <div v-if="userRole === 'admin' || userRole === 'customer'" class="max-w-7xl mx-auto p-6">
+    <PageHeader title="Kullanıcı Paneli">
+      <template #actions>
+        <div class="flex justify-end mt-4">
+          <Button v-if="userRole === 'admin'" @click="router.push('/admin')">
+            🛠️ Admin Yönetim Paneli
+          </Button>
+        </div>
+      </template>
+    </PageHeader>
 
     <div v-if="userRole === 'admin'" class="mb-6 p-4 bg-indigo-50 border border-indigo-200 rounded-lg">
       <div class="flex items-start gap-3">
@@ -312,110 +250,94 @@ onMounted(() => {
       </div>
     </div>
 
-    <section class="mb-8 p-4 border rounded-lg bg-green-50">
-      <h3 class="font-semibold mb-3 text-lg">📦 Yeni İlan Ekle</h3>
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <input v-model="newProduct.title" placeholder="Ürün başlığı" class="input" />
-        <input v-model.number="newProduct.price" type="number" placeholder="Fiyat" class="input" />
-        <textarea v-model="newProduct.description" placeholder="Açıklama" class="input" rows="3"></textarea>
-        <select v-model="newProduct.category_id" class="input">
+    <!-- Yeni İlan Ekle -->
+    <Card title="📦 Yeni İlan Ekle" padding="md" class="mb-8 bg-green-50">
+      <div class="space-y-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <Input v-model="newProduct.title" placeholder="Ürün başlığı" />
+          <Input v-model.number="newProduct.price" type="number" placeholder="Fiyat" />
+        </div>
+
+        <textarea 
+          v-model="newProduct.description" 
+          placeholder="Açıklama" 
+          rows="3"
+          class="w-full py-3 px-4 border-2 border-gray-200 rounded-lg focus:border-slate-900 focus:outline-none"
+        />
+
+        <select 
+          v-model="newProduct.category_id" 
+          class="w-full py-3 px-4 border-2 border-gray-200 rounded-lg focus:border-slate-900 focus:outline-none"
+        >
           <option :value="null">Kategori seç</option>
           <option v-for="c in categories" :key="c.id" :value="c.id">{{ c.name }}</option>
         </select>
-      </div>
 
-      <!-- Resim URL'leri -->
-      <div class="mt-4 p-4 rounded-lg border border-gray-200">
-        <h4 class="font-semibold mb-3 text-gray-700">📷 Ürün Resimleri</h4>
-        <div class="flex gap-2 mb-3">
-          <input 
-            v-model="newImageUrl" 
-            placeholder="Resim URL'si ekle (https://...)" 
-            class="input flex-1"
-            @keyup.enter="addImageUrl"
-          />
-          <Button @click="addImageUrl" >
-            Ekle
-          </Button>
-        </div>
-        
-        <div v-if="newProduct.image_urls.length > 0" class="grid grid-cols-3 gap-3">
-          <div 
-            v-for="(url, index) in newProduct.image_urls" 
-            :key="index"
-            class="relative group aspect-square border-2 border-gray-200 rounded-lg overflow-hidden"
-          >
-            <img :src="url" alt="Ürün resmi" class="w-full h-full object-cover" />
-            <button 
-              @click="removeImageUrl(index)"
-              class="absolute top-1 right-1 bg-red-500 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition"
-            >
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
-            <div class="absolute bottom-1 left-1 bg-black/60 text-white text-xs px-2 py-1 rounded">
-              {{ index + 1 }}
+        <!-- Resim URL'leri -->
+        <Card padding="md" border>
+          <h4 class="font-semibold mb-3 text-gray-700">📷 Ürün Resimleri</h4>
+          <div class="flex gap-2 mb-3">
+            <Input 
+              v-model="newImageUrl" 
+              placeholder="Resim URL'si ekle (https://...)" 
+              @keyup.enter="addImageUrl"
+            />
+            <Button @click="addImageUrl">Ekle</Button>
+          </div>
+          
+          <div v-if="newProduct.image_urls.length > 0" class="grid grid-cols-3 gap-3">
+            <div v-for="(url, index) in newProduct.image_urls" :key="index" class="relative group aspect-square border-2 border-gray-200 rounded-lg overflow-hidden">
+              <img :src="url" alt="Ürün resmi" class="w-full h-full object-cover" />
+              <button @click="removeImageUrl(index)" class="absolute top-1 right-1 bg-red-500 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
             </div>
           </div>
-        </div>
-        <p v-else class="text-sm text-gray-500 text-center py-4">Henüz resim eklenmedi</p>
-      </div>
+          <p v-else class="text-sm text-gray-500 text-center py-4">Henüz resim eklenmedi</p>
+        </Card>
 
-      <!-- ÖZELLİKLER BÖLÜMÜ -->
-      <div class="mt-4 p-4 rounded-lg border border-gray-200">
-        <h4 class="font-semibold mb-3 text-gray-700 flex items-center gap-2">
-          Ürün Özellikleri
-        </h4>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-          <div>
-            <label class="block text-sm font-medium text-gray-600 mb-1">Beden:</label>
-            <div class="flex flex-wrap gap-2">
-              <label v-for="s in predefinedSizes" :key="s" class="inline-flex items-center gap-2 text-sm">
-                <input type="checkbox" :value="s" v-model="selectedProductSizes" class="w-4 h-4" />
-                <span class="text-xs">{{ s }}</span>
-              </label>
+        <!-- Özellikler -->
+        <Card padding="md" border>
+          <h4 class="font-semibold mb-3 text-gray-700">Ürün Özellikleri</h4>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-sm font-medium text-gray-600 mb-1">Beden:</label>
+              <div class="flex flex-wrap gap-2">
+                <label v-for="s in predefinedSizes" :key="s" class="inline-flex items-center gap-2 text-sm">
+                  <input type="checkbox" :value="s" v-model="selectedProductSizes" class="w-4 h-4" />
+                  <span class="text-xs">{{ s }}</span>
+                </label>
+              </div>
             </div>
+            <Input v-model="newProduct.features.renk" label="Renk" placeholder="Örn: Siyah, Mavi" />
+            <Input v-model="newProduct.features.malzeme" label="Malzeme" placeholder="Örn: %100 Pamuk" />
+            <Input v-model="newProduct.features.marka" label="Marka" placeholder="Örn: Nike, Adidas" />
           </div>
-          <div>
-            <label class="block text-sm font-medium text-gray-600 mb-1">Renk</label>
-            <input v-model="newProduct.features.renk" 
-                   placeholder="Örn: Siyah, Mavi" 
-                   class="input text-sm" />
-          </div>
-          <div>
-            <label class="block text-sm font-medium text-gray-600 mb-1">Malzeme</label>
-            <input v-model="newProduct.features.malzeme" 
-                   placeholder="Örn: %100 Pamuk" 
-                   class="input text-sm" />
-          </div>
-          <div>
-            <label class="block text-sm font-medium text-gray-600 mb-1">Marka</label>
-            <input v-model="newProduct.features.marka" 
-                   placeholder="Örn: Nike, Adidas" 
-                   class="input text-sm" />
-          </div>
-        </div>
+        </Card>
+
+        <Button variant="primary" full-width size="md" @click="addProduct">
+          Ürün Ekle
+        </Button>
       </div>
+    </Card>
 
-      <Button variant="primary" full-width size="md" class="mt-2" @click="addProduct">Ürün Ekle</Button>
-    </section>
-
-    <section class="mb-8 p-4 border rounded-lg">
-      <h3 class="font-semibold mb-4 text-lg">🏷️ Benim İlanlarım ({{ myProducts.length }})</h3>
+    <!-- Benim İlanlarım -->
+    <Card title="🏷️ Benim İlanlarım" :padding="myProducts.length ? 'md' : 'lg'" class="mb-8">
+      <p class="text-sm text-gray-600 mb-4">Toplam {{ myProducts.length }} ilan</p>
       
-      <div v-if="myProducts.length === 0" class="text-center py-10 text-gray-500">
-        Henüz ilan eklemediniz. Yukarıdan yeni ilan ekleyebilirsiniz.
-      </div>
+      <EmptyState 
+        v-if="myProducts.length === 0"
+        title="Henüz ilan eklemediniz"
+        description="Yukarıdan yeni ilan ekleyebilirsiniz"
+        icon="product"
+      />
 
       <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        <div v-for="product in myProducts" :key="product.id" class="border rounded-lg p-4 hover:shadow-lg transition bg-white">
-          <RouterLink :to="`/urun/${product.id}`" class="block">
-            <img 
-              :src="getFirstImage(product.image_url)" 
-              alt="Ürün"
-              class="w-full h-48 object-cover rounded-lg mb-3 hover:opacity-90 transition"
-            />
+        <Card v-for="product in myProducts" :key="product.id" padding="md" hover>
+          <RouterLink :to="`/urun/${product.id}`">
+            <img :src="getFirstImage(product.image_url)" alt="Ürün" class="w-full h-48 object-cover rounded-lg mb-3 hover:opacity-90 transition" />
           </RouterLink>
           <RouterLink :to="`/urun/${product.id}`">
             <h4 class="font-semibold text-lg mb-1 hover:text-blue-600 transition">{{ product.title }}</h4>
@@ -425,37 +347,32 @@ onMounted(() => {
           
           <div v-if="featureEntries(product.features).length" class="mb-3">
             <div class="flex flex-wrap gap-2">
-              <span v-for="([key,value]) in featureEntries(product.features)" :key="product.id"
-                    class="inline-flex items-center gap-1 text-black text-xs font-medium px-3 py-1.5 rounded-full border">
+              <span v-for="[key, value] in featureEntries(product.features)" :key="key" class="text-xs font-medium px-3 py-1.5 rounded-full border text-black">
                 {{ key }}: {{ value }}
               </span>
             </div>
           </div>
           
           <p class="font-bold text-lg mb-3 text-gray-900">{{ product.price }} TL</p>
-          <Button variant="danger" full-width @click="deleteProduct(product.id)">
-            Sil
-          </Button>
-        </div>
+          <Button variant="danger" full-width @click="deleteProduct(product.id)">Sil</Button>
+        </Card>
       </div>
-    </section>
+    </Card>
 
-    <section class="mb-8 p-4 border rounded-lg bg-blue-50">
-      <h3 class="font-semibold mb-4 text-lg">💼 Sattığım Ürünlerin Siparişleri ({{ soldOrders.length }})</h3>
-      <p class="text-sm text-gray-600 mb-4">Sizin ilanlarınızdan satın alınan ürünler. Sipariş durumlarını buradan yönetebilirsiniz.</p>
+    <!-- Sattığım Ürünlerin Siparişleri -->
+    <Card title="💼 Sattığım Ürünlerin Siparişleri" padding="md" class="mb-8 bg-blue-50">
+      <p class="text-sm text-gray-600 mb-4">Sizin ilanlarınızdan satın alınan ürünler ({{ soldOrders.length }} sipariş)</p>
       
-      <div v-if="soldOrders.length === 0" class="text-center py-10 text-gray-500">
-        Henüz ürünlerinizden sipariş verilmedi.
-      </div>
+      <EmptyState 
+        v-if="soldOrders.length === 0"
+        title="Henüz ürünlerinizden sipariş verilmedi"
+        icon="cart"
+      />
 
       <div v-else class="space-y-4">
-        <div v-for="order in soldOrders" :key="order.id" class="bg-white border rounded-lg p-4 hover:shadow-lg transition">
+        <Card v-for="order in soldOrders" :key="order.id" padding="md" hover>
           <div class="flex items-start gap-4">
-            <img 
-              :src="getFirstImage(order.image_url)" 
-              alt="Ürün" 
-              class="w-24 h-24 object-cover rounded-lg"
-            />
+            <img :src="getFirstImage(order.image_url)" alt="Ürün" class="w-24 h-24 object-cover rounded-lg" />
             <div class="flex-1">
               <h3 class="font-semibold text-lg">{{ order.product_title }}</h3>
               <p class="text-gray-600 text-sm">✉️ Alıcı: {{ order.buyer_email }}</p>
@@ -465,9 +382,7 @@ onMounted(() => {
               <p class="text-gray-500 text-xs mt-1">📅 {{ formatDate(order.created_at) }}</p>
             </div>
             <div class="flex flex-col gap-2 min-w-[140px]">
-              <span 
-                :class="['px-3 py-1 rounded-full text-sm font-medium text-center', getStatusBadge(order.status)]"
-              >
+              <span :class="['px-3 py-1 rounded-full text-sm font-medium text-center', getStatusBadge(order.status)]">
                 {{ getStatusText(order.status) }}
               </span>
               <select 
@@ -482,26 +397,24 @@ onMounted(() => {
               </select>
             </div>
           </div>
-        </div>
+        </Card>
       </div>
-    </section>
+    </Card>
 
-    <section class="p-4 border rounded-lg bg-purple-50">
-      <h3 class="font-semibold mb-4 text-lg">🛒 Satın Aldığım Siparişler ({{ purchasedOrders.length }})</h3>
-      <p class="text-sm text-gray-600 mb-4">Başka satıcılardan satın aldığınız ürünler. Sipariş durumunu takip edebilirsiniz.</p>
+    <!-- Satın Aldığım Siparişler -->
+    <Card title="🛒 Satın Aldığım Siparişler" padding="md" class="bg-purple-50">
+      <p class="text-sm text-gray-600 mb-4">Başka satıcılardan satın aldığınız ürünler ({{ purchasedOrders.length }} sipariş)</p>
       
-      <div v-if="purchasedOrders.length === 0" class="text-center py-10 text-gray-500">
-        Henüz ürün satın almadınız.
-      </div>
+      <EmptyState 
+        v-if="purchasedOrders.length === 0"
+        title="Henüz ürün satın almadınız"
+        icon="cart"
+      />
 
       <div v-else class="space-y-4">
-        <div v-for="order in purchasedOrders" :key="order.id" class="bg-white border rounded-lg p-4 hover:shadow-lg transition">
+        <Card v-for="order in purchasedOrders" :key="order.id" padding="md" hover>
           <div class="flex items-start gap-4">
-            <img 
-              :src="getFirstImage(order.image_url)" 
-              alt="Ürün" 
-              class="w-24 h-24 object-cover rounded-lg"
-            />
+            <img :src="getFirstImage(order.image_url)" alt="Ürün" class="w-24 h-24 object-cover rounded-lg" />
             <div class="flex-1">
               <h3 class="font-semibold text-lg">{{ order.product_title }}</h3>
               <p class="text-gray-600 text-sm">🏪 Satıcı: {{ order.seller_email }}</p>
@@ -511,9 +424,7 @@ onMounted(() => {
               <p class="text-gray-500 text-xs mt-1">📅 {{ formatDate(order.created_at) }}</p>
             </div>
             <div class="flex flex-col gap-2">
-              <span 
-                :class="['px-3 py-1 rounded-full text-sm font-medium text-center', getStatusBadge(order.status)]"
-              >
+              <span :class="['px-3 py-1 rounded-full text-sm font-medium text-center', getStatusBadge(order.status)]">
                 {{ getStatusText(order.status) }}
               </span>
               <div class="text-xs text-gray-500 text-center mt-1 px-2">
@@ -521,17 +432,8 @@ onMounted(() => {
               </div>
             </div>
           </div>
-        </div>
+        </Card>
       </div>
-    </section>
+    </Card>
   </div>
 </template>
-
-<style scoped>
-.input {
-  width: 100%;
-  padding: 0.5rem;
-  border: 1px solid #d1d5db;
-  border-radius: 0.375rem;
-}
-</style>

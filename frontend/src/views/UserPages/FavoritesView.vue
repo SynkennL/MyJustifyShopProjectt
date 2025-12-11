@@ -1,12 +1,14 @@
 <script setup lang="ts">
 import { ref, onMounted, reactive } from "vue";
 import { useRouter } from "vue-router";
-import { apiGet, apiPost } from "../../services/api";
-import { addToCart } from "../../services/cart";
-import { removeFromFavorites } from "../../services/favorites";
+import { apiGet } from "../../services/api";
 import { toast } from "vue3-toastify";
-import { addToCompare, removeFromCompare, isInCompare, MAX_COMPARE, compareList } from "../../services/compare";
+import ProductCard from "../../components/ProductCard.vue";
+import EmptyState from "../../components/EmptyState.vue";
+import LoadingSpinner from "../../components/LoadingSpinner.vue";
+import PageHeader from "../../components/PageHeader.vue";
 import Button from "../../components/Button.vue";
+
 const router = useRouter();
 const favorites = ref<any[]>([]);
 const loading = ref(true);
@@ -23,51 +25,17 @@ onMounted(async () => {
 
   const userStr = localStorage.getItem("user");
   if (userStr) {
-    const user = JSON.parse(userStr);
-    currentUserId.value = user.id;
+    currentUserId.value = JSON.parse(userStr).id;
   }
 
   await loadFavorites();
 });
-
-// Karşılaştırma fonksiyonu
-const handleToggleCompare = (product: any) => {
-  if (isInCompare(product.id)) {
-    removeFromCompare(product.id);
-    toast.success("Ürün karşılaştırmadan kaldırıldı!");
-  } else {
-    if (compareList.value.length >= MAX_COMPARE) {
-      toast.error(`En fazla ${MAX_COMPARE} ürün karşılaştırabilirsiniz!`);
-      return;
-    }
-    const success = addToCompare({
-      id: product.id,
-      title: product.title,
-      price: product.price,
-      image_url: getFirstImage(product.image_url),
-      category_name: product.category_name,
-      features: product.features,
-      description: product.description
-    });
-    if (success) {
-      toast.success("Ürün karşılaştırmaya eklendi!");
-    }
-  }
-};
-
 
 async function loadFavorites() {
   try {
     loading.value = true;
     const data = await apiGet("/favorites");
     favorites.value = data;
-
-    favorites.value.forEach((p: any) => {
-      const f = parseFeatures(p.features);
-      if (f && Array.isArray(f.sizes) && f.sizes.length > 0) {
-        selectedSizes[p.id] = "";
-      }
-    });
   } catch (error) {
     console.error("Favoriler yüklenemedi:", error);
     toast.error("Favoriler yüklenirken bir hata oluştu!");
@@ -76,218 +44,51 @@ async function loadFavorites() {
   }
 }
 
-function parseFeatures(features: any) {
-  if (!features) return null;
-  if (typeof features === 'string') {
-    try {
-      return JSON.parse(features);
-    } catch {
-      return null;
-    }
-  }
-  return features;
+function isOwnProduct(product: any): boolean {
+  if (!currentUserId.value || !product?.seller_id) return false;
+  return product.seller_id === currentUserId.value;
 }
-
-function getFirstImage(imageUrl: string | null | undefined): string {
-  if (!imageUrl) return 'https://via.placeholder.com/300';
-  try {
-    const parsed = JSON.parse(imageUrl);
-    if (Array.isArray(parsed) && parsed.length > 0) {
-      return parsed[0];
-    }
-  } catch {
-    return imageUrl;
-  }
-  return imageUrl;
-}
-
-function featureEntries(features: any) {
-  const f = parseFeatures(features);
-  if (!f) return [];
-  const hasSizes = Array.isArray(f.sizes) && f.sizes.length > 0;
-  return Object.entries(f).filter(([k]) => {
-    const lk = String(k).toLowerCase();
-    if (lk === 'sizes') return false;
-    if (hasSizes && (lk === 'beden' || lk === 'bede' || lk === 'size')) return false;
-    return true;
-  });
-}
-
-function isOwnProduct(product: any) {
-  return currentUserId.value && product.seller_id === currentUserId.value;
-}
-
-const handleRemoveFavorite = async (productId: number) => {
-  try {
-    await removeFromFavorites(productId);
-    toast.success("Favorilerden kaldırıldı!");
-    await loadFavorites();
-  } catch (error) {
-    toast.error("Favorilerden kaldırılamadı!");
-  }
-};
-
-const handleAddToCart = (product: any) => {
-  if (isOwnProduct(product)) {
-    toast.error("Kendi ürününüzü sepete ekleyemezsiniz!");
-    return;
-  }
-
-  const selectedSize = selectedSizes[product.id];
-  const hasRequiredSize = parseFeatures(product.features)?.sizes;
-
-  if (hasRequiredSize && !selectedSize) {
-    toast.error("Lütfen bir beden seçiniz!");
-    return;
-  }
-
-  addToCart({
-    id: product.id,
-    title: product.title,
-    price: product.price,
-    image: getFirstImage(product.image_url),
-    sizes: selectedSize ? [selectedSize] : null,
-    seller_id: product.seller_id,
-  });
-  toast.success(`"${product.title}" sepete eklendi!`);
-};
-
-const handleBuyNow = async (product: any) => {
-  if (isOwnProduct(product)) {
-    toast.error("Kendi ürününüzü satın alamazsınız!");
-    return;
-  }
-
-  const selectedSize = selectedSizes[product.id];
-  const hasRequiredSize = parseFeatures(product.features)?.sizes;
-
-  if (hasRequiredSize && !selectedSize) {
-    toast.error("Lütfen bir beden seçiniz!");
-    return;
-  }
-
-  const res = await apiPost("/orders", {
-    product_id: product.id,
-    quantity: 1,
-    sizes: selectedSize ? [selectedSize] : undefined
-  });
-
-  if (res.error) {
-    toast.error(res.error);
-    return;
-  }
-
-  toast.success(`"${product.title}" başarıyla satın alındı!`);
-  router.push("/customer-panel");
-};
 </script>
 
 <template>
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-    <div class="flex items-center justify-between mb-8">
-      <div>
-        <h1 class="text-3xl font-bold text-gray-900">Favorilerim</h1>
-        <p class="text-gray-600 mt-1">Beğendiğiniz ürünleri buradan takip edebilirsiniz</p>
-      </div>
-      <button @click="router.push('/')"
-        class="flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-gray-900 transition">
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-        </svg>
-        Alışverişe Devam
-      </button>
-    </div>
-
-    <div v-if="loading" class="flex justify-center items-center py-16">
-      <div class="animate-spin rounded-full h-16 w-16 border-4 border-gray-300 border-t-gray-900"></div>
-    </div>
-
-    <div v-else-if="favorites.length === 0" class="text-center py-16">
-      <h2 class="text-2xl font-bold text-gray-900 mb-2">Henüz favori ürününüz yok</h2>
-      <p class="text-gray-600 mb-6">Beğendiğiniz ürünleri favorilere ekleyerek kolayca takip edebilirsiniz</p>
-      <button @click="router.push('/')"
-        class="bg-gray-900 text-white px-6 py-3 rounded-lg hover:bg-gray-800 transition font-medium">
-        Ürünleri Keşfet
-      </button>
-    </div>
-
-    <div v-else>
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-        <div v-for="product in favorites" :key="product.id"
-          class="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg transition relative group flex flex-col">
-          <button @click="handleRemoveFavorite(product.id)"
-            class="absolute top-3 right-3 z-10 bg-white/90 hover:bg-white p-2 rounded-full shadow-lg transition"
-            title="Favorilerden çıkar">
-            <svg class="w-5 h-5 text-red-500" fill="currentColor" viewBox="0 0 24 24">
-              <path
-                d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+    <PageHeader 
+      title="Favorilerim" 
+      description="Beğendiğiniz ürünleri buradan takip edebilirsiniz"
+    >
+      <template #actions>
+        <div class="flex justify-end mt-4">
+          <Button @click="router.push('/')">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
             </svg>
-          </button>
-
-          <!-- Karşılaştırma Butonu -->
-          <button @click.prevent="handleToggleCompare(product)"
-            :title="isInCompare(product.id) ? 'Karşılaştırmadan çıkar' : 'Karşılaştırmaya ekle'" :class="[
-              'absolute top-14 right-3 z-10 p-2 rounded-full shadow-lg transition-all',
-              isInCompare(product.id)
-                ? 'bg-blue-500 text-white hover:bg-blue-600'
-                : 'bg-white/90 hover:bg-white text-gray-600 hover:text-blue-600'
-            ]">
-            <svg class="w-5 h-5" :class="{ 'fill-current': isInCompare(product.id) }" fill="none" stroke="currentColor"
-              viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-            </svg>
-          </button>
-
-          <RouterLink :to="`/urun/${product.id}`" class="block relative overflow-hidden aspect-square">
-            <img :src="getFirstImage(product.image_url)" :alt="product.title"
-              class="w-full h-full object-cover hover:opacity-90 transition" />
-          </RouterLink>
-
-          <div class="p-4 flex flex-col flex-1">
-            <RouterLink :to="`/urun/${product.id}`">
-              <h3 class="font-semibold text-lg text-gray-900 mb-1 line-clamp-2 hover:text-blue-600 transition">
-                {{ product.title }}
-              </h3>
-            </RouterLink>
-            <p class="text-sm text-gray-600 mb-2 line-clamp-2">{{ product.description }}</p>
-
-            <div v-if="featureEntries(product.features).length" class="mb-3">
-              <div class="flex flex-wrap gap-1.5">
-                <span v-for="([key, value]) in featureEntries(product.features)" :key="key"
-                  class="text-xs bg-gray-100 px-2 py-1 rounded">
-                  {{ key }}: {{ value }}
-                </span>
-              </div>
-            </div>
-
-            <div v-if="parseFeatures(product.features)?.sizes" class="mb-3">
-              <label class="text-xs text-gray-600 block mb-2">Beden:</label>
-              <div class="flex flex-wrap gap-2">
-                <label v-for="size in parseFeatures(product.features).sizes" :key="size">
-                  <input type="radio" :value="size" v-model="selectedSizes[product.id]"
-                    :name="`sizeGroup-${product.id}`" class="w-4 h-4" />
-                  {{ size }}
-                </label>
-              </div>
-            </div>
-
-            <div class="flex items-center justify-between mb-3">
-              <span class="text-2xl font-bold text-gray-900">{{ product.price }} TL</span>
-              <span class="text-xs text-gray-500">{{ product.category_name }}</span>
-            </div>
-
-            <div v-if="!isOwnProduct(product)" class="flex gap-2 mt-auto pt-3">
-              <Button flex variant="primary" @click="handleAddToCart(product)">
-                Sepete Ekle
-              </Button>
-              <Button flex variant="success" @click="handleBuyNow(product)">
-                Satın Al
-              </Button>
-            </div>
-          </div>
+            Alışverişe Devam
+          </Button>
         </div>
-      </div>
+      </template>
+    </PageHeader>
+
+    <LoadingSpinner v-if="loading" />
+
+    <EmptyState
+      v-else-if="favorites.length === 0"
+      title="Henüz favori ürününüz yok"
+      description="Beğendiğiniz ürünleri favorilere ekleyerek kolayca takip edebilirsiniz"
+      icon="favorite"
+      action-text="Ürünleri Keşfet"
+      action-to="/"
+    />
+
+    <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+      <ProductCard
+        v-for="product in favorites"
+        :key="product.id"
+        :product="product"
+        :selected-size="selectedSizes[product.id]"
+        @update:selected-size="selectedSizes[product.id] = $event"
+        :is-owned="isOwnProduct(product)"
+        @refresh="loadFavorites"
+      />
     </div>
   </div>
 </template>
