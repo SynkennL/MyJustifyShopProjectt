@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import { useRouter } from "vue-router";
-import { apiPost } from "../services/api";
-import { clearGuestCart } from "../services/cart";
+import { apiPost } from "../../services/api";
+import { clearGuestCart } from "../../services/cart";
 
 const router = useRouter();
 const name = ref("");

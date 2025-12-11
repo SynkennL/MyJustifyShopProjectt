@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import { useRouter } from "vue-router";
-import { apiPost } from "../services/api";
+import { apiPost } from "../../services/api";
 import { toast } from "vue3-toastify";
-import { removeOwnedProductsFromCart } from "../services/cart";
+import { removeOwnedProductsFromCart } from "../../services/cart";
 
 
 const router = useRouter();

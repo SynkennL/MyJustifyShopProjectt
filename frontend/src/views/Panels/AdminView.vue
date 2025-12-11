@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
-import { apiGet, apiPost } from "../services/api";
+import { apiGet, apiPost } from "../../services/api";
 import { useRouter } from "vue-router";
 import { toast } from "vue3-toastify";
 

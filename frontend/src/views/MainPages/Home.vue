@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { ref, onMounted, reactive } from "vue";
 import { useRouter } from "vue-router";
-import { apiGet, apiPost } from "../services/api";
-import { addToCart } from "../services/cart";
+import { apiGet, apiPost } from "../../services/api";
+import { addToCart } from "../../services/cart";
 import { toast } from "vue3-toastify";
-import { isFavorite, toggleFavorite, loadFavoriteIds } from "../services/favorites";
-import { addToCompare, removeFromCompare, isInCompare, MAX_COMPARE, compareList } from "../services/compare";
+import { isFavorite, toggleFavorite, loadFavoriteIds } from "../../services/favorites";
+import { addToCompare, removeFromCompare, isInCompare, MAX_COMPARE, compareList } from "../../services/compare";
 
 const router = useRouter();
 const popularProducts = ref<any[]>([]);
@@ -549,7 +549,7 @@ const handleBuyNow = async (product: any) => {
           <div class="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg transition-shadow">
             <div class="relative overflow-hidden aspect-video">
               <img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                src="../assets/erkek-giyim.jpeg" alt="Erkek Giyim">
+                src="../../assets/erkek-giyim.jpeg" alt="Erkek Giyim">
               <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
               <div class="absolute bottom-3 left-3 right-3">
                 <h3 class="text-white font-bold text-lg mb-0.5">Erkek Giyim</h3>
@@ -563,7 +563,7 @@ const handleBuyNow = async (product: any) => {
           <div class="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg transition-shadow">
             <div class="relative overflow-hidden aspect-video">
               <img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                src="../assets/kadın-giyim.jpg" alt="Kadın Giyim">
+                src="../../assets/kadın-giyim.jpg" alt="Kadın Giyim">
               <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
               <div class="absolute bottom-3 left-3 right-3">
                 <h3 class="text-white font-bold text-lg mb-0.5">Kadın Giyim</h3>
@@ -577,7 +577,7 @@ const handleBuyNow = async (product: any) => {
           <div class="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg transition-shadow">
             <div class="relative overflow-hidden aspect-video">
               <img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                src="../assets/ayakkabi3.jpg" alt="Ayakkabı">
+                src="../../assets/ayakkabi3.jpg" alt="Ayakkabı">
               <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
               <div class="absolute bottom-3 left-3 right-3">
                 <h3 class="text-white font-bold text-lg mb-0.5">Ayakkabı</h3>
@@ -591,7 +591,7 @@ const handleBuyNow = async (product: any) => {
           <div class="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg transition-shadow">
             <div class="relative overflow-hidden aspect-video">
               <img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                src="../assets/cocuk-giyim.jpg" alt="Çocuk Giyim">
+                src="../../assets/cocuk-giyim.jpg" alt="Çocuk Giyim">
               <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
               <div class="absolute bottom-3 left-3 right-3">
                 <h3 class="text-white font-bold text-lg mb-0.5">Çocuk Giyim</h3>

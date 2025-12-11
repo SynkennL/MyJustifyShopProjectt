@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { ref, onMounted, reactive } from "vue";
 import { useRouter } from "vue-router";
-import { apiGet, apiPost } from "../services/api";
-import { addToCart } from "../services/cart";
-import { removeFromFavorites } from "../services/favorites";
+import { apiGet, apiPost } from "../../services/api";
+import { addToCart } from "../../services/cart";
+import { removeFromFavorites } from "../../services/favorites";
 import { toast } from "vue3-toastify";
-import { addToCompare, removeFromCompare, isInCompare, MAX_COMPARE, compareList } from "../services/compare";
+import { addToCompare, removeFromCompare, isInCompare, MAX_COMPARE, compareList } from "../../services/compare";
 
 const router = useRouter();
 const favorites = ref<any[]>([]);

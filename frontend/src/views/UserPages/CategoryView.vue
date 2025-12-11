@@ -2,11 +2,11 @@
 
 import { ref, onMounted, watch, reactive } from "vue";
 import { useRoute, useRouter } from "vue-router";
-import { apiGet, apiPost } from "../services/api";
-import { addToCart } from "../services/cart";
+import { apiGet, apiPost } from "../../services/api";
+import { addToCart } from "../../services/cart";
 import { toast } from "vue3-toastify";
-import { isFavorite, toggleFavorite, loadFavoriteIds } from "../services/favorites";
-import { addToCompare, removeFromCompare, isInCompare, MAX_COMPARE, compareList } from "../services/compare";
+import { isFavorite, toggleFavorite, loadFavoriteIds } from "../../services/favorites";
+import { addToCompare, removeFromCompare, isInCompare, MAX_COMPARE, compareList } from "../../services/compare";
 
 
 const route = useRoute();

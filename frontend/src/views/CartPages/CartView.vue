@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useRouter } from "vue-router";
-import { cart, clearCart } from "../services/cart";
-import { apiPost } from "../services/api";
+import { cart, clearCart } from "../../services/cart";
+import { apiPost } from "../../services/api";
 import { toast } from "vue3-toastify";
 
 const router = useRouter();

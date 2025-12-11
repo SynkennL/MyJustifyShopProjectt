@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useRouter } from "vue-router";
-import { compareList, removeFromCompare, clearCompare } from "../services/compare";
-import { addToCart } from "../services/cart";
+import { compareList, removeFromCompare, clearCompare } from "../../services/compare";
+import { addToCart } from "../../services/cart";
 import { toast } from "vue3-toastify";
 
 const router = useRouter();

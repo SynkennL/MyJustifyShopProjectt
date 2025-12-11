@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
-import { apiGet, apiPost } from "../services/api";
-import { addToCart } from "../services/cart";
+import { apiGet, apiPost } from "../../services/api";
+import { addToCart } from "../../services/cart";
 import { toast } from "vue3-toastify";
 
 const route = useRoute();
