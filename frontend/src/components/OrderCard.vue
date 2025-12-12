@@ -64,7 +64,7 @@ function handleStatusChange(event: Event) {
 
 <template>
   <Card padding="md" hover>
-    <div class="flex items-start gap-4">
+    <div class="flex items-start gap-5 space-y-4">
       <img :src="getFirstImage(order.image_url)" alt="Ürün" class="w-24 h-24 object-cover rounded-lg" />
       <div class="flex-1">
         <h3 class="font-semibold text-lg">{{ order.product_title }}</h3>
@@ -72,12 +72,12 @@ function handleStatusChange(event: Event) {
           {{ type === 'sold' ? 'Alıcı:' : 'Satıcı:' }} 
           {{ type === 'sold' ? order.buyer_email : order.seller_email }}
         </p>
-        <p class="text-gray-600 text-sm">📦 Adet: {{ order.quantity }}</p>
+        <p class="text-gray-600 text-sm">Adet: {{ order.quantity }}</p>
         <p v-if="order.sizes && order.sizes.length" class="text-gray-600 text-sm">
           Bedenler: {{ order.sizes.join(", ") }}
         </p>
-        <p class="font-bold text-lg mt-1">💰 {{ order.total_price }} TL</p>
-        <p class="text-gray-500 text-xs mt-1">📅 {{ formatDate(order.created_at) }}</p>
+        <p class="font-bold text-lg mt-1">{{ order.total_price }} TL</p>
+        <p class="text-gray-500 text-xs mt-1">{{ formatDate(order.created_at) }}</p>
       </div>
       <div class="flex flex-col gap-2 min-w-[140px]">
         <span :class="['px-3 py-1 rounded-full text-sm font-medium text-center', getStatusBadge(order.status)]">

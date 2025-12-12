@@ -230,18 +230,17 @@ const handleBuyNow = async () => {
           <label 
             v-for="size in features.sizes" 
             :key="size"
-            class="inline-flex items-center text-xs cursor-pointer"
+            class="inline-flex items-center text-xs"
           >
-            <input 
-              type="radio" 
-              :value="size" 
-              :checked="selectedSize === size"
-              @change="$emit('update:selectedSize', size)"
-              class="w-3 h-3 rounded mr-1" 
-            />
-            <span>{{ size }}</span>
+            <span class="mr-2 mt-auto bg-gray-300 rounded-md px-2 py-1 hover:px-5 hover:py-1.5 transition-all ">{{ size }}</span>
           </label>
         </div>
+      </div>
+
+      <div v-if="!features?.sizes">
+         <div class="flex flex-wrap gap-1">
+            <span class="mr-1 mt-auto bg-gray-300 rounded-md px-2 py-2 hover:px-3 transition-all ">Mevcut beden yok.</span>
+          </div>
       </div>
 
       <!-- Price -->

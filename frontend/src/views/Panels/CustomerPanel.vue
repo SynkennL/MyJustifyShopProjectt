@@ -152,7 +152,7 @@ function featureEntries(features: any) {
     </Card>
 
     <!-- Benim İlanlarım -->
-    <Card title="🏷️ Benim İlanlarım" :padding="myProducts.length ? 'md' : 'lg'" class="mb-8">
+    <Card title="Benim İlanlarım" :padding="myProducts.length ? 'md' : 'lg'" class="mb-8">
       <p class="text-sm text-gray-600 mb-4">Toplam {{ myProducts.length }} ilan</p>
       
       <EmptyState 
@@ -188,7 +188,7 @@ function featureEntries(features: any) {
     </Card>
 
     <!-- Sattığım Ürünlerin Siparişleri -->
-    <Card title="💼 Sattığım Ürünlerin Siparişleri" padding="md" class="mb-8 bg-blue-50">
+    <Card title="Sattığım Ürünlerin Siparişleri" padding="md" class="mb-8 bg-blue-50">
       <p class="text-sm text-gray-600 mb-4">Sizin ilanlarınızdan satın alınan ürünler ({{ soldOrders.length }} sipariş)</p>
       
       <EmptyState 
@@ -209,7 +209,7 @@ function featureEntries(features: any) {
     </Card>
 
     <!-- Satın Aldığım Siparişler -->
-    <Card title="🛒 Satın Aldığım Siparişler" padding="md" class="bg-purple-50">
+    <Card title="Satın Aldığım Siparişler" padding="md" class="bg-purple-50">
       <p class="text-sm text-gray-600 mb-4">Başka satıcılardan satın aldığınız ürünler ({{ purchasedOrders.length }} sipariş)</p>
       
       <EmptyState 
