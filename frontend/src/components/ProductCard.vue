@@ -251,10 +251,10 @@ const handleBuyNow = async () => {
 
       <!-- Actions -->
       <div v-if="showActions && !isOwned" class="flex gap-2">
-        <Button flex variant="primary" size="md" @click="handleAddToCart">
+        <Button flex variant="primary" size="sm" @click="handleAddToCart">
           Sepete Ekle
         </Button>
-        <Button flex variant="success" size="sm" @click="handleBuyNow">
+        <Button flex variant="success" size="md" @click="handleBuyNow">
           Satın Al
         </Button>
       </div>
