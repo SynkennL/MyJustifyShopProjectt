@@ -153,7 +153,7 @@ const handleBuyNow = async () => {
 </script>
 
 <template>
-  <RouterLink :to="`/urun/${product.id}`" class="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg transition relative group flex flex-col h-full">
+  <div class="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg transition relative group flex flex-col h-full">
     <!-- Badges -->
     <div v-if="product.total_sales" class="absolute top-2 right-2 z-10 bg-red-500 text-white text-xs font-semibold px-2 py-1 rounded">
       {{ product.total_sales }} Satış
@@ -259,5 +259,5 @@ const handleBuyNow = async () => {
         </Button>
       </div>
     </div>
-  </RouterLink>
+  </div>
 </template>
