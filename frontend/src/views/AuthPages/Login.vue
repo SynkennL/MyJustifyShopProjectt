@@ -6,7 +6,9 @@ import { toast } from "vue3-toastify";
 import { removeOwnedProductsFromCart } from "../../services/cart";
 import Button from "../../components/common/Button.vue";
 import Input from "../../components/common/Input.vue";
-import Card from "../../components/common/Card.vue";
+import AuthLayout from "./components/AuthLayout.vue";
+import AuthFormHeader from "./components/AuthFormHeader.vue";
+import AuthFooter from "./components/AuthFooter.vue";
 
 const router = useRouter();
 const email = ref("");
@@ -44,53 +46,53 @@ async function submit() {
 </script>
 
 <template>
-  <div class="flex items-center justify-center min-h-[80vh] px-4">
-    <Card class="w-full max-w-lg" padding="lg">
-      <div class="text-center mb-8">
-        <h1 class="text-3xl font-bold text-slate-900 mb-2">Giriş Yap</h1>
-        <p class="text-gray-600">Hesabınıza erişmek için giriş yapın</p>
-      </div>
+  <AuthLayout max-width="md">
+    <!-- Header -->
+    <AuthFormHeader
+      title="Giriş Yap"
+      description="Hesabınıza erişmek için giriş yapın"
+      icon="login"
+    />
 
-      <form @submit.prevent="submit" class="space-y-4">
-        <Input
-          v-model="email"
-          type="email"
-          label="E-posta"
-          placeholder="ornek@email.com"
-          required
-          autocomplete="email"
-        />
+    <!-- Login Form -->
+    <form @submit.prevent="submit" class="space-y-4">
+      <Input
+        v-model="email"
+        type="email"
+        label="E-posta"
+        placeholder="ornek@email.com"
+        required
+        autocomplete="email"
+      />
 
-        <Input
-          v-model="password"
-          type="password"
-          label="Şifre"
-          placeholder="Şifrenizi girin"
-          required
-          autocomplete="current-password"
-        />
+      <Input
+        v-model="password"
+        type="password"
+        label="Şifre"
+        placeholder="Şifrenizi girin"
+        required
+        autocomplete="current-password"
+      />
 
-        <p v-if="error" class="text-red-500 text-sm bg-red-50 py-2 px-4 rounded-lg border border-red-200">
-          {{ error }}
-        </p>
+      <!-- Error Message -->
+      <p v-if="error" class="text-red-500 text-sm bg-red-50 py-2 px-4 rounded-lg border border-red-200">
+        {{ error }}
+      </p>
 
-        <Button 
-          type="submit" 
-          variant="primary" 
-          size="lg" 
-          full-width
-          :loading="loading"
-        >
-          Giriş Yap
-        </Button>
+      <!-- Submit Button -->
+      <Button 
+        type="submit" 
+        variant="primary" 
+        size="lg" 
+        full-width
+        :loading="loading"
+      >
+        Giriş Yap
+      </Button>
+    </form>
 
-        <p class="text-center text-sm text-gray-600 mt-4">
-          Hesabınız yok mu?
-          <RouterLink to="/register" class="font-semibold text-slate-900 hover:underline ml-1">
-            Kayıt Olun
-          </RouterLink>
-        </p>
-      </form>
-    </Card>
-  </div>
+
+    <!-- Footer -->
+    <AuthFooter type="login" />
+  </AuthLayout>
 </template>
