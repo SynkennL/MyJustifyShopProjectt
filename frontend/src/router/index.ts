@@ -1,5 +1,7 @@
 import { createWebHistory, createRouter } from 'vue-router'
 
+import MainLayout from '../layouts/MainLayout.vue'
+
 import HomeView from '../views/MainPages/Home.vue'
 import AboutView from '../views/MainPages/About.vue'
 import ContactView from '../views/MainPages/Contact.vue'
@@ -15,20 +17,77 @@ import CompareView from '../views/UserPages/CompareView.vue'
 import ProfileView from '../views/UserPages/ProfileView.vue'
 
 const routes = [
-  { path: '/', component: HomeView },
-  { path: '/hakkimizda', component: AboutView },
-  { path: '/iletisim', component: ContactView },
-  { path: '/login', component: LoginView },
-  { path: '/register', component: RegisterView },
-  { path: '/admin', component: AdminView },
-  { path: '/customer-panel', component: CustomerPanel },
-  { path: "/cart", name: "Cart", component: CartView },
-  { path: "/kategori/:name", name: "category", component: CategoryView },
-  { path: "/urun/:id", name: "ProductDetail", component: ProductDetailView },
-  { path: '/favorilerim', component: FavoritesView },
-  { path: '/karsilastir', name: 'Compare', component: CompareView },
-  { path: '/profil', name: 'Profile', component: ProfileView }
-
+  {
+    path: '/',
+    component: MainLayout,
+    children: [
+      { 
+        path: '', 
+        name: 'Home',
+        component: HomeView 
+      },
+      { 
+        path: 'hakkimizda',
+        name: 'About', 
+        component: AboutView 
+      },
+      { 
+        path: 'iletisim',
+        name: 'Contact', 
+        component: ContactView 
+      },
+      { 
+        path: 'kategori/:name', 
+        name: 'Category', 
+        component: CategoryView 
+      },
+      { 
+        path: 'urun/:id', 
+        name: 'ProductDetail', 
+        component: ProductDetailView 
+      },
+      { 
+        path: 'favorilerim',
+        name: 'Favorites', 
+        component: FavoritesView 
+      },
+      { 
+        path: 'karsilastir', 
+        name: 'Compare', 
+        component: CompareView 
+      },
+      { 
+        path: 'cart', 
+        name: 'Cart', 
+        component: CartView 
+      },
+      { 
+        path: 'profil', 
+        name: 'Profile', 
+        component: ProfileView 
+      },
+      { 
+        path: 'customer-panel',
+        name: 'CustomerPanel', 
+        component: CustomerPanel 
+      },
+      { 
+        path: 'admin',
+        name: 'Admin', 
+        component: AdminView 
+      },
+    ]
+  },
+  {
+    path: '/login',
+    name: 'Login',
+    component: LoginView
+  },
+  {
+    path: '/register',
+    name: 'Register',
+    component: RegisterView
+  }
 ]
 
 export const router = createRouter({
