@@ -228,7 +228,7 @@ const handleBuyNow = async () => {
 
       <div v-if="!features?.sizes">
         <div class="flex flex-wrap gap-1">
-          <span class="mr-1 mt-auto bg-gray-300 rounded-md px-2 py-2 hover:px-3 transition-all ">Mevcut beden
+          <span class="mr-1 mt-auto bg-gray-300 rounded-md px-2 py-2 hover:px-3 transition-all z-20">Mevcut beden
             yok.</span>
         </div>
       </div>
