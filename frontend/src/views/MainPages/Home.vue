@@ -2,10 +2,10 @@
 import { ref, onMounted, reactive } from "vue";
 import { apiGet } from "../../services/api";
 import { loadFavoriteIds } from "../../services/favorites";
-import ProductCard from "../../components/ProductCard.vue";
-import EmptyState from "../../components/EmptyState.vue";
-import LoadingSpinner from "../../components/LoadingSpinner.vue";
-import Button from "../../components/Button.vue";
+import ProductCard from "../../components/product/ProductCard.vue";
+import EmptyState from "../../components/common/EmptyState.vue";
+import LoadingSpinner from "../../components/common/LoadingSpinner.vue";
+import Button from "../../components/common/Button.vue";
 
 const popularProducts = ref<any[]>([]);
 const categoryProducts = ref<any[]>([]);

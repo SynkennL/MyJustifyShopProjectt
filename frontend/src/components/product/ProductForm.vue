@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { ref } from 'vue';
-import Button from './Button.vue';
-import Input from './Input.vue';
-import Card from './Card.vue';
+import Button from '../common/Button.vue';
+import Input from '../common/Input.vue';
+import Card from '../common/Card.vue';
 
 interface ProductFormData {
   title: string;

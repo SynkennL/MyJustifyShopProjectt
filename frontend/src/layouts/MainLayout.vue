@@ -11,8 +11,8 @@
 </template>
 
 <script setup lang="ts">
-import Navbar from '../components/Navbar.vue'
-import Footer from '../components/Footer.vue'
-import Announcement from '../components/Announcement.vue'
-import CookieConsent from '../components/CookieConsent.vue'
+import Navbar from '../components/layout/Navbar.vue'
+import Footer from '../components/layout/Footer.vue'
+import Announcement from '../components/layout/Announcement.vue'
+import CookieConsent from '../components/features/CookieConsent.vue'
 </script>

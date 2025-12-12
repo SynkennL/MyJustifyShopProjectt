@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { ref } from "vue";
-import Button from "../../components/Button.vue";
-import Input from "../../components/Input.vue";
-import Card from "../../components/Card.vue";
-import PageHeader from "../../components/PageHeader.vue";
+import Button from "../../components/common/Button.vue";
+import Input from "../../components/common/Input.vue";
+import Card from "../../components/common/Card.vue";
+import PageHeader from "../../components/layout/PageHeader.vue";
 
 const name = ref("");
 const email = ref("");

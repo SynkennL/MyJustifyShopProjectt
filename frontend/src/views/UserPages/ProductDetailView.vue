@@ -4,9 +4,9 @@ import { useRoute, useRouter } from "vue-router";
 import { apiGet, apiPost } from "../../services/api";
 import { addToCart } from "../../services/cart";
 import { toast } from "vue3-toastify";
-import Button from "../../components/Button.vue";
-import LoadingSpinner from "../../components/LoadingSpinner.vue";
-import Card from "../../components/Card.vue";
+import Button from "../../components/common/Button.vue";
+import LoadingSpinner from "../../components/common/LoadingSpinner.vue";
+import Card from "../../components/common/Card.vue";
 
 const route = useRoute();
 const router = useRouter();

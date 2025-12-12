@@ -4,10 +4,10 @@ import { useRouter } from "vue-router";
 import { cart, clearCart } from "../../services/cart";
 import { apiPost } from "../../services/api";
 import { toast } from "vue3-toastify";
-import Button from "../../components/Button.vue";
-import EmptyState from "../../components/EmptyState.vue";
-import Card from "../../components/Card.vue";
-import PageHeader from "../../components/PageHeader.vue";
+import Button from "../../components/common/Button.vue";
+import EmptyState from "../../components/common/EmptyState.vue";
+import Card from "../../components/common/Card.vue";
+import PageHeader from "../../components/layout/PageHeader.vue";
 
 const router = useRouter();
 

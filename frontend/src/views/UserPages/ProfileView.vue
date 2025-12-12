@@ -3,10 +3,10 @@ import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import { apiPatch } from "../../services/api";
 import { toast } from "vue3-toastify";
-import Button from "../../components/Button.vue";
-import Input from "../../components/Input.vue";
-import Card from "../../components/Card.vue";
-import PageHeader from "../../components/PageHeader.vue";
+import Button from "../../components/common/Button.vue";
+import Input from "../../components/common/Input.vue";
+import Card from "../../components/common/Card.vue";
+import PageHeader from "../../components/layout/PageHeader.vue";
 
 const router = useRouter();
 const user = ref<any>(null);

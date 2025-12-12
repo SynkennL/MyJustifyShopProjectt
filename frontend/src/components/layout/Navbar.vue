@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { ref, onMounted, watch, computed } from 'vue'
 import { RouterLink, useRouter } from 'vue-router'
-import { cart, clearGuestCart } from "../services/cart";
-import { favoriteIds, loadFavoriteIds, clearFavorites } from "../services/favorites";
-import { compareList } from "../services/compare";
-import { apiGet } from "../services/api";
+import { cart, clearGuestCart } from "../../services/cart";
+import { favoriteIds, loadFavoriteIds, clearFavorites } from "../../services/favorites";
+import { compareList } from "../../services/compare";
+import { apiGet } from "../../services/api";
 
 const isMobileMenuOpen = ref(false)
 const isDropdownOpenMobile = ref(false)
@@ -155,7 +155,7 @@ onMounted(() => {
         
         <!-- Logo -->
         <RouterLink to="/" class="flex-shrink-0">
-          <img src="../assets/justlogopurplee.png" class="h-32 mt-3 w-auto hover:opacity-90 transition-opacity" alt="JustifyShop" />
+          <img src="../../assets/justlogopurplee.png" class="h-32 mt-3 w-auto hover:opacity-90 transition-opacity" alt="JustifyShop" />
         </RouterLink>
 
         <!-- Desktop Navigation -->

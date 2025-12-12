@@ -3,11 +3,11 @@ import { ref, onMounted, reactive } from "vue";
 import { useRouter } from "vue-router";
 import { apiGet } from "../../services/api";
 import { toast } from "vue3-toastify";
-import ProductCard from "../../components/ProductCard.vue";
-import EmptyState from "../../components/EmptyState.vue";
-import LoadingSpinner from "../../components/LoadingSpinner.vue";
-import PageHeader from "../../components/PageHeader.vue";
-import Button from "../../components/Button.vue";
+import ProductCard from "../../components/product/ProductCard.vue";
+import EmptyState from "../../components/common/EmptyState.vue";
+import LoadingSpinner from "../../components/common/LoadingSpinner.vue";
+import PageHeader from "../../components/layout/PageHeader.vue";
+import Button from "../../components/common/Button.vue";
 
 const router = useRouter();
 const favorites = ref<any[]>([]);

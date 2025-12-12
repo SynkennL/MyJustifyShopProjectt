@@ -3,12 +3,12 @@ import { ref, onMounted } from "vue";
 import { apiGet, apiPost, apiDelete, apiPatch } from "../../services/api";
 import { useRouter } from "vue-router";
 import { toast } from "vue3-toastify";
-import Button from "../../components/Button.vue";
-import Card from "../../components/Card.vue";
-import PageHeader from "../../components/PageHeader.vue";
-import EmptyState from "../../components/EmptyState.vue";
-import OrderCard from "../../components/OrderCard.vue";
-import ProductForm from "../../components/ProductForm.vue";
+import Button from "../../components/common/Button.vue";
+import Card from "../../components/common/Card.vue";
+import PageHeader from "../../components/layout/PageHeader.vue";
+import EmptyState from "../../components/common/EmptyState.vue";
+import OrderCard from "../../components/order/OrderCard.vue";
+import ProductForm from "../../components/product/ProductForm.vue";
 
 const router = useRouter();
 const myProducts = ref<any[]>([]);

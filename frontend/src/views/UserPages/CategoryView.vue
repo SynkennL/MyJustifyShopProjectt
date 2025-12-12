@@ -3,9 +3,9 @@ import { ref, onMounted, watch, reactive } from "vue";
 import { useRoute } from "vue-router";
 import { apiGet } from "../../services/api";
 import { loadFavoriteIds } from "../../services/favorites";
-import ProductCard from "../../components/ProductCard.vue";
-import EmptyState from "../../components/EmptyState.vue";
-import PageHeader from "../../components/PageHeader.vue";
+import ProductCard from "../../components/product/ProductCard.vue";
+import EmptyState from "../../components/common/EmptyState.vue";
+import PageHeader from "../../components/layout/PageHeader.vue";
 
 const route = useRoute();
 const categorySlug = ref(String(route.params.name));

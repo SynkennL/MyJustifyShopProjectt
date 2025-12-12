@@ -4,9 +4,9 @@ import { useRouter } from "vue-router";
 import { compareList, removeFromCompare, clearCompare } from "../../services/compare";
 import { addToCart } from "../../services/cart";
 import { toast } from "vue3-toastify";
-import Button from "../../components/Button.vue";
-import EmptyState from "../../components/EmptyState.vue";
-import PageHeader from "../../components/PageHeader.vue";
+import Button from "../../components/common/Button.vue";
+import EmptyState from "../../components/common/EmptyState.vue";
+import PageHeader from "../../components/layout/PageHeader.vue";
 
 const router = useRouter();
 

@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { useRouter } from 'vue-router';
-import { addToCart } from '../services/cart';
-import { isFavorite, toggleFavorite } from '../services/favorites';
-import { addToCompare, removeFromCompare, isInCompare, MAX_COMPARE, compareList } from '../services/compare';
-import { apiPost } from '../services/api';
+import { addToCart } from '../../services/cart';
+import { isFavorite, toggleFavorite } from '../../services/favorites';
+import { addToCompare, removeFromCompare, isInCompare, MAX_COMPARE, compareList } from '../../services/compare';
+import { apiPost } from '../../services/api';
 import { toast } from 'vue3-toastify';
-import Button from './Button.vue';
+import Button from '../common/Button.vue';
 
 interface Props {
   product: any;
