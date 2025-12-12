@@ -43,8 +43,8 @@ const firstImage = computed(() => {
 
 const features = computed(() => {
   if (!props.product.features) return null;
-  const f = typeof props.product.features === 'string' 
-    ? JSON.parse(props.product.features) 
+  const f = typeof props.product.features === 'string'
+    ? JSON.parse(props.product.features)
     : props.product.features;
   return f;
 });
@@ -153,71 +153,62 @@ const handleBuyNow = async () => {
 </script>
 
 <template>
-  <div class="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg transition relative group flex flex-col h-full">
+  <div
+    class="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg transition relative group flex flex-col h-full">
+    <RouterLink :to="`/urun/${product.id}`" class="absolute inset-0 z-0"></RouterLink>
+
     <!-- Badges -->
-    <div v-if="product.total_sales" class="absolute top-2 right-2 z-10 bg-red-500 text-white text-xs font-semibold px-2 py-1 rounded">
+    <div v-if="product.total_sales"
+      class="absolute top-2 right-2 z-10 bg-red-500 text-white text-xs font-semibold px-2 py-1 rounded">
       {{ product.total_sales }} Satış
     </div>
 
     <!-- Favorite Button -->
-    <button 
-      v-if="showFavorite"
-      @click.prevent="handleFavoriteToggle"
+    <button v-if="showFavorite" @click.prevent="handleFavoriteToggle"
       class="absolute top-2 left-2 z-10 bg-white/90 hover:bg-white p-2 rounded-full shadow-lg transition"
-      title="Favorilere ekle"
-    >
-      <svg 
-        class="w-5 h-5" 
-        :class="isFavorite(product.id) ? 'text-red-500 fill-current' : 'text-gray-400'"
-        fill="none" 
-        stroke="currentColor" 
-        viewBox="0 0 24 24"
-      >
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+      title="Favorilere ekle">
+      <svg class="w-5 h-5" :class="isFavorite(product.id) ? 'text-red-500 fill-current' : 'text-gray-400'" fill="none"
+        stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
       </svg>
     </button>
 
     <!-- Compare Button -->
-    <button 
-      v-if="showCompare"
-      @click.prevent="handleCompareToggle"
-      :title="isInCompare(product.id) ? 'Karşılaştırmadan çıkar' : 'Karşılaştırmaya ekle'"
-      :class="[
+    <button v-if="showCompare" @click.prevent="handleCompareToggle"
+      :title="isInCompare(product.id) ? 'Karşılaştırmadan çıkar' : 'Karşılaştırmaya ekle'" :class="[
         'absolute top-14 left-2 z-10 p-2 rounded-full shadow-lg transition-all',
-        isInCompare(product.id) 
-          ? 'bg-blue-500 text-white hover:bg-blue-600' 
+        isInCompare(product.id)
+          ? 'bg-blue-500 text-white hover:bg-blue-600'
           : 'bg-white/90 hover:bg-white text-gray-600 hover:text-blue-600'
-      ]"
-    >
-      <svg class="w-5 h-5" :class="{ 'fill-current': isInCompare(product.id) }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+      ]">
+      <svg class="w-5 h-5" :class="{ 'fill-current': isInCompare(product.id) }" fill="none" stroke="currentColor"
+        viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
       </svg>
     </button>
 
     <!-- Product Image -->
     <div class="relative overflow-hidden aspect-square">
-      <img :src="firstImage" :alt="product.title" class="w-full h-full object-cover" />
+      <RouterLink :to="`/urun/${product.id}`">
+        <img :src="firstImage" :alt="product.title" class="w-full h-full object-cover z-20" />
+      </RouterLink>
     </div>
 
     <!-- Product Info -->
     <div class="p-3 flex flex-col flex-1">
-      <RouterLink 
-        :to="`/urun/${product.id}`" 
-        class="font-semibold text-sm hover:text-blue-600 text-gray-900 mb-1 line-clamp-2 min-h-[40px]"
-      >
+      <RouterLink :to="`/urun/${product.id}`"
+        class="font-semibold text-sm hover:text-blue-600 text-gray-900 mb-1 line-clamp-2 min-h-[40px] z-20">
         {{ product.title }}
       </RouterLink>
-      
+
       <p class="text-xs text-gray-500 mb-2 line-clamp-1">{{ product.description }}</p>
 
       <!-- Features -->
       <div v-if="displayFeatures.length" class="mb-2">
         <div class="flex flex-wrap gap-1">
-          <span 
-            v-for="[key, value] in displayFeatures" 
-            :key="key"
-            class="text-xs bg-gray-100 px-2 py-0.5 rounded"
-          >
+          <span v-for="[key, value] in displayFeatures" :key="key" class="text-xs bg-gray-100 px-2 py-0.5 rounded">
             {{ key }}: {{ value }}
           </span>
         </div>
@@ -227,20 +218,19 @@ const handleBuyNow = async () => {
       <div v-if="features?.sizes" class="mb-2">
         <label class="text-xs text-gray-600 block mb-1">Beden:</label>
         <div class="flex flex-wrap gap-1">
-          <label 
-            v-for="size in features.sizes" 
-            :key="size"
-            class="inline-flex items-center text-xs"
-          >
-            <span class="mr-2 mt-auto bg-gray-300 rounded-md px-2 py-1 hover:px-5 hover:py-1.5 transition-all ">{{ size }}</span>
+          <label v-for="size in features.sizes" :key="size" class="inline-flex items-center text-xs">
+            <span class="mr-2 mt-auto bg-gray-300 rounded-md px-2 py-1 hover:px-5 hover:py-1.5 transition-all z-20 ">{{
+              size
+            }}</span>
           </label>
         </div>
       </div>
 
       <div v-if="!features?.sizes">
-         <div class="flex flex-wrap gap-1">
-            <span class="mr-1 mt-auto bg-gray-300 rounded-md px-2 py-2 hover:px-3 transition-all ">Mevcut beden yok.</span>
-          </div>
+        <div class="flex flex-wrap gap-1">
+          <span class="mr-1 mt-auto bg-gray-300 rounded-md px-2 py-2 hover:px-3 transition-all ">Mevcut beden
+            yok.</span>
+        </div>
       </div>
 
       <!-- Price -->
@@ -250,7 +240,7 @@ const handleBuyNow = async () => {
       </div>
 
       <!-- Actions -->
-      <div v-if="showActions && !isOwned" class="flex gap-2">
+      <div v-if="showActions && !isOwned" class="flex gap-2 z-20">
         <Button flex variant="primary" size="sm" @click="handleAddToCart">
           Sepete Ekle
         </Button>
