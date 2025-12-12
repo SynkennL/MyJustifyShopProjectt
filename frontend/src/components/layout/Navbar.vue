@@ -155,7 +155,7 @@ onMounted(() => {
         
         <!-- Logo -->
         <RouterLink to="/" class="flex-shrink-0">
-          <img src="../../assets/justlogopurplee.png" class="h-32 mt-3 w-auto hover:opacity-90 transition-opacity" alt="JustifyShop" />
+          <img src="../../assets/icon/justlogopurplee.png" class="h-32 mt-3 w-auto hover:opacity-90 transition-opacity" alt="JustifyShop" />
         </RouterLink>
 
         <!-- Desktop Navigation -->
