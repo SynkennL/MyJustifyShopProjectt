@@ -1,11 +1,13 @@
 <template>
-  <div>
-    <Announcement />
-    <Navbar />
-    <router-view />
-    <Footer />
-    <CookieConsent />
-  </div>
+    <div>
+        <Announcement />
+        <Navbar />
+        <div class="max-w-7xl mx-auto px-4 py-6">
+            <router-view />
+        </div>
+        <Footer />
+        <CookieConsent />
+    </div>
 </template>
 
 <script setup lang="ts">
