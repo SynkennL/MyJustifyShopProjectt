@@ -43,19 +43,22 @@ const inputClasses = computed(() => {
       <span v-if="required" class="text-red-600">*</span>
     </label>
     
-    <input
-      :type="type"
-      :value="modelValue"
-      @input="emit('update:modelValue', ($event.target as HTMLInputElement).value)"
-      :placeholder="placeholder"
-      :required="required"
-      :disabled="disabled"
-      :min="min"
-      :max="max"
-      :maxlength="maxlength"
-      :autocomplete="autocomplete"
-      :class="inputClasses"
-    />
+    <div class="relative">
+      <input
+        :type="type"
+        :value="modelValue"
+        @input="emit('update:modelValue', ($event.target as HTMLInputElement).value)"
+        :placeholder="placeholder"
+        :required="required"
+        :disabled="disabled"
+        :min="min"
+        :max="max"
+        :maxlength="maxlength"
+        :autocomplete="autocomplete"
+        :class="inputClasses"
+      />
+      <slot name="icon" />
+    </div>
     
     <p v-if="error" class="mt-1 text-sm text-red-600">
       {{ error }}
