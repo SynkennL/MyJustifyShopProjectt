@@ -2,7 +2,7 @@ import { createApp } from 'vue'
 import './style.css'
 import App from './App.vue'
 import 'preline'
-import "vue3-toastify/dist/index.css";      // Stil dosyası!
+import "vue3-toastify/dist/index.css";
 import Vue3Toastify from 'vue3-toastify';
 import { router } from './router'
 
