@@ -103,7 +103,7 @@ defineExpose({ resetForm });
 
     <!-- Resim URL'leri -->
     <Card padding="md">
-      <h4 class="font-semibold mb-3 text-gray-700">📷 Ürün Resimleri</h4>
+      <h4 class="font-semibold mb-3 text-gray-700">Ürün Resimleri</h4>
       <div class="flex gap-2 mb-3">
         <Input 
           v-model="newImageUrl" 

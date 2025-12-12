@@ -18,7 +18,7 @@ const emit = defineEmits<{
 </script>
 
 <template>
-  <div class="text-center py-16 bg-white rounded-xl shadow-sm">
+  <div class="text-center py-16 bg-white rounded-xl">
     <h2 class="text-2xl font-bold text-gray-900 mb-2">{{ title }}</h2>
     <p v-if="description" class="text-gray-600 mb-6">{{ description }}</p>
     

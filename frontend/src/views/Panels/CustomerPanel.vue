@@ -140,25 +140,14 @@ function featureEntries(features: any) {
       <template #actions>
         <div class="flex justify-end mt-4">
           <Button v-if="userRole === 'admin'" @click="router.push('/admin')">
-            🛠️ Admin Yönetim Paneli
+           Admin Yönetim Paneli
           </Button>
         </div>
       </template>
     </PageHeader>
 
-    <div v-if="userRole === 'admin'" class="mb-6 p-4 bg-indigo-50 border border-indigo-200 rounded-lg">
-      <div class="flex items-start gap-3">
-        <svg class="w-5 h-5 text-indigo-600 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
-        <div class="text-sm text-indigo-800">
-          <strong>Yönetici Olarak:</strong> Kendi ürünlerinizi satabilir, alabilir ve yönetebilirsiniz. Ayrıca tüm kullanıcıların ürünlerini ve kategorileri yönetmek için yukarıdaki "Admin Yönetim Paneli" butonuna tıklayın.
-        </div>
-      </div>
-    </div>
-
     <!-- Yeni İlan Ekle -->
-    <Card title="📦 Yeni İlan Ekle" padding="md" class="mb-8 bg-green-50">
+    <Card title="Yeni İlan Ekle" padding="md" class="mb-8 bg-green-50">
       <ProductForm :categories="categories" @submit="handleProductSubmit" />
     </Card>
 

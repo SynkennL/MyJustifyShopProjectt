@@ -69,7 +69,7 @@ function handleStatusChange(event: Event) {
       <div class="flex-1">
         <h3 class="font-semibold text-lg">{{ order.product_title }}</h3>
         <p class="text-gray-600 text-sm">
-          {{ type === 'sold' ? '✉️ Alıcı:' : '🏪 Satıcı:' }} 
+          {{ type === 'sold' ? 'Alıcı:' : 'Satıcı:' }} 
           {{ type === 'sold' ? order.buyer_email : order.seller_email }}
         </p>
         <p class="text-gray-600 text-sm">📦 Adet: {{ order.quantity }}</p>
